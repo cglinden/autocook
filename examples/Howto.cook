@@ -1,0 +1,37 @@
+/* Top level "cook" file. See "b help" for details */
+
+/*============================================================*
+ * Supported platforms mean build platforms,                  *
+ * not necessarily target platforms                           *
+ *============================================================*/
+supported_platforms =
+ default_platform
+;
+
+/*============================================================*
+ * Variants can mean whatever you want them to mean.          *
+ * The first listed variant is the default variant            *
+ *============================================================*/
+supported_variants =
+ debug          /* default variant */
+ optimized
+;
+
+/*============================================================*
+ * The following environment variables are sensitive and will *
+ * cleared during a normal build. You can override this       *
+ * behaviour by using the "myenv" target.                     *
+ *============================================================*/
+sensitive_env_vars =
+ JAVA_HOME
+ CDPATH
+ CLASSPATH
+ ANT_HOME
+ JAVA5_HOME
+ LITMUS_HOME
+ JWSDP_HOME
+ JBOSS_HOME
+;
+
+#include "autobuild/include/main"
+

@@ -1,0 +1,48 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1991-1993, 1996, 1997, 2000, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Supplied Cookbooks
+.\"
+.H 1 "Supplied Cookbooks"
+A number of cookbooks are supplied with
+.BR cook .
+To make use of one, a preprocessor directive of the form
+.eB
+#include "\f(CIwhichone\fP"
+.eE
+must appear at the start of your cookbook.
+.P
+.B Cook
+does not have any "built-in" recipes.
+All recipes are stored in text files,
+so they are more easily read, understood, copied, hacked or corrected.
+The supplied cookbooks live in the
+.I \*[datadir]
+directory.
+.P
+You may supply your own "system" recipes,
+by placing cookbooks into a directory called
+.IR $HOME/.cook
+or using the
+.B -Include
+command line option,
+possibly in your
+.I $COOK
+environment variable.
+.so system.list.so

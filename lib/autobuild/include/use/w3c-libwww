@@ -1,0 +1,57 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+w3c-libwww_dir = [thirdparty]/[variant]/[unix]/w3c-libwww;
+w3c-libwww_cpp_I_flags = -I[w3c-libwww_dir]/include -I[w3c-libwww_dir]/include/w3c-libwww;
+w3c-libwww_cpp_D_flags = -DHAVE_CONFIG_H;
+w3c-libwww_cc_I_flags  = -I[w3c-libwww_dir]/include -I[w3c-libwww_dir]/include/w3c-libwww;
+w3c-libwww_cc_D_flags  = -DHAVE_CONFIG_H;
+w3c-libwww_external_lib  = 
+  [w3c-libwww_dir]/lib/libmd5.so
+  [w3c-libwww_dir]/lib/libpics.so
+  [w3c-libwww_dir]/lib/libwwwapp.so
+  [w3c-libwww_dir]/lib/libwwwcache.so
+  [w3c-libwww_dir]/lib/libwwwcore.so
+  [w3c-libwww_dir]/lib/libwwwdir.so
+  [w3c-libwww_dir]/lib/libwwwfile.so
+  [w3c-libwww_dir]/lib/libwwwftp.so
+  [w3c-libwww_dir]/lib/libwwwgopher.so
+  [w3c-libwww_dir]/lib/libwwwhtml.so
+  [w3c-libwww_dir]/lib/libwwwhttp.so
+  [w3c-libwww_dir]/lib/libwwwinit.so
+  [w3c-libwww_dir]/lib/libwwwmime.so
+  [w3c-libwww_dir]/lib/libwwwmux.so
+  [w3c-libwww_dir]/lib/libwwwnews.so
+  [w3c-libwww_dir]/lib/libwwwstream.so
+  [w3c-libwww_dir]/lib/libwwwtelnet.so
+  [w3c-libwww_dir]/lib/libwwwtrans.so
+  [w3c-libwww_dir]/lib/libwwwutils.so
+  [w3c-libwww_dir]/lib/libwwwxml.so
+  [w3c-libwww_dir]/lib/libxmlparse.so
+  [w3c-libwww_dir]/lib/libxmltok.so
+;
+
+/* explicit dependency to the tarball - use only
+ * if there is a tarball - duh...
+ */
+
+w3c-libwww_use_dependency = ADD [__FILE__]':'[__LINE__] [__FILE__];
+w3c-libwww_thirdparty_deps = [thirdparty]/[variant]/[unix]/w3c-libwww[tar_suffix];

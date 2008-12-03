@@ -1,0 +1,103 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+
+/*--- filename suffixes, infixes, prefixes etc... --------------*/
+as_suffix       = .s;
+bat_suffix      = .bat;
+bat_include_suffix = .bat-inc;
+bin_suffix      = ;
+bindep_suffix   = .bd;
+bison_infix     = .tab;
+bison_suffix    = .y;
+bisonpp_suffix  = .ypp;
+c_suffix        = .c;
+class_suffix    = .class;
+cpp_suffix      = .cpp;
+dpp_suffix      = .dpp;
+ddep_suffix     = .dd;
+dep_suffix      = .d;
+dtd_suffix      = .dtd;
+esql_suffix     = .pc;
+flex_prefix     = lex.;
+flex_suffix     = .l;
+gif_suffix	= .gif;
+h_suffix        = .h;
+hpp_suffix      = .hpp;
+jar_suffix      = .jar;
+java_suffix     = .java;
+jdep_suffix     = .jd;
+jjdep_suffix    = .jjd;
+ksh_suffix      = .ksh;
+lib_prefix      = lib;
+lib_suffix      = .a;
+libdep_suffix   = .ld;
+lint_suffix     = .lob;
+linto_suffix    = .lint-output;
+lints_suffix    = .lint-date;
+need_suffix     = .need;
+why_suffix      = .why;
+how_suffix      = .how.sh;
+error_suffix    = .errors;
+obj_suffix      = .o;
+old_suffix      = .old;
+pl_suffix       = .pl;
+pm_suffix       = .pm;
+rpm_suffix      = .rpm;
+rpmbuild_suffix = .rpmbuild-output;
+rpminstall_suffix = .rpminstall-output;
+spec_suffix     = .spec;
+spec_include_suffix = .spec-inc;
+template_suffix = .template;
+pkg_suffix      = .pkg;
+pkgdep_suffix   = .pd;
+sh_include_suffix=.sh-inc;
+sh_suffix       = .sh;
+so_suffix       = .so;
+tar_suffix      = .tar.gz;
+test_prefix     = test_;
+tsort_suffix    = .sd;
+xml_suffix      = .xml;
+xml_include_suffix = .xml-inc;
+zip_suffix      = .zip;
+gzip_suffix     = .gz;
+
+prototype_name  = prototype;
+prototype_generator  = mkproto[sh_suffix];
+labelfile_name  = label;
+container_name  = pkg_stream;
+perl_makefile   = Makefile.PL;
+perl_manifest   = MANIFEST;
+perl_symlinklog = _symlinks;
+perl_buildlog   = _buildlog;
+
+sub_build_script = build[sh_suffix];
+sub_build_log    = build.log;
+sub_build_test   = build.test;
+xcopy_log        = xcopy.log;
+
+pom_file = pom.xml;
+pom_dep  = pom.d;
+maven_compile_log = mvn_compile.log;
+maven_install_log = mvn_install.log;
+
+main = main;
+dummy = dummy;

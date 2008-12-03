@@ -1,0 +1,67 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1998, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.6 features
+.\"
+.PP
+.if n *
+.if t \(bu
+There is a new \fIcook_bom\fP(1) command (Bill Of Materials).
+This may be used to efficiently scan a directory tree for files,
+so that ingredients lists may be produced automatically.
+See \fIcook_bom\fP(1) for more information.
+.PP
+.if n *
+.if t \(bu
+There is a new assign-append statement, so you can now use \f[CW]+=\fP
+to append to the value of a variable.  See the User Guide for more
+information.
+.PP
+.if n *
+.if t \(bu
+There is a new \fIgate-first\fP recipe flag, which causes the recipe gate
+to be evaluated before the ingredients are derived, rather than after.
+.PP
+.if n *
+.if t \(bu
+The \fIc_incl\fP(1) command has a new --interior-files option, so you can
+tell it about include files that don't exist yet.  This is helpful when
+they are generated, \fIi.e.\fP they are interior files of the dependency
+graph, hence the option name.
+.PP
+.if n *
+.if t \(bu
+There is a new [interior-files] function, which returns the files interior
+to the dependency graph (constructed by a recipe), and a complementatry
+[leaf-files] function, which returns the leaf files of the dependency
+graph (not constructed by any recipe).
+.PP
+.if n *
+.if t \(bu
+There is a new ``no-include-cooked-warning'' flag, if you want to suppress
+the warnings about derived file dependencies in include-cooked files.
+.PP
+.if n *
+.if t \(bu
+There is a new \fIrelative_dirname\fP built-in function, similar to the
+existing \fIdirname\fP function, but it returns ``.'' for files with no
+directory part, rather than the absolute path of the current directory.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.6 (1998-Nov-09)

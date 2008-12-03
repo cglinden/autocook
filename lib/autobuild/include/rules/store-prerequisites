@@ -1,0 +1,40 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+
+/* This fragment is at the beginning of almost all build rules:
+ *
+ * Every build target should generate the following files:
+ *
+ *    <target>.need   contains all the prerequisites
+ *    <target>.why    lists those prerequisites which appear out of date
+ *    <target>.how.sh the build script to generate the target
+ *    <target>.errors the combined stdout/stderr of the build script
+ */
+
+[cat] > [target][need_suffix];
+data
+[unsplit "\n" [need]]
+dataend
+[cat] > [target][why_suffix];
+data
+[unsplit "\n" [younger]]
+dataend

@@ -1,0 +1,156 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1997, 1998, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Predefined Variables
+.\"
+.H 1 "Predefined Variables"
+A number of variables are defined by
+.B cook
+at run-time.
+.\" ------------------------------  A  ------------------------------
+.H 2 arg
+This is the arguments list for user-defined functions.  Individual
+arguments are split out into ``@1'' to ``@9''.  These can also be used
+at automatic variables.  Caution: \fIarg\fP and the automatic variables
+are \fIshared\fP for parallel execution, causing weird interactions if
+you execute a command within the function.
+.\" ------------------------------  B  ------------------------------
+.\" ------------------------------  C  ------------------------------
+.H 2 command-line-goals
+The value of this variable is the goals specified on the command line,
+if any.  If none were specified, and the default goal is in effect, the
+value will be empty.
+.\" ------------------------------  D  ------------------------------
+.\" ------------------------------  E  ------------------------------
+.\" ------------------------------  F  ------------------------------
+.H 2 __FILE__
+The value of this variable is the logical name of the
+file which contains it.
+In the case of \f[CW]#include-cooked\fP files,
+the physical name may be obtained using the [resolve] function.
+The logical name may be set using the \f[CW]#line\fP directive.
+.H 2 __FUNCTION__
+The value of this variable is the name of the function which executes it.
+It is not set for the global cookbook scope or the recipe body scope.
+.\" ------------------------------  G  ------------------------------
+.H 2 graph_leaf_file
+File names which are listed in this variable
+could be leaf files of the dependency graph.
+(See also the \fIleaf_files\fP function, for Cook's idea of the leaf files.)
+.H 2 graph_exterior_file
+File names which are listed in this variable
+cannot be present in any way in the dependency graph.
+.H 2 graph_interior_file
+File names which are listed in this variable
+could be interior files of the dependency graph.
+(See also the \fIinterior_files\fP function, for Cook's idea of the
+interior files.)
+.H 2 graph_leaf_pattern
+File names which match the patterns in this variable
+could be leaf files of the dependency graph.
+(See also the \fIleaf_files\fP function, for Cook's idea of the leaf files.)
+.H 2 graph_exterior_pattern
+File names which match the patterns in this variable
+cannot be present in any way in the dependency graph.
+.H 2 graph_interior_pattern
+File names which match the patterns in this variable
+could be interior files of the dependency graph.
+(See also the \fIinterior_files\fP function, for Cook's idea of the
+interior files.)
+.\" ------------------------------  H  ------------------------------
+.\" ------------------------------  I  ------------------------------
+.\" ------------------------------  J  ------------------------------
+.\" ------------------------------  K  ------------------------------
+.\" ------------------------------  L  ------------------------------
+.H 2 __LINE__
+The value of this variable is the line number within of the
+file which contains it.
+The line number may be set using the \f[CW]#line\fP directive.
+.\" ------------------------------  M  ------------------------------
+.\" ------------------------------  N  ------------------------------
+.H 2 need
+The ingredients of the recipe currently being cooked.
+.\" ------------------------------  O  ------------------------------
+.\" ------------------------------  P  ------------------------------
+.H 2 parallel_hosts
+This variable may be set to indicate a list of hosts to use to distribute
+the execution of recipe bodies.
+.H 2 parallel_jobs
+This variable may be set to the number of parallel execution threads to
+perform simultaneously.  Defaults to 1 if not set.
+.H 2 parallel_rsh
+This variable may be set to the command used to execute commands on
+remote machines.  Assumes to take argument in the same form as the
+BSD \fIrsh\fP(1) command.  Defaults to ``\fIrsh\fP'' if not set.
+.\" ------------------------------  Q  ------------------------------
+.\" ------------------------------  R  ------------------------------
+.\" ------------------------------  S  ------------------------------
+.H 2 "search_list"
+This variable may be set to a list of directories to be searched for
+targets and ingredients.
+This list is initially the current directory (.)
+and will always have the current directory prepended if it is not present.
+This is useful when taking partial copies of a source
+to perform controlled updates.
+Use the
+.I "resolve"
+built-in function to determine what file name cook actually found.
+The targets of recipes are always cooked into the current directory.
+.P
+The cookbooks distributed with Cook contain full support for the
+\f[CW]search_list\fP functionality.  They are a good source of examples
+of how to write recipes which take this into account.
+.H 2 self
+The name
+.B cook
+was invoked as,
+usually "cook".
+Be careful what you call cook,
+because anything with the string "cook" in it will be changed,
+including (but not limited to) file suffixes and environment variable names.
+.\" ------------------------------  T  ------------------------------
+.H 2 target
+The target of the recipe currently being cooked,
+or the first target if there is more than one.
+.H 2 targets
+The targets of the recipe currently being cooked.
+This includes all targets of the recipe,
+should there be more than one.
+.H 2 thread-id
+This variable has a unique value for each execution thread, for the
+lifetime of that thread.  This value may be used to construct
+thread-unique variable names, thread-unique temporary file names, or
+anything else that needs to be unique to each execution thread.  The
+thread IDs are re-used, and so several threads in sequence may have the
+same thread ID; it is only guaranteed that no other simultaneous thread
+will have the same thread ID.  By re-using thread IDs, generated
+variable names are also re-used, avoiding memory bloat.
+.\" ------------------------------  U  ------------------------------
+.\" ------------------------------  V  ------------------------------
+.\" ------------------------------  W  ------------------------------
+.\" ------------------------------  X  ------------------------------
+.\" ------------------------------  Y  ------------------------------
+.H 2 younger
+The subset of the ingredients of the recipe currently being cooked
+which are younger than the target.
+.H 2 version
+The version of
+.B cook
+currently executing.
+.\" ------------------------------  Z  ------------------------------

@@ -1,0 +1,285 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1998-2003, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing recipe flags
+.\"
+.H 4 "Recipe Flags"
+The \fIflags\fP are defined as follows.
+.so lang.flags.pic
+Recipe flags are evaluated when the recipe targets are evaluated.  At
+this time, \fInone\fP of the [target], [targets], [need] or [younger]
+variables are set, and neither are any of the pattern matches (%, %1,
+\fIetc\fP) available.
+.P
+A number of flags may be used
+.VL 1i
+.\" ---------------------------------  A  ---------------------------------
+.\" ---------------------------------  B  ---------------------------------
+.\" ---------------------------------  C  ---------------------------------
+.LI clearstat
+The last-modified time of the files named in executed commands will be
+removed from the last-modified time cache.
+This is essential for commands such as
+.IR rm (1)
+and
+.IR mv (1).
+.LI noclearstat
+Do not clear entries from the last-modified time cache.
+This is usually the default.
+.\" ---------------------------------  D  ---------------------------------
+.LI default
+If no targets are specified on the command line,
+the first recipe with the
+.I default
+flag will be used.
+Not meaningful for implicit recipes.
+.LI nodefault
+If no targets are specified on the command line,
+and there are no recipes with the
+.I default
+flag set,
+the first recipe
+.B without
+the
+.I nodefault
+flag will be used.
+Not meaningful for implicit recipes.
+.\" ---------------------------------  E  ---------------------------------
+.LI errok
+Exit status from commands will be ignored.
+.LI noerrok
+If the
+.I noerrok
+flag is specified,
+the commands within the actions bound to the recipe must always be successful.
+This is usually the default.
+.\" ---------------------------------  F  ---------------------------------
+.LI fingerprint
+File fingerprints are used to supplement last-modified time
+information about files,
+which is how
+.I cook
+determines if a file is out-of-date and needs to be cooked.
+If a file appears to have changed,
+from the last-modified time,
+it is fingerprinted,
+and the fingerprint compared with what it was in the past.
+The file has changed if and only if the fingerprint has also changed.
+A cryptographically strong hash is used,
+so the chance of a file edit producing an identical fingerprint is
+less than 1 in 2**200.
+Fingerprinting is disabled by default.
+.LI nofingerprint
+Do not use file fingerprinting.
+This is usually the default.
+.LI forced
+If the
+.I forced
+flag is specified,
+the actions bound to the recipe will always be evaluated.
+.LI noforced
+If the
+.I noforced
+flag is specified,
+the actions bound to the recipe will be evaluated
+when the recipe is logically out-of-date.
+This is usually the default.
+.\" ---------------------------------  G  ---------------------------------
+.LI gate-after-ingredients
+This flags causes the recipe gate to be evaluated after the ingredients
+have been evaluated and determined to be cookable.
+This is usually the default.
+.LI gate-before-ingredients
+This flag causes the recipe gate to be applied before the ingredients
+are evaluated and determined to be cookable.  This is useful if the
+ingredients evaluation itself needs to be conditional.
+.\" ---------------------------------  H  ---------------------------------
+.\" ---------------------------------  I  ---------------------------------
+.LI implicit-ingredients
+.br
+This flag may be used to specify that a recipe's ingredients may be
+satisfied by implicit recipes.  This is usually the default.
+.LI no-implicit-ingredients
+.br
+This flag may be used to specify that a recipe's ingredients may not be
+satisfied by implicit recipes; this is of most use with utilities such as
+RCS where the recipe writer knows that the ingredients cannot be constructed.
+.LI include-cooked-warning
+This flag may be used to enable warnings when the relationship between
+a target and a derived ingredient appears only in a derived cookbook.
+This is usually the default.  This flag is only meaningful at the cookbook
+level, it is not meaningful for individial recipes or commands.
+.LI no-include-cooked-warning
+This flag may be used to disable warnings when the relationship between
+a target and a derived ingredient appears only in a derived cookbook.
+This flag is only meaningful at the cookbook level, it is not meaningful
+for individial recipes or commands.
+.LI ingredients-fingerprint
+This flag may be used to cause recipes to re-trigger when their
+ingredients list chages in any way.  This is especially useful, for
+example, in causing libraries to be rebuilt when a content source file
+is removed.
+.LI no-ingredients-fingerprint
+Cancel any active \fIingredients-fingerprint\fP setting.
+.\" ---------------------------------  J  ---------------------------------
+.\" ---------------------------------  K  ---------------------------------
+.\" ---------------------------------  L  ---------------------------------
+.\" ---------------------------------  M  ---------------------------------
+.LI match-mode-cook
+Use native Cook pattern matching.
+.LI match-mode-regex
+Use POSIX regular expression pattern matching.
+.LI meter
+If the
+.I meter
+flag is specified,
+a summary of the CPU usage by the commands within this recipe
+will be printed after each command.
+The silent options override this option.
+.LI nometer
+Do not meter commands.
+This is usually the default.
+.LI mkdir
+If the
+.I mkdir
+flag is specified,
+the directories of any targets will be created before
+the actions bound to the recipe are evaluated.
+.LI nomkdir
+If the
+.I nomkdir
+flag is specified,
+the directories of any targets will need to be created
+by the actions bound to the recipe.
+This is usually the default.
+.\" ---------------------------------  N  ---------------------------------
+.\" ---------------------------------  O  ---------------------------------
+.\" ---------------------------------  P  ---------------------------------
+.LI precious
+If the
+.I precious
+flag is specified,
+if the actions bound to the recipe fail,
+the targets of the recipe will not be deleted.
+.LI noprecious
+If the
+.I noprecious
+flag is specified,
+if the actions bound to the recipe fail,
+the targets of the recipe will be deleted.
+This is usually the default, so that erroneous targets will be re-cooked.
+.\" ---------------------------------  Q  ---------------------------------
+.\" ---------------------------------  R  ---------------------------------
+.LI recurse
+If this flag is specified,
+recipes will recurse upon themselves if one of their ingredients
+matches one of their targets.
+This can cause problems, and so it is not the default.
+.LI norecurse
+If this flag is specified,
+the recipe will not recurse if one of its ingredients matches one of
+its targets.
+This is the default.
+.\" ---------------------------------  S  ---------------------------------
+.LI silent
+If the
+.I silent
+flag is specified,
+the commands within the actions bound to the recipe will not be echoed.
+.LI nosilent
+Commands will be echoed.
+This is usually the default.
+.LI stripdot
+This option causes
+.B cook
+to remove leading "./" prefixes from filenames.
+This is usually the default.
+.LI nostripdot
+This option causes
+.B cook
+to leave leading "./" prefixes on filenames.
+.\" ---------------------------------  T  ---------------------------------
+.LI tell-position
+This option causes the filename and line number to be printed when echoing
+commands just before they are executed, in addition to the command itself.
+.LI no-tell-position
+This option supresses the printing of the filename and line number when
+echoing commands just before they are executed.
+This is usually the default.
+.LI time-adjust
+This option causes
+.B cook
+to check the last-modified time of the targets of recipes,
+and adjust them if necessary,
+to make sure they are consistent with (younger than) the last-modified
+times of the ingredients.
+This usually adjusts the file time into the (near) future.
+A warning message will be printed,
+telling you how many seconds the file was adjusted.
+This results in more system calls,
+and can slow things down on some systems\*F.
+.FS
+This flag was once named the ``update'' flag.
+The name was changed to more closely reflect its function.
+The old name continues to work.
+.FE
+.LI no-time-adjust
+Do not adjust the file last-modified times after performing
+the body of a recipe.
+This is usually the default.
+.LI
+time-adjust-back
+This option causes
+.B cook
+to force the last-modified time of the targets of recipes
+to be exactly one (1) second younger than their youngest ingredient.
+This usually adjusts the file time into the (recent) past.
+A warning message will be printed,
+telling you how many seconds the file was adjusted.
+This results in more system calls,
+and can slow things down on some systems.
+This is primarily useful when some later process is going to compress file
+modification times; this provides smarter compression.
+.\" ---------------------------------  U  ---------------------------------
+.LI unlink
+If the
+.I unlink
+flag is specified,
+of any targets will be unlinked before
+the actions bound to the recipe are performed.
+.LI nounlink
+If the
+.I nounlink
+flag is specified,
+the recipe targets are not removed
+before the actions bound to the recipe are performed.
+This is usually the default.
+.\" ---------------------------------  V  ---------------------------------
+.\" ---------------------------------  W  ---------------------------------
+.\" ---------------------------------  X  ---------------------------------
+.\" ---------------------------------  Y  ---------------------------------
+.\" ---------------------------------  Z  ---------------------------------
+.\" -----------------------------------------------------------------------
+.LE
+.P
+Each flag may also be specified in the negative,
+by adding a "no" prefix,
+to override any existing positive default setting.
+There is a strict precedence defined for the various levels of flag setting,
+see the end of the "How Cook Works" chapter for details.

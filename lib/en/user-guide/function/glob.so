@@ -1,0 +1,52 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1995, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Glob
+.\"
+.H 2 "glob"
+Each argument is treated as a
+.IR sh (1)
+file name pattern,
+and expanded accordingly.
+The resulting list of filenames is sorted lexicographically.
+.P
+You may need to quote the pattern,
+to protect square brackets from the meaning cook attaches to them.
+.P
+.B Note:
+The character sequence \f(CW/*\fP is a comment introducer,
+and is a frequent source of problems when combined with the
+.I glob
+function.
+Remember to quote
+.I glob
+arguments which need this character sequence.
+See the [head] function, below, for an example of this.
+.H 3 "Example"
+To find the sources in the current directory:
+.eB
+src = [glob *.c];
+obj = [fromto %.c %.o [src]];
+.eE
+.H 3 "See Also"
+filter,
+filter_out,
+shell
+.H 3 "Also Known As"
+wildcard

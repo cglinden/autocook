@@ -1,0 +1,153 @@
+#!@PERL@
+
+while (@ARGV) {
+  $_ = shift;
+  if ($_ eq '-target') {
+    $target = shift;
+  } elsif ($_ eq '-thirdparty') {
+    $thirdparty = shift;
+  } elsif ($_ eq '-indythirdparty') {
+    $indy3party = shift;
+  } elsif ($_ eq '-dir') {
+    $dir = shift;
+  } elsif ($_ eq '-customized_in') {
+    $customized_in = shift;
+  } elsif ($_ eq '-o') {
+    $output = shift;
+  } elsif (index($_, '-') == 0) {
+    print STDERR "Unknown option: $_\n";
+    exit 1;
+  } else {
+    push(@input, $_);
+  }
+}
+
+$read_errors = 0;
+$make_statements = 0;
+
+$dirname = $1 if $dir =~ m,([^/]*)/$,;
+
+if (open(O, ">$output")) {
+  print O <<EOT;
+/* Automatically generated from @input */
+
+here = $dir;
+/* Initialize customizable vars */
+loop var = \[stringset \[cumulative_parameters\] \[once_only_parameters\]\] \{
+  \[var\]_$dir = \[get-local-value \[var\] $dir\];
+  loop v = \[supported_variants\] \{
+    \[var\]_\[v\]_$dir = \[get-local-value \[var\]\_\[v\]\ $dir\];
+    loop p = \[supported_platforms\] \{
+      \[var\]_\[p\]_\[v\]_$dir = \[get-local-value \[var\]\_\[p\]\_\[v\]\ $dir\];
+    \}
+  \}
+  loop p = \[supported_platforms\] \{
+    \[var\]\_\[p\]_$dir = \[get-local-value \[var\]\_\[p\] $dir\];
+  \}
+\}
+
+/* create dependency to this file */
+customized_in_$dir = $customized_in;
+
+EOT
+
+  foreach $file (@input) {
+    my $line = 0;
+    if (open(F, $file)) {
+      print O "\n/* explicit assignments in $file */\n";
+      while (<F>) {
+	$line++;
+	if (/^\s*[^\s\'\"\+=]+\s*:=/) { 
+	  s/^(\s*[^\s\'\"\+=]+)\s*:=/$1\_$dir = RESET '$file:$line' /;
+	  print O;
+	} elsif (/^\s*[^\s\'\"\+=]+\s*\+=/) {
+	  s/^\s*([^\s\'\"\+=]+)\s*\+=/$1\_$dir += ADD '$file:$line' /;
+	  print O;
+	} elsif (/^\s*[^\s\'\"\+=]+\s*\-=/) {
+	  s/^\s*([^\s\'\"\+=]+)\s*\+=/$1\_$dir += DEL '$file:$line' /;
+	  print O;
+        } elsif (/^\s*(ex|in)clude-(variant|platform)\s+([^;]*);/) {
+	  print O "/* ${1}cluded $2(s): $3 */\n";
+	} elsif (/^\s*(make|use)\s+([^\s;]+)\s*;\s*$/) {
+	  my $op  = $1;
+	  my $arg = $2;
+	  print O <<EOT;
+/* BEGIN use $arg; */
+loop var = \[stringset \[cumulative_parameters\]\] \{
+  if \[defined $arg\_\[var\]\] then
+    \[var\]_$dir += USE '$file:$line' \[$arg\_\[var\]\];
+  loop v = \[supported_variants\] \{
+    if \[defined $arg\_\[var\]\_\[v\]\] then
+      \[var\]_\[v\]\_$dir += USE '$file:$line' \[$arg\_\[var\]\_\[v\]\];
+    loop p = \[supported_platforms\] \{
+      if \[defined $arg\_\[var\]\_\[p\]_\[v\]\] then
+        \[var\]_\[p\]_\[v\]\_$dir += USE '$file:$line' \[$arg\_\[var\]\_\[p\]_\[v\]\];
+    \}
+  \}
+  loop p = \[supported_platforms\] \{
+    if \[defined $arg\_\[var\]\_\[p\]\] then
+      \[var\]_\[p\]\_$dir += USE '$file:$line' \[$arg\_\[var\]\_\[p\]\];
+  \}
+\}
+loop var = \[stringset \[once_only_parameters\]\] \{
+  if \[defined $arg\_\[var\]\] then
+    \[var\]\_$dir = USE '$file:$line' \[$arg\_\[var\]\];
+  loop v = \[supported_variants\] \{
+    if \[defined $arg\_\[var\]\_\[v\]\] then
+      \[var\]\_\[v\]\_$dir = USE '$file:$line' \[$arg\_\[var\]\_\[v\]\];
+    loop p = \[supported_platforms\] \{
+      if \[defined $arg\_\[var\]\_\[p\]\_\[v\]\] then
+        \[var\]\_\[p\]_\[v\]\_$dir = USE '$file:$line' \[$arg\_\[var\]\_\[p\]\_\[v\]\];
+    \}
+  \}
+  loop p = \[supported_platforms\] \{
+    if \[defined $arg\_\[var\]\_\[p\]\] then
+      \[var\]\_\[p\]\_$dir = USE '$file:$line' \[$arg\_\[var\]\_\[p\]\];
+  \}
+\}
+/* END use $arg; */
+
+EOT
+          if ($op eq 'make') {
+	    if ($make_statements) {
+	      print STDERR "$file:$line: Only one make statement allowed.\n";
+	      $read_errors++;
+	    } else {
+	      $make_statements++;
+	      print O <<EOT;
+/* BEGIN make $arg */
+loop v = \[supported\_variants\] \{
+  if \[defined target\_list\_for\_$arg\_\[v\]\] then \{
+    if \[count \[defined-or-null files\_under\_$dir\[v\]\]\] then \{
+      target\_list\_\[v\] += $dir;
+      target\_types\_\[v\] += $arg;
+      target\_list\_for\_$arg\_\[v\] += $dir;
+      target\_in\_$dir\[v\] = $arg;
+    \}
+  \} else \{
+    \[print Invalide make $arg ignored\];
+    fail;
+  \}
+\}
+/* END make $arg */
+
+EOT
+            }
+          }
+        } else {
+	  print O;
+	}
+      }
+      close(F);
+    } else {
+      print STDERR "Couldn't read $file\n";
+      $read_errors++;
+    }
+  }
+  close(O);
+} else {
+  print STDERR "Couldn't write $output\n";
+  exit 2;
+}
+
+exit $read_errors;

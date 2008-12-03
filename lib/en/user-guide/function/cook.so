@@ -1,0 +1,36 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1999, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing cook.so
+.\"
+.H 2 "cook"
+This function requires one or more arguments,
+filenames to be tested to see if they are up-to-date,
+and be brought up-to-date if they are not.
+The result are true ("1") if the files are (now) up-to-date,
+or false ("") if they could not be built.
+.H 3 "Caveat"
+This will use as much of the cookbook as has been read in up to the
+point where this function is used.  This can mean that crucial recipes
+have yet to be parsed and instantiated.
+.P
+This function works one argument at a time.  This is slower than the
+main cookbook, which will pursue all targets simultaneously.
+.H 3 "See Also"
+cando, uptodate

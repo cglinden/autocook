@@ -1,0 +1,80 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.2 features
+.\"
+.PP
+.if n *
+.if t \(bu
+There are 6 new special variables:
+graph_leaf_file,
+graph_leaf_pattern,
+graph_interior_file,
+graph_interior_pattern,
+graph_exterior_file and
+graph_exterior_pattern.
+These variables may be used
+to define the leaves of the derivation graph (the \fIaccept\fP forms),
+and non-leave of the graph (the \fIreject\fP forms).  This can make
+the graph derivation faster, and greatly improves some error messages.
+This functionality is of most use when you have an exact source file
+manifest, \fIe.g.\fP from a software configuration management system.
+See the User Guide for more information.
+.PP
+.if n *
+.if t \(bu
+The %0 pattern element has been extended to permit the matching of
+absolute paths.
+.\" ---------------------- Add New Notes Above This Line ----------------------
+.SS "Release 2.2.2 (1997-Dec-10)"
+.PP
+.if n *
+.if t \(bu
+There is a new statement type, allowing functions to be invoked as
+subroutines in any place where a command may be invoked.  See the User
+Guide for more information.
+.PP
+.if n *
+.if t \(bu
+A number of problems with installing Cook have been fixed.
+This includes changing -mgm to -mm for the documnetation formatting,
+and missing include dependencies and missing rules for installing the man pages.
+.PP
+.if n *
+.if t \(bu
+There is a new ``print'' builtin function.
+When combined with the new function call statement,
+this provides a way of printing information without invoking ``echo''.
+See the User Guide for more information.
+.PP
+.if n *
+.if t \(bu
+Cook now defaults the language to ``en'' internally if neoither the
+LANG nor LANGUAGE environment variable was set.  This gives better
+error messages.
+.\" ---------------------- Add New Notes Above This Line ----------------------
+.SS "Release 2.2.1 (1997-Nov-04)"
+.PP
+.if n *
+.if t \(bu
+A bug was fixed where a recipe would fail to trigger if some, but not
+all, of its targets were not present, but the existing targets were
+up-to-date.  This bug was introduced in the inference engine re-write.
+.\" ---------------------- Add New Notes Above This Line ----------------------
+.SS "Release 2.2 (1997-Oct-31)"

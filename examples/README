@@ -1,0 +1,21 @@
+This is a little sample source tree demonstrating some of the capabilities
+of the autobuild extension to cook.
+
+The structure here represents the recommended top level layout for a large
+project. The Howto.cook file here is a real one. All "b" does is cd into
+this directory, then run cook with an argument specifying where in the
+source tree "b" was invoked. 
+
+There are four sample "hello world" variants, each demonstrating commonly
+used patterns. There are many more, and some of them will be added in
+future versions.
+
+src/hello_world_1    A simple executable;
+src/hello_world_2    A complex executable compiled from two source files
+src/hello_world_3    A simple executable and a library;
+src/hello_world_4    A simple executable with a library and a third party
+                     dependency.
+
+pkg/hello_world      An rpm packing up all of the four executables above.
+
+3party/noarch/       Sample third party package used by hello_world_4.

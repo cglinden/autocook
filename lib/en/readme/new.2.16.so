@@ -1,0 +1,66 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2000, 2001, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.16 features
+.\"
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" change 25
+When using file fingerprints, the way the \fI\&.cook.fp\fP file is
+written has been changed, so that the timestamp of the containing
+directory is modified much less often.  This is useul in combination
+with the \fIcook_bom\fP(1) utility.
+.PP
+.if n *
+.if t \(bu
+.\" change 21
+A bug has been fixed under Cygwin, where archive members were not being
+fingerprinted correctly.
+.PP
+.if n *
+.if t \(bu
+.\" change 20
+A bug has been fixed in the \f[CW][quote]\fP function.  It now quotes all
+\fIsh\fP(1), \fIcsh\fP(1) and \fIbash\fP(1) special characters correctly.
+.PP
+.if n *
+.if t \(bu
+.\" change 19
+A bug has been fixed in the \f[CW][uptodate]\fP function.
+It now works as advertised.
+.PP
+.if n *
+.if t \(bu
+.\" change 16
+There is a new \fIingredients-fingerprint\fP recipe flag.  This means
+that you can now cause a recipe to re-trigger when the ingredients list
+changes.  This is especially useful when a library has a file removed.
+.PP
+.if n *
+.if t \(bu
+.\" change 15
+The dependency graph can now have the edge types specified.  The ``weak''
+edge type if useful for managing links, and the ``exists'' edge type
+is useful for managing version stamps.  See the User Guide for more
+information.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.16 (2000-Oct-25)

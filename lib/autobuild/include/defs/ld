@@ -1,0 +1,50 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+/* list of items modifiable via a "use" or "make" module */
+cumulative_parameters += ld_flags ld_l_flags ld_L_flags
+	                 external_obj external_lib post_ld_flags;
+once_only_parameters  += exec_suffix pre_ld ld post_ld post_ld_temp make-L-l-flags-function make-ld-flags-function;
+inheritable_parameters += ld_flags ld_l_flags ld_L_flags
+	                  external_obj external_lib;
+/* do_not_propagate_parameters += ld_flags ld_l_flags ld_L_flags
+	                       external_obj external_lib;*/
+
+/* global defaults */
+exec_suffix   = ;
+pre_ld	      = ;
+post_ld       = ADD [__FILE__]':'[__LINE__] true;
+post_ld_flags = ;
+post_ld_temp  = ;
+default_ld    = ADD [__FILE__]':'[__LINE__] /usr/bin/ld;
+ld            = default_ld;
+ld_flags      = ;
+ld_L_flags    = ;
+ld_l_flags    = ;
+ld_system_l_flags = ;
+ld_static_flag= ;
+ld_dynamic_flag=;
+
+make-L-l-flags-function = ADD [__FILE__]':'[__LINE__] make-L-l-flags;
+make-ld-flags-function = ADD [__FILE__]':'[__LINE__] null;
+
+external_obj  = ;
+external_lib  = ;

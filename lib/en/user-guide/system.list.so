@@ -1,0 +1,54 @@
+.br
+.ne 3i
+.so system/as.so
+.br
+.ne 3i
+.so system/c.so
+.br
+.ne 3i
+.so system/f77.so
+.br
+.ne 3i
+.so system/g77.so
+.br
+.ne 3i
+.so system/gcc.so
+.br
+.ne 3i
+.so system/home.so
+.br
+.ne 3i
+.so system/lex.so
+.br
+.ne 3i
+.so system/library.so
+.br
+.ne 3i
+.so system/print.so
+.br
+.ne 3i
+.so system/program.so
+.br
+.ne 3i
+.so system/rcs.so
+.br
+.ne 3i
+.so system/recursive.so
+.br
+.ne 3i
+.so system/sccs.so
+.br
+.ne 3i
+.so system/text.so
+.br
+.ne 3i
+.so system/usr.local.so
+.br
+.ne 3i
+.so system/usr.so
+.br
+.ne 3i
+.so system/yacc_many.so
+.br
+.ne 3i
+.so system/yacc.so

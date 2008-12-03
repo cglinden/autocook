@@ -1,0 +1,74 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1997, 2001, 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Option Precedence
+.\"
+.H 1 "Option Precedence"
+At various points in the description there are a number of flags and options
+with the same,
+or similar,
+names.
+These are in fact different levels of the same option.
+.P
+The different levels,
+from highest precedence to lowest,
+are as follows.
+.VL 1i
+.LI "Error"
+This level is used to disable undesirable side effects when an error occurs.
+.LI "Command Line"
+Options specified on the command line override almost everything.
+There are some isolated cases where there is no equivalent command line option.
+They are in scope for the entire
+.B cook
+session.
+.LI "Execute"
+When a command attached to a recipe is executed,
+the flags in the '\fBset\fP' clause are given this precedence.
+They are in scope for the duration of the execution of the command they are
+bound to.
+.LI "Recipe"
+When a recipe is considered for use,
+the flags in the '\fBset\fP' clause are given the precedence.
+They are in scope for the evaluation of the ingredients names and the
+execution of the recipe body;
+they are not in scope while cooking the ingredients.
+.LI "Cookbook"
+When a '\fBset\fP' statement is encountered in the cookbook,
+the option are given this priority.
+They are in scope until the end of the
+.B cook
+session.
+.LI "Environment Variable"
+.br
+When the  options in the
+.B COOK
+environment variable are set,
+they are given this precedence.
+They are in scope for the entire
+.B cook
+session.
+.LI "Default"
+All options have a default setting.
+The defaults noted in chapter 3
+are given this precedence.
+They are in scope for the entire
+.B cook
+session.
+.LE

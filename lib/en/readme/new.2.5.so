@@ -1,0 +1,55 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1998, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.5. features
+.\"
+.PP
+.if n *
+.if t \(bu
+Cook has been ported to Windows-NT using CygWin32.
+See the BUILDING file for details.
+.PP
+.if n *
+.if t \(bu
+There are two new functions (\fIdos-path\fP and \fIun-dos-path\fP)
+for use when invoking non-CygWin32 WindowsNT programs.
+See the Cook User Guide for more information.
+.PP
+.if n *
+.if t \(bu
+Fingerprints now work meaningfully with directories.
+.PP
+.if n *
+.if t \(bu
+A bug has been fixed in the pattern matching code.
+It would sometimes cause core dumps.
+.PP
+.if n *
+.if t \(bu
+A bug involving fingerprints in combination with the search_list has
+been fixed.  Cook would occasionally conclude that a shallow target was
+up-to-date when a shallow ingredient was edited to be the same as a
+deeper ingredient.
+.PP
+.if n *
+.if t \(bu
+A bug has been fixed in cooktime.
+It would use an inappropriate timezone offset on some systems.
+.\" ---------------------- Add New Notes Above This Line ------------------
+.SS "Release 2.5 (1998-Sep-02)"

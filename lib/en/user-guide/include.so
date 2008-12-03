@@ -1,0 +1,396 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2002, 2003, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Include File Dependencies
+.\"
+.H 1 "Include File Dependencies"
+A significant factor in a cookbook accurately describing the dependencies
+in a program are the include file dependencies.  There are
+three
+methods
+for doing this in Cook.  The first is easily understandable but is too
+slow to use on large projects, the second is a little harder to
+understand, but works well for large projects.
+The third method is rather convoluted, but works well for projects with
+many thousands of source files and multiple simultaneous architectures
+built within the same source tree.
+.P
+The recipes here are merely examples and starting points; you will almost
+certainly need to enhance them to suit the needs of your projects.
+Areas you will need to address include
+(a) the existence of \f[CW]cc -I\fP\fIpath\fP options,
+(b) the use of \f[CW]search_list\fP variable and the \f[CW][resolve]\fP
+function, and
+(c) heterogeneous development.
+The techniques also apply to other languages,
+such as Fortran, Pascal and Roff,
+but each requires a language-specific include scanning program\*F.
+.FS
+The \fIc_incl\fP program understands Roff, you just need to use the
+\f[CW]\-r\fP option.
+.FE
+.H 2 "The Manual Method"
+Well, actually there are
+four
+methods, if you count maintaining the
+dependencies manually.  This has the serious defect that humans tend to
+\fIforget\fP to update the cookbook.  On a large project not all
+developers are familiar with the workings of Cook, and so they shy away
+from updating the cookbook.  By finding ways to automate include
+dependency processing, we reduce the risk that a developer will forget
+to update the cookbook, and we reduce the risk that the cookbook's
+dependency information is out-of-date.
+.P
+Automatic include dependency methods described below have flaws, and can
+never replace a human for flexibility and domain knowledge.  On the
+other hand, humans have better things to do with their time than grope
+files for include file dependencies (like write neat software).
+.H 2 "Debugging Cookbooks"
+Before we proceed further, it is worth spending some time covering some
+of the methods for debugging your cookbook, because small mistakes in
+implementing the methods below can become quite difficult to locate.
+.H 3 "Command Locations"
+Usually Cook will echo all the commands it executes, just before
+executing them.  If you add the line
+.eB
+set tell-position;
+.eE
+near the top of your cookbook, Cook will add the filename and line number
+within the cookbook to each command it echoes.
+This can be useful in figuring out which recipe Cook actually chose to execute.
+.H 3 "Printing Stuff"
+Often you will want to have Cook print various pieces of information.
+The wrong way to do it is with the shell's "echo" command
+.eB
+echo variable "=" [variable];
+.eE
+because this invokes another process (which can make debugging parallel
+cookbooks harder) and because of the optional \fIdata ... dataend\fP
+which can follow commands (see the command statement in the language
+definition, below).
+The correct method is to call the "print" function, like this
+.eB
+function print [__FILE__]: [__LINE__]: variable "=" [variable];
+.eE
+Note the use of the __FILE__ and __LINE__ builtins, which provide you
+with cookbook position information.
+.H 3 "Trigger Ingredients"
+Another useful piece of information is the ingredients which caused Cook to
+invoke a particular recipe body.  The following function
+.eB
+function say-why =
+{
+        if [count [@1]] then
+                @1 = [@1]\:;
+        if [count [@2]] then
+                @2 = [@2]\:;
+        local tt = [target];
+        if [defined targets] then
+                tt = [targets];
+        local t = ;
+        if [in [count [younger]] 0 1 2 3] then
+        {
+                function print [@1] [@2]
+                        Building [target]
+                        because of [younger];
+        }
+        else
+        {
+                function print [@1] [@2]
+                        Building [target] because of
+                        [wordlist 1 3 [younger]] et al;
+        }
+}
+.eE
+can be inserted at the beginning of a recipe
+.eB
+%.o: %.c
+{
+        function say-why [__FILE__] [__LINE__];
+        cc -c %.c;
+}
+.eE
+to say why the recipe was invoked.
+This will even include dependencies automatically determined by all of
+the methods which follow, not just those named on the right-hand-side
+of the recipe itself.
+.H 2 "Tools"
+All of the automated include file dependency methods described below use the
+\fIc_incl\fP(1) program included in the Cook distribution.  It has a
+number of options tailored for use with Cook.  For exact information
+about the \fIc_incl\fP command, consult the on-line \fIman\fP(1) system
+(it should have been installed) or the Cook Reference Manual.
+.P
+Other tools are available.  The commonest is to use the \f[CW]gcc\|-M\fP
+option, which produces a list of include files on the standard output.
+Because the \f[CW]gcc\|-M\fP output is aimed at GNU Make, you will need an
+\fIawk\fP(1) or \fIsed\fP(1) script to massage the output into a format
+suitable for Cook.
+.H 2 "The Small Method"
+The easiest way to determine a file's include
+dependencies is within the recipe's ingredients.
+.eB
+%.o: %.c: [collect c_incl -api %.c]
+{
+        cc -c %.c;
+}
+.eE
+.P
+Note the second colon \- the \fIsecond\fP set of dependencies are only
+evaluated after Cook has chosen to activate the recipe (based on the first set).
+This does not guarantee that the file exists yet
+(it may have to be generated by \fIlex\fP or \fIyacc\fP),
+which is why the \f[CW]--Absent-Program-Ignore\fP option is required.
+.P
+This method has the advantage of simplicity.
+It uses a single recipe which reads the way recipes usually read,
+and does not contain any unusual constructs.
+.P
+There are two problems with this method.  The first is that it doesn't
+scale well.  When there are only a few source files, the processing
+burden of running \fIc_incl\fP for every \fB\&.c\fP file every time Cook
+is invoked is hardly noticeable.  The \fIc_incl\fP program caches the
+results of its scans, so that is can minimize the length of time taken,
+and this does help a little.  However projects with hundreds or
+thousands of files find even the cached performance an unreasonable
+burden; it is constantly re-calculating something which has not changed
+from one run to the next.
+.P
+The second problem is that the \fIc_incl\fP program is run when the
+dependency graph is being built, not when it is being walked.  This
+means that the \fB\&.c\fP file (or a subordinate \fB\&.h\fP file) may
+have been out-of-date at the time.  When the graph is walked, it will
+have been regenerated, and the two sets of include files, those
+determined by \fIc_incl\fP at graph building time, and those seen by
+\fIcc\fP at graph walking time, may not agree \- which may result in
+compile-time errors.
+.H 2 "The Large Method"
+For projects with large numbers of files, hundreds or even thousands,
+it is necessary to re-calculate the include
+file dependencies only when a \fB\&.c\fP file changes, or a subordinate
+\fB\&.h\fP file.  Ideally, Cook should access this information directly,
+rather than running a program to determine it or to fetch it.
+.P
+The first task is to move the information which \fIc_incl\fP caches into
+a format that Cook can access directly; Cook can then read in this
+information as it scans the cookbook.  By making a separate
+``dependency'' file for each \fB\&.c\fP file, we can use existing Cook
+mechanisms to describe how to keep this file up-to-date.
+.P
+The dependency file is generated and maintained as follows:
+.eB
+%.c.d: %.c
+{
+        c_incl --no-cache %.c
+                "--prefix='%.o "[target]": %.c'"
+                "--suffix='set nodefault;'"
+                -o [target];
+}
+.eE
+.P
+This recipe generates a file which contains a mini-cookbook describing
+the ingredients of the \fIobject\fP file.  The dependencies are in terms
+of the object file because if any of the \fB\&.h\fP files change, it is
+the object file which is out-of-date, not the \fB\&.c\fP file.
+The mini-cookbook itself is also described, so that if any of the
+source files change, the mini-cookbook can be brought up-to-date again.
+.P
+The recipe for the object file is less complicated than in the previous
+section, because the mini-cookbooks supplement it:
+.eB
+%.o: %.c
+{
+        cc -c %.c;
+}
+.eE
+.P
+The only thing missing is how to get the information in the
+mini-cookbooks into the main cookbook.  This is done with an include
+directive in the cookbook itself, but a special form of it.  The names
+of the mini-cookbooks can be determined the same way as the names of the
+object files, and this allows the cookbook fragments such as the
+following to be written:
+.eB
+object_files = [fromto %.c %.o [source_files]];
+dependency_files = [fromto %.c %.c.d [source_files]];
+
+#include-cooked [dependency_files]
+.eE
+.P
+The \f[CW]#include-cooked\fP directive says to include the named files
+(there may be more than one) if the file exist.  Once the cookbook (and
+its includes) have been read in, the files included with this directive
+are checked to see if they are up-to-date.  If they are not, then they
+are re-cooked, and then Cook starts over again; this time with
+up-to-date include dependencies.
+.P
+The advantage of the method is
+that if the source files don't change, the dependency information is not
+recalculated, this can result in significant savings.  Also, no
+processes are invoked if nothing has changed, Cook reads the information
+directly.  Because file opens are significantly cheaper than process
+invocations, this results in a significant performance improvement.
+.P
+The disadvantage of this method is
+that it is harder to describe and harder to implement.
+To the uninitiated the cookbook looks incomplete and overly complex.
+.P
+Another problem is that if you delete an include file, Cook will
+complain that it is unable to derive the dependency file because the
+include file is not present.  Simply delete the dependency file and
+start again.  To avoid the problem, remove references to include files,
+and re-build, before deleting the include files.  This problem is seen
+from time to time, but does not present a huge problem in normal practice.
+.H 2 "The Cascade Method"
+When large numbers of files are involved, it becomes clear that the
+more popular include files are being scanned repeatedly.  This can be
+un-necessarily time-consuming when a popular include file is touched,
+as the dependency files of all \f(CW.c\fP files which reference it,
+even indirectly, must be re-calculated.
+.P
+There is also a problem when you are attempting to perform heterogenous
+builds for multiple architectures out of the same sources.  This is
+typically done by inserting the architecture name into the object file
+path as a directory.  This presents another problem: nominating all of the
+architectures on the left-hand-side of the regenerated dependency recipes.
+Especially if you add another one after the fact - now all the existing
+dependency files must be recalculated, merely to add the new architecture.
+.P
+An alternative is to scan each of the source files and include files
+once, and request cook to combine them together at build time, rather than
+at dependence scan time.  This is done using \f(CWcascade\fP recipes.
+These recipes nominate additional ingredients (on their right-hand-size)
+if any of the files on their left-hand-size appears in an ingredients list.
+.eB
+cascade foo.c = bar.h;
+.eE
+This recipe says that any recipe which has \fIfoo.c\fP for an ingredient,
+also has \fIbar.h\fP for an ingredient.
+.P
+This takes care of the heterogeneous case, because while the recipes
+remain specified in a simple manner, \fIviz:\fP
+.eB
+%1/%0%.o: %0%.c
+{
+        %1-gcc -o [target] -c %0%.c;
+}
+.eE
+Any and all of them which compile \fIfoo.c\fP will depend on \fIbar.h\fP
+from the \f(CWcascade\fP recipe.  (This example assumes that you are
+using \fIgcc\fP(1) in the usual way, and that your architecture names
+match the GNU target names.)
+.P
+The dependency files are generated and maintained in much the same way
+as before, except that you need two: one for \f(CW.c\fP files and one
+for \f(CW.h\fP files:
+.eB
+%0%.c.d: %0%.c
+        set no-cascade
+{
+        c_incl --no-cache --no-recurs %0%.c
+                "--prefix='cascade %0%.c ='"
+                "--suffix=';'"
+                -o [target];
+}
+.eE
+.eB
+%0%.h.d: %0%.h
+        set no-cascade
+{
+        c_incl --no-cache --no-recurs %0%.h
+                "--prefix='cascade %0%.h ='"
+                "--suffix=';'"
+                -o [target];
+}
+.eE
+You will also need to add the \f(CW.h.d\fP files to the
+\f(CW#include-cooked\fP lines, to ensure they are generated.  If there are
+any generated \f(CW.c\fP or \f(CW.h\fP files, you will need to mention
+these, too.
+.H 2 "Dependencies on Derived Files"
+If the relationship between a target and a derived ingredient appears
+only in a derived cookbook, it is likely that a clean build (solely
+from primary source files) will fail.  It is recommended that
+relationships such as this be placed in a primary source cookbook.
+Cook looks for such dependencies, and will warn you about them.
+.P
+An example of this is commonly seen when using the \f[CW]-d\fP option
+with \fIyacc\fP(1).  If you have a separate lexical analyzer (the usual
+reason for using \f[CW]-d\fP) it will need to include the generated
+token definition file.
+.P
+When you first add the \fIyacc\fP(1) grammar definition, Cook will
+generate both the \f[CW].c\fP and \f[CW].h\fP file from the usual yacc
+recipes.  It is only later, when you have cleaned out all derived files
+(including the dependency files) that you may have problems.  Where is
+it recorded that Cook needs to regenerate the token definition file
+before it can determine the include dependencies of the lexical
+analyzer?  (They were in a \f[CW].d\fP file which was ``cleaned'' away.)
+.P
+Cook will detect this situation at the first possible moment, and warn
+you.  But placing the dependency in a non-derived cookbook (\fIe.g.\fP
+\f[CW]Howto.cook\fP) the warning will go away, and you will be able to
+do reliable clean builds.
+.P
+If you are convinced that Cook is \fIalways\fP wrong in your case,
+it is possible to suppress this warning.  Place the line
+.eB
+set no-include-cooked-warning;
+.eE
+in your main cookbook, and the warning will not be issued.
+.P
+Suppressing the warning could lead to problems.  It is often better to add
+the ingredients recipe given in the warning to the cookbook, even if you
+think it is redundant.  This disables a single instance of the warning,
+rather than all of them \- subsequent \fIvalid\fP instances will still
+be reported.  (Implicit ingredients recipes, rather than explicit ones,
+are a useful alternative if you have a consistent pattern.)
+.H 2 "Renaming Include Files"
+A consistent problem when you have automatically generated include
+dependencies is that when you move an include file, Cook complains that
+a required ingredient does not exist.
+.P
+The easiest way to avoid this is to do a few things before you build
+again after moving the include file.
+.BL
+.LI
+Move the include file to the new name.
+.LI
+Where the include file was \fIfrom\fP, put a file containing the line
+.eB
+#error "I'm not here"
+.eE
+to make Cook happy (the ingredient will exist),
+but also have the compiler generate an error if you miss a reference to it.
+.LI
+Edit all the references to the old include file name to reference the new name.
+Don't worry if you miss one or two, the previous step will catch it.
+.LI
+Rebuild the program.
+Cook will automatically re-calculate all of the include dependences
+and then recompile.
+.LI
+If you missed one of the include file references, Cook will not complain,
+but the compiler will.
+(This assumes you are using whole-project builds, as described in the
+\fILarge Projects\fP chapter.)
+.LI
+Once the program builds cleanly, remove the fake old include file,
+because you know for certain that there are no longer any references.
+.LE

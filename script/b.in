@@ -1,0 +1,172 @@
+#!@SH@
+#  Process wrapper scripts for Rational's ClearCase (tm) product.
+#  Copyright (C) 1997 1998 1999 Christian Goetze
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+usage()
+{
+  cat <<EOF
+Usage:
+    $0 [clean|uninstall|rpm-v|rpm-q|rpm-qa|rpm-ql|<cook target> ...]
+
+This is a wrapper script to run "cook" from the top of the source tree. It will
+determine the top of the source tree, change to it and run cook with "top" set
+to the path to the current directory.
+
+Arguments are usually cook targets, but the following special targets are
+intercepted by this wrapper and have special meaning:
+
+  clean
+    Removes all DO subdirectories
+
+  uninstall
+    Removes all source-tree local RPM installs. If additional arguments are
+    specified, it only removes that particular RPM.
+
+  missing
+    Displays a list of files which may be candidates for a "p4 add".
+
+  rpm-qa
+    Lists all source-tree local RPMs.
+
+  rpm-q
+    queries specified list of source-tree local RPMs. Pass in any additional query flags
+
+  rpm-ql
+    short of "b rpm-q -l".
+
+  rpm-v
+    verifies specified source-tree local RPMs.
+EOF
+}
+umask 2
+
+if [ `id | grep 'uid=0(root)' | wc -l` -eq 1 ]; then
+  echo '### Do not run builds as root' >&2
+  exit 1
+fi
+
+LANG=C
+export LANG
+SHELL=@SH@
+export SHELL
+
+prefix=@prefix@
+datadir=@datadir@
+
+# Check if this is gonna work
+if [ -d "$datadir/autobuild" ]
+then
+  true
+else
+  bindir=`echo $0 | sed 's:[^/]*$:.:'`
+  if [ -d "$bindir/../lib/autobuild" ]
+  then
+    datadir="$bindir/../lib"
+  else
+    echo '### Failed to locate autobuild library, tried:'
+    echo "###   $datadir/autobuild"
+    echo "###   $bindir/autobuild"
+    exit 1
+  fi
+fi
+
+here=`pwd`
+top="$here"
+where="."
+outside_source_tree=true
+while $outside_source_tree && [ "$top" ]
+do
+  if [ -r "$top"/Howto.cook ] && grep -q autobuild/include/main "$top"/Howto.cook
+  then
+    outside_source_tree=false
+  else
+    where=`echo $top | sed 's:.*/::'`/"$where"
+    top=`echo $top | sed 's:/[^/]*$::'`
+  fi
+done
+
+if $outside_source_tree
+then
+  echo "### Not in a source tree"
+  exit 1
+fi
+
+where=`echo $where | sed 's:/\.$::'`
+
+# go to top of source tree
+cd "$top"
+
+rc=0
+echo $0: Entering directory \`$top\' >&2
+if [ -r Howto.cook ]; then
+  case "$1" in
+  clean)
+    find "$where" -type d -name DO -print -prune | xargs rm -rf ;;
+  rpm-qa)
+    rpm --dbpath "$top"/runtime/rpmdb -qa ;;
+  rpm-q)
+    shift
+    rpm --dbpath "$top"/runtime/rpmdb -q "$@" ;;
+  rpm-v)
+    shift
+    rpm --dbpath "$top"/runtime/rpmdb -V "$@" ;;
+  rpm-ql)
+    shift
+    rpm --dbpath "$top"/runtime/rpmdb -ql "$@" ;;
+  uninstall)
+    if [ "$2" ]; then
+      shift
+      rpm -v --dbpath "$top"/runtime/rpmdb -e "$@"
+    else
+      rpm --dbpath "$top"/runtime/rpmdb -qa | xargs rpm --dbpath "$top"/runtime/rpmdb -e --allmatches
+      rm -rf runtime
+      find . -name '*.rpminstall-output' | grep /DO/ | xargs rm -f
+    fi
+    ;;
+  help|-h|--help)
+    echo 'Features implemented in the "b" wrapper:'
+    echo '========================================'
+    echo
+    usage
+    echo
+    echo 'Features implemented via "cook":'
+    echo '================================'
+    echo
+    @bindir@/cook -NoList help
+    exit 0 ;;
+  *)
+    if grep -q autobuild/include/main Howto.cook; then
+      rm -f DO/Errors-*
+      # start doing the build
+      @bindir@/cook\
+	-No_Include_Cooked_Warning\
+        -I @datadir@\
+	-List "$where"/Howto.list\
+	top="$where"\
+	${1+"$@"}
+      rc=$?
+    else
+      echo '### Failed to locate top level Howto.cook file.' >&2
+      rc=1
+    fi
+  esac
+else
+    echo '### Cannot locate Howto.cook file.' >&2
+    rc=1
+fi
+echo $0: Leaving directory \`$top\' >&2
+exit $rc

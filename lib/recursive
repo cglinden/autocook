@@ -1,0 +1,36 @@
+/*
+ * NAME
+ *      recursive - invoke recursive cook commands
+ *
+ * DESCRIPTION
+ *      This cookbook defines how to construct a program
+ *      by recursive descent through a directory structure.
+ *
+ * RECIPES
+ *      all:            the default target
+ *
+ * MANIFEST: cookbook for recursive directory structured projects
+ * Copyright (C) 1997-2007 Peter Miller
+ */
+
+#pragma once
+
+%:
+{
+        dirlist = [dirname [glob '*/Howto.cook' ]];
+        loop
+        {
+                dir = [head [dirlist]];
+                if [not [dir]] then
+                loopstop;
+                dirlist = [tail [dirlist]];
+
+                cd [dir]\; [self] [options] %;
+        }
+}
+
+/*
+ * This recipe sets the default.
+ * It doesn't actually do anything.
+ */
+all:;

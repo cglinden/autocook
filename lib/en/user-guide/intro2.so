@@ -1,0 +1,311 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1997, 2000, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Cook from a Cookbook
+.\"
+.H 1 "Cook from a Cookbook"
+This chapter describes the contents and meaning of a cookbook,
+a file which contains information
+.B cook
+needs to do its job.
+It focuses on what a cookbook looks like,
+and touches on a few areas of how
+.B cook
+works does its job.
+.H 2 "What does Cook do?"
+The basic building block for
+.B cook
+is the concept of a
+.IR recipe .
+A recipe has three parts:
+.AL
+.LI
+one or more files which the recipe constructs,
+known as the
+.I targets
+of the recipe
+.LI
+zero or more files which are used by the recipe to construct the target,
+known as the
+.I ingredients
+of the recipe
+.LI
+one or more commands to execute which construct
+the targets from the ingredients,
+known as the
+.I body
+of the recipe.
+.LE
+.P
+When a number of recipes are given,
+some recipes may describe how to cook the ingredients of other recipes.
+When
+.B cook
+is asked to construct a particular target it
+automatically determines the correct order to perform the
+recipe bodies to cook the requested target.
+.P
+.B Cook
+would not be especially useful if you had to give explicit recipes
+for how to cook every little thing.
+As a result,
+.B cook
+has the concept of an
+.I implicit
+recipe.
+An implicit recipe is very similar to an explicit recipe,
+except that the targets and ingredients of the recipe
+are
+.I patterns
+to be matched to file names,
+rather than explicit file names.
+This means it is possible to write a recipe,
+for example
+which constructs a files with a name ending in `\fB.o\fP' from a file
+of the same name, but ending in `\fB.c\fP' rather than `\fB.o\fP'.
+.P
+In addition to recipes,
+.B cook
+needs to know
+.I when
+to construct targets from ingredients.
+.B Cook
+has been designed to cook as little as possible.
+"As little as possible" is determined by examining when each file was last
+modified,
+and only constructing targets when that are out of date with the ingredients.
+
+.H 3 "When is Cook useful?"
+From the above description,
+.B cook
+may be described as a tool for maintaining consistency of sets of files.
+
+.H 3 "When is Cook not useful?"
+Cook is not useful for maintaining consistency of sets of things
+which are
+.I within
+files and thus
+.B cook
+is unable to determine when they were modified.
+For example,
+.B cook
+is not useful for
+maintaining consistency of sets of records within a database.
+
+.H 2 "How do I tell Cook what to do?"
+Sets of recipes are gathered together into cookbooks.
+When
+.B cook
+is executed it looks for a cookbook of the name
+.I Howto.cook
+in the current directory.
+If you did not name a file to be constructed on the command line,
+the first target in the cookbook will be constructed.
+.P
+The best way to understand how to write recipes is an example.
+In this example, a  program,
+.IR prog ,
+is composed of three files:
+.IR foo.c ,
+.I bar.c
+and
+.IR baz.c .
+To inform
+.B cook
+of this,
+the cookbook
+.eB
+#include "c"
+
+prog: foo.o bar.o baz.o
+{
+        cc -o prog foo.o bar.o baz.o;
+}
+.eE
+is sufficient for
+.I prog
+to be constructed.
+.P
+This cookbook has two parts.
+The line
+.eB
+#include "c"
+.eE
+tells
+.B cook
+to refer to a system cookbook which tells it,
+among other things,
+how to construct a
+.IB something .o
+file from a
+.IB something .c
+file.
+.P
+The second part is a recipe.
+The first line of this recipe
+.eB
+prog: foo.o bar.o baz.o
+    ...
+.eE
+names the target,
+.IR prog ,
+and the ingredients,
+.IR foo.o ,
+.I bar.o
+and
+.IR baz.o .
+.P
+The next three lines
+.eB
+\&...
+{
+        cc -o prog foo.o bar.o baz.o;
+}
+.eE
+are the recipe body,
+which consists of a single
+.IR cc (1)
+command to be executed.
+Recipe bodies are always within
+.B {
+curly braces
+.BR } ,
+and commands always end with a semicolon
+.RB ( ; ).
+.P
+Thus,
+to update
+.I prog
+after any of the source files have been edited,
+it is only necessary to issue the command
+.eB
+cook prog
+.eE
+This could be simplified further,
+because
+.B cook
+will cook the targets of the first recipe by default;
+in this case,
+.IR prog .
+.P
+The power of cook becomes more apparent when include files are
+considered.
+If the files
+.I foo.c
+and
+.I baz.c
+include the file
+.IR defs.h ,
+this would automatically be detected by
+.BR cook .
+If
+.I defs.h
+were to be edited,
+and
+.B cook
+re-executed,
+this would cause
+.B cook
+to recompile
+both
+.I foo.c
+and
+.IR baz.c ,
+and relink
+.IR prog.
+The information about how to turn \fB\&.c\fP files into \fB\&.o\fP files
+came from the ``\f[CW]#include "c"\fP'' line,
+which read in the C recipes distributed with Cook.
+.H 3 "The common program case"
+The above example may be simplified even further.
+If the four files
+.IR foo.c ,
+.IR bar.c ,
+.IR baz.c
+and
+.I defs.h
+all resided in a directory with a path of
+.IR /some/where/prog ,
+then the
+.I Howto.cook
+file in that directory need only contain
+.eB
+#include "c"
+#include "program"
+.eE
+for
+.I prog
+to be cooked.
+This is because the "\f(CWprogram\fP" cookbook
+looks for all of the
+.IB something .c
+files in the current directory,
+compiles them all,
+and links them into a program named after the current directory.
+.P
+The default target in the "\f(CWprogram\fP" cookbook is called
+.IR all .
+The ingredient of
+.I all
+is the program named after the current directory.
+Two other targets are supplied by this cookbook:
+.VL 0.5i
+.LI clean
+removes all of the
+.IB something .o
+files from the current directory.
+.LI clobber
+removes the program named after the current directory,
+and also removes all of the
+.IB something .o
+files from the current directory.
+.LE
+.H 2 "Creating a Cookbook"
+To use
+.B cook
+you will usually need to define a cookbook,
+by creating a file,
+usually called
+.I Howto.cook
+in the current directory,
+with your favorite text editor.
+.P
+This file has a specific format.
+The format has been designed to be easy to learn,
+even for the casual user.
+Much of the power of
+.B cook
+is contained in how it works,
+without complicating the format of the cookbook.
+.br
+.ne 2i
+.P
+Example of what a cookbook looks like are scattered throughout this
+document.
+The following example is the entire cookbook for
+many programs, some quite large:
+.eB
+#include "c"
+#include "yacc"
+#include "usr.local"
+#include "program"
+.eE
+As you can see,
+even for many complex programs,
+the cookbook is remarkably simple.

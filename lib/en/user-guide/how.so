@@ -1,0 +1,459 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1993-1995, 1997, 1998, 2000-2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Actions when Cooking
+.\"
+.H 1 "Actions when Cooking"
+This section describes what
+.B cook
+does when you ask it to cook something.
+.P
+.B Cook
+performs the following actions in the order stated.
+.H 2 "Scan the COOK Environment Variable"
+The
+.B COOK
+environment variable is looked for.
+If it is found,
+it is treated as if it consisted of
+.B cook
+command line arguments.
+Only the
+.B -Help
+option is illegal.
+This could result is very strange behavior if used incorrectly.
+.P
+This feature is supplied to override
+.BR cook 's
+default with your own preferences.
+.H 2 "Scan the Command Line"
+The command line is scanned
+as defined in chapter 3.
+.H 2 "Locate the Cookbook"
+The current directory is scanned for the cookbook.
+Names which a cookbook may have include
+.TS
+center, tab(;);
+c c c.
+howto.cook;Howto.cook;.howto.cook
+how.to.cook;How.to.cook;.how.to.cook
+cookfile;Cookfile;.cookrc
+cook.file;Cook.file;.cook.rc
+.TE
+The first so named file found in the current directory
+will be used.
+The order of search is not defined.
+You are strongly advised to have just
+.I one
+of these name forms in any directory.
+The name
+.I Howto.cook
+is the preferred form.
+.H 2 "Form the Listing Filename"
+The listing file,
+if not explicitly named in the environment variable or on the command line,
+will be the name of the cookbook,
+with any suffix removed and '\f(CW.list\fP' appended.
+.H 2 "Create the Listing file"
+The listing file is created.
+If
+.B cook
+is executing in the background,
+or the
+.B -NoTTy
+option has been specified,
+.I stdout
+and
+.I stderr
+will be redirected into the listing file.
+If
+.B cook
+is executing in the foreground,
+and the
+.B -NoTTy
+option has not been specified,
+.I stdout
+and
+.I stderr
+will be redirected into
+a pipe to a
+.IR tee (1)
+command;
+which will, in turn, copy the output into the named file.
+.P
+A heading line with the name of the file and the date,
+is generated.
+.H 2 "Scan the Cookbook"
+When
+.B cook
+reads the cookbook it evaluates all of the statements it
+finds in it.
+Usually these statements instantiate recipes,
+although other things are possible.
+.P
+Recipes contain statements that are not evaluated immediately,
+but which are remembered for later execution when cooking a target.
+The meaning of a cookbook is defined in chapter X.
+.H 2 "Determine targets to cook"
+If no target files are named on the command line,
+the targets of the first defined explicit or ingredients recipe.
+It is an error if this is none.
+.H 2 "Cooking a Target"
+A derivation graph is formed using all of the targets given.  Once the
+derivation graph is formed, it will be walked, looking for files which
+are out of date.
+.P
+To build the derivation graph for a target,
+each the following steps is performed in the order given:
+.AL
+.LI
+.B Cook
+exploits knowledge of the derivation graph that the user may provide to it:
+.BL
+.LI
+If the \fIgraph_exterior_file\fP variable is set, and the file name is
+listed in it, the file is not a leaf, and the derivation will backtrack
+and try another alternative.
+.LI
+If the \fIgraph_exterior_pattern\fP variable is set, and the file name
+matches one of the patterns listed in it, the file is not a leaf, and
+the derivation will backtrack and try another alternative.
+.LI
+If the \fIgraph_leaf_file\fP variable is set, and the file name is
+listed in it, the file is a leaf file of the derivation.  There is no
+need to attempt to apply any recipes.  It will be an error if the file
+does not exist.
+.LI
+If the \fIgraph_leaf_pattern\fP variable is set, and the file name
+matches one of the patterns listed in it, the file is a leaf file of
+the derivation.  There is no need to attempt to apply any recipes.
+It will be an error if the file does not exist.
+.LE
+These optimizations require an accurate source file manifest,
+but can result is substantial performance improvements.
+.LI
+.B Cook
+scans through the instantiated ingredients recipes
+in the order they were defined.
+All ingredients recipes with the target in their target list are used.
+.P
+If a recipe is used,
+then any ingredients also have their derivation graph constructed.
+When walking the graph,
+if any of the ingredients are younger than the target,
+all other explicit or implicit recipes with the same target will
+be deemed to be out of date.\*F
+.FS
+A target which does not exist yet is considered to be infinitely ancient,
+and thus everything is younger than it.
+.FE
+.LI
+.B Cook
+then scans through the instantiated explicit recipes
+in the order they were defined.
+All explicit recipes with the target in their target list are used.
+.P
+If a recipe is a used,
+the ingredients also have their derivation graph constructed.
+When walking the graph,
+if any ingredients are out of date
+or the target does not yet exist
+(or the "forced" flag is set in the recipe's \fIset\fP clause)
+the recipe body will be performed.
+If a recipe has no ingredients,
+it will not be performed,
+unless the target does not yet exist, or it is forced.
+.LI
+If the target was not in the target list of any explicit recipe,
+.B cook
+then scans the instantiated implicit recipes in the order they were
+defined, in two passes.  Implicit recipes which not not have pattern
+elements in the basename of the targets are scanned before implicit
+recipes which do have patterns in the basename.  Usually this has
+no significant effect, however in heavily heterogeneous builds this
+method is often used in constructing the dependency files, so that all
+architectures may use the one implicit dependency recipe, rather than
+stating every architecture explicitly.  Within each pass, the order of
+scan is the order of definition.
+.P
+Implicit recipe targets and ingredients may contain a wildcard
+character (\fB%\fP),
+which is why they are implicit.
+When expressions are evaluated into word lists in an implicit recipe,
+any word containing the wildcard character (\fB%\fP) will be expanded
+out by the current wildcard expansion.
+.P
+If the target matches a pattern in the targets of an implicit recipe,
+it is a candidate.
+Each ingredient of a candidate recipe is recursively cooked.
+If any ingredient cannot be cooked,
+then the implicit recipe is not used.
+If all ingredients can be cooked,
+then the implicit recipe is used.
+.P
+If an implicit recipe is a used,
+the forced ingredients also have their derivation graph constructed.
+It is an error if a forced ingredient cannot be constructed.
+.P
+Only the first implicit recipe to get to this point is used.
+The scan stops at this point.
+.LI
+If the target is not the subject of any ingredients or explicit recipe,
+and no implicit recipes can be applied, then several derivations are
+attempted, in the order specified:
+.BL
+.LI
+If the \fIgraph_interior_file\fP variable is set, and the file name is
+listed in it, the file is a not leaf file of the derivation.  Cook will
+backtrack and try another alternative.
+.LI
+If the \fIgraph_interior_pattern\fP variable is set, and the file name
+matches one of the patterns listed in it, the file is a not leaf file
+of the derivation.  Cook will backtrack and try another alternative.
+.LI
+If the \fIgraph_leaf_file\fP variable is set, and the file name is
+listed in it, the file is a leaf file of the derivation.  It will be an
+error if the file does not exist.
+.LI
+If the \fIgraph_leaf_pattern\fP variable is set, and the file name
+matches one of the patterns listed in it, the file is a leaf file of
+the derivation.  It will be an error if the file does not exist.
+.LI
+If either of the \fIgraph_leaf_file\fP or \fIgraph_leaf_pattern\fP
+variables are set, then the file is not a leaf, and the derivation will
+backtrack and try another alternative.
+.LI
+If the file exists, then it is up to date, and the file is a leaf file
+of the derivation.
+.LI
+If the file does not exist then \fBCook\fP doesn't know how, and the
+derivation will backtrack and try another alternative.
+.LE
+.LE
+.P
+If a command in the body of any recipe fail,
+.B cook
+will not that body any further,
+and will not perform the body of any recipe for which the target
+of the failed actions was an ingredient,
+directly or indirectly.
+.P
+.B Cook
+will trap recursive looping of targets.
+.BL
+.LI
+If the file exists, the it is up to date, or
+.LI
+If the file does not exist then
+.B cook
+doesn't know how.
+.LE
+.H 2 "The Dependency Graph"
+The above section describes how Cook derives the dependency graph.
+Once the dependency graph has been derived, it is then walked.
+The next section describes a little about how Cook walks the dependency graph.
+.P
+Cook is a simple kind of expert system.  You give it a set of of recipes
+for how to construct things, and a target to be constructed.  The
+recipes can be decomposed into pair-wise ordered dependencies between
+files.
+.P
+Cook determines how to build the target by constructing a \fIdirected
+acyclic graph\fP.  The vertexes of this graph are the files in the
+system, the edges in this graph are the inter-file dependencies.  The
+edges of the graph are directed because the pair-wise dependencies are
+ordered resulting in a \fIacyclic\fP graph \- things which look like
+loops are resolved by the direction of the edges.
+.P
+For example, if you have a simple cookbook (with the recipe bodies
+omitted for simplicity) like this:
+.eB
+program: one.o two.o;
+one.o: one.c one.h;
+two.o: two.c two.h one.h;
+.eE
+here is the corresponding directed acyclic graph.
+.PS
+E1: ellipse "one.c"
+E2: ellipse "one.h" with .w at E1.e+(0.25,0)
+E3: ellipse "two.c" with .w at E2.e+(0.25,0)
+E4: ellipse "two.h" with .w at E3.e+(0.25,0)
+E5: ellipse "one.o" with .s at 1/2<E1.n,E2.n>+(0,0.25)
+E6: ellipse "two.o" with .s at 1/2<E3.n,E4.n>+(0,0.25)
+E7: ellipse "program" with .s at 1/2<E5.n,E6.n>+(0,0.25)
+arrow from E1.n to E5.sw
+arrow from E2.n to E5.se
+arrow from E3.n to E6.sw
+arrow from E4.n to E6.se
+arrow from E5.n to E7.sw
+arrow from E6.n to E7.se
+arrow from E2.ne to E6.w
+.PE
+.P
+There are several things that can be done with the graph once it has
+been derived:
+.br
+.if n *
+.if t \(bu
+It can be walked to verify and regenerate the referential integrity of
+the files (the usual case), or
+.br
+.if n *
+.if t \(bu
+it can walked to print the pair-wise dependencies (the \f[CW]-pairs\fP
+option), or
+.br
+.if n *
+.if t \(bu
+it can be walked to generate a shell script
+(the \f[CW]-script\fP option)
+which does something very similar to the first option.
+.H 3 "Edge Types"
+Each of the arrows in the above graph have a specific type.
+.VL 0.6i
+.LI \fIstrict\fP
+edges mean that Cook will decide that a target is out-of-date if its
+time stamp is not strictly younger than all of the ingredients.  This is
+almost always what you want.
+.LI \fIweak\fP
+edges mean that Cook will decide that a target is out-of-date if its
+time stamp is older than any of the ingredients.  This means that the
+times stamps of the target and ingredients may be equal - this is useful
+for hard links and symbolic links.
+You specify edges of this type by appending the ``\f[CW](weak)\fP''
+string to the name of the ingredient.
+.LI \fIexists\fP
+edges mean that Cook will arrange for the ingredient to be cooked
+before the recipe is run, but the time stamp \fIis not consulted\fP.
+The ingredient cannot ever make the target out-of-date.  This is useful
+form coping with version stamps which change often, but you don't want
+to re-link unless something else changes.
+You specify edges of this type by appending the ``\f[CW](exists)\fP''
+string to the name of the ingredient.
+.LE
+The default edge type is ``\fIstrict\fP''.
+You can use the "time-adjust" setting (see the "set" command)
+to make this simpler on very fast machines.
+.H 2 "File Status"
+.B Cook
+determines the time a file was last modified by asking the operating system.
+Because this operation tends to be performed frequently,
+.B cook
+maintains a cache of this information,
+rather than make redundant calls to the operating system.
+Because this information is cached,
+it is possible for
+.BR cook "'s"
+memory of a file's last-modified time
+to become inconsistent with the file's actual last-modified time.
+In particular,
+.B cook
+doe \fInot\fP ask the operating system for the "new" last-modified time
+of a recipe target once a recipe body is completed.
+Careful use of the \f(CWset clearstat\fP clause
+will generally prevent this.
+For example,
+the following recipe needs to create a directory
+when writing its output:
+.eB
+bin/%: [%_obj]
+{
+        if [not [exists bin]] then
+                mkdir bin;
+        [cc] -o [target] [need];
+}
+.eE
+If there were several programs being cooked,
+e.g. \fIbin/foo\fP and \fIbin/bar\fP,
+the second time \fBcook\fP performed the recipe,
+it would erroneously attempt to make the \fIbin\fP directory
+a second time - contrary to the test.
+This is because \fI[exists bin]\fP used the cache,
+and nothing tells \fBcook\fP that the cache is now wrong.
+The recipe should have been written
+.eB
+bin/%: [%_obj]
+{
+        if [not [exists bin]] then
+                mkdir bin
+                        set clearstat;
+        [cc] -o [target] [need];
+}
+.eE
+which tells \fBcook\fP that it should remove any files
+named in the \fImkdir\fP command from the cache.
+.P
+An alternative way of performing the above example
+is to set the \fImkdir\fP recipe flag:
+.eB
+bin/%: [%_obj]
+        set mkdir
+{
+        [cc] -o [target] [need];
+}
+.eE
+This flag instructs \fBcook\fP to create the directory for the target
+before running the
+recipe body.
+There is a similar \fIunlink\fP flag, which unlinks the targets of the recipe
+before running the recipe body.
+These two flags take care of most, but not all,
+uses of the \fIclearstat\fP flag.
+.P
+A second mechanism used by
+.B cook
+to determine the last-modified times of files is
+a file
+.IR fingerprint .
+This is a cryptographically strong hash of the contents of a file.
+The chances of two different files having the same fingerprint
+is less than 1 in 2**200.
+If \fBcook\fP notices that a file has changed,
+because its last-modified time has changed,
+a fingerprint is taken of the file
+and compared with the remembered fingerprint.
+If the fingerprints differ,
+the file is considered to be different.
+If the fingerprints match,
+the file is considered not to have changed.
+.P
+This description of fingerprints is somewhat simplified,
+the actual mechanics depends on remembering two
+different last-modified times,
+as well as the fingerprint,
+in a file called
+.I \&.cook.fp
+in the current directory.
+.P
+Fingerprinting can cause some surprises.
+For example,
+when you use the
+.IR touch (1)
+command,
+.B cook
+will often fail to do anything,
+and report instead that everything is up-to-date.
+This is because the fingerprint has not changed.
+In this situation,
+either remove the
+.I \&.cook.fp
+file,
+or use the
+.B -No_FingerPrint
+command line option.

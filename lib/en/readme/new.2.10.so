@@ -1,0 +1,54 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1999, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new.2.10.so
+.\"
+.PP
+.if n *
+.if t \(bu
+Numerous portability problems have been fixed in the configure and build.
+.PP
+.if n *
+.if t \(bu
+.\" change 20
+A bug has been fixed which prevented Cook from working correctly when
+run by some versions of \fIcron\fP(8) and \fIat\fP(1).
+.PP
+.if n *
+.if t \(bu
+.\" change 18
+There is a new \fIcook_bom --ignore\fP option, allowing you to nominate
+file patterns that you don't want in the file lists.
+.PP
+.if n *
+.if t \(bu
+.\" change 16
+There is a new [__FUNCTION__] variable, which contains the name of the
+executing function, which suppliments the existing [__FILE__] and
+[__LINE__] variables.
+.PP
+.if n *
+.if t \(bu
+.\" change 12
+Functions now have local variables, just put the word \f[CW]local\fP
+on the left-hand-side of the first assignment.  Local variables are
+reentrant and thread-safe.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.10 (1999-Sep-06)

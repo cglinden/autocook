@@ -1,0 +1,1174 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1994, 1995, 1997-2003, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Cookbook Language Definition
+.\"
+.H 1 "Cookbook Language Definition"
+.nr Cl 3
+.nr toc*tlevel 3
+This chapter defines that language which cookbooks
+are written in.
+While some of its properties are similar to C,
+do not be misled.
+.P
+A number of sections appear within this chapter.
+.AL
+.LI
+The
+.I "Lexical Analysis"
+section describes what the words of the cookbook language look like.
+.LI
+The
+.I Preprocessor
+section describes
+the include mechanism
+and the conditional compilation mechanism.
+.LI
+The
+.I "Syntax and Semantics"
+section describes
+how words in the cookbook may be combined to form valid constructs
+(the
+.IR syntax ),
+and what these constructs
+mean (the
+.IR semantics ).
+.LE
+.P
+The sections are laid out in the recommended reading order.
+.H 2 "Lexical Analysis"
+The cookbook is made of a number of recipes,
+which are in turn made of words.
+This section describes what constitutes a word, and what does not.
+.H 3 "Words and Keywords"
+Words are made of sequences of almost any character,
+and are separated by white space (including end-of-line) or the
+special symbols.
+.B Cook
+is always case sensitive
+when reading cookbooks.
+.P
+The characters
+.B ":;={}[]"
+are the special symbols,
+and are words in themselves,
+needing no delimiting.
+.P
+In addition to the special symbols,
+some words,
+known as
+.IR keywords ,
+have special meaning to
+.BR cook .
+The keywords are:
+.TS
+center, tab(;);
+ce ce ce ce.
+else;host-binding;loopstop;single-thread
+fail;if;return;then
+function;loop;set;unsetenv
+.TE
+You will meet the keywords in later sections.
+.H 3 "Escape Sequences"
+The character
+.B \e
+is the
+.I escape
+character.
+If a character is preceded by a
+.B \e
+any specialness,
+if it had any,
+will be removed.
+If it had no specialness it may have some added.
+.P
+This means that,
+if you want to use
+.B if
+as a word,
+rather than a keyword,
+at least one of its characters needs to be escaped,
+for example
+.BR \eif .
+.P
+The escape sequences which are special are as follows.
+.TS
+center, tab(;);
+cf(B) lw(2.2i).
+\eb;The backspace character
+\ef;The form feed character
+\en;The newline or linefeed character
+\er;The carriage return character
+\et;The horizontal tab character
+\e\fInnn\fP;T{
+A character with a value of
+.IR nnn ,
+where
+.I nnn
+is an octal number of at most 3 digits.
+T}
+.TE
+An escaped end-of-line is totally ignored.
+It should be noted that a cookbook may not have any non-printing
+ASCII characters in it other than space, tab and end-of-line.
+.H 3 "Quoting"
+Words, and sections of words, may be quoted.
+If any part of a word is quoted it cannot be a keyword.
+.P
+This means that,
+if you want to use
+.B if
+as a word, rather than a keyword,
+at least one of its characters needs to be quoted,
+for example
+.BR "\&'if'" .
+.P
+Both single
+.RB ( ' )
+and double
+(\fB"\fP)
+quotes are understood by
+.BR cook ,
+and one may enclose the other.
+If a quote is escaped it does not open or close a quote as it usually
+would.
+.P
+.B Cook
+does not like newlines within quotes.
+This is a generally good heuristic for catching unbalanced quotes.
+If you really want a newline within a string, use the \f[CW]\en\fP escape.
+.H 3 "Comments"
+Comments are delimited on the left by
+.BR /* ,
+and on the right by
+.BR */ .
+If the
+.B /
+character has been escaped or quoted,
+it doesn't introduce a comment.
+Comments may be nested.
+Comments may span multiple lines.
+Comments are replaced by one logical space.
+.H 2 "Preprocessor"
+The preprocessor may be thought of as doing a little work before the
+.I "Syntax and Semantics"
+section has its turn.
+.P
+The preprocessor is driven by
+.IR "preprocessor directives" .
+A preprocessor directive is a line
+which starts with a hash
+.RB ( # )
+character.
+Each of the preprocessor directives is described below.
+.H 3 "include"
+The most common preprocessor directive is
+.eB
+#include "\f(CIfilename\fP"
+.eE
+.P
+This preprocessor directive is processed as if the contents
+of the named file had appeared in the cookbook,
+rather than the preprocessor include directive.
+.P
+The most common use of the #include directive is to include
+system cookbooks.
+For example, many small programs can be developed
+using the following simple cookbook:
+.eB
+#include "c"
+#include "program"
+.eE
+.P
+The standard places to search are first any path specified with the
+.B -Include
+command line option,
+and then
+.I $HOME/.cook
+and
+then
+.IR \*[datadir]
+in that order.
+.H 3 "include-cooked"
+This directive looks similar to the one above,
+but do not be deceived.
+.eB
+#include-cooked \fIfilename\fP...
+.eE
+You may name several filenames on the line,
+and they may be expressions.
+.P
+The search path used for these files
+is the same as that used for other cooked files,
+see the
+.I search_list
+variable and the
+.I resolve
+built-in function for more information.
+The order in which you set the
+.I search_list
+and the
+.I #include-cooked
+directives is important.
+Always set the
+.I search_list
+variable first,
+if you are going to use it.
+.P
+Files included in this way are checked,
+after they have been read,
+to make sure they are up-to-date.
+If they are not,
+.B cook
+brings them up-to-date
+and then re-reads the cookbook and starts over.
+.P
+You will only get a warning if the files are not found.
+Usually,
+.B cook
+will either succeed in constructing them,
+in which case they will be present the second time around,
+or a fatal error will result from attempting to construct them.
+Note that it is possible to go into an infinite loop,
+if the files are constantly out-of-date.
+.P
+The commonest use of this construct
+is maintaining include file dependency lists
+for source files.
+.eB
+obj = [fromto %.c %.o [glob *.c]];
+
+%.o: %.c
+{
+        [cc] [cc_flags] -c %.c;
+}
+
+%.c.d: %.c
+{
+        c_incl -prefix "'%.o "[target]": %.c'" -suffix "';'"
+                -no-cache %.c > [target];
+}
+
+#include-cooked [fromto %.o %.c.d [obj]]
+.eE
+This cookbook fragment shows how include file dependencies are maintained.
+Notice how the \fI.d\fP files have a recipe to construct them,
+and that they are also included.
+.B Cook
+will bring them up-to-date if necessary,
+and then re-read the cookbook,
+so that it is always working with the current include dependencies.
+(The doubly nested quotes are to insulate the spaces
+and special characters from both
+.B cook
+and the shell.)
+.P
+You could use
+.I "gcc -MM"
+if you prefer (you will need some extra shell script).
+The
+.I c_incl
+program understands absent files better
+but doesn't understand conditional compilation,
+and
+.I gcc
+understands conditional compilation but
+gives fatal errors for absent include files.
+Warning:
+If you are using
+.I search_list
+you
+.B must
+use
+.IR c_incl .
+Gcc returns complete paths,
+which will result in
+.B cook
+failing to notice when
+an include file is copied from later in the search list to earlier,
+and then modified.
+.P
+There are times when you don't want the \f[CW]#include-cooked\fP directives to
+be acted upon.  You can over-ride it using the \f[CW]--no-include-cooked\fP
+command line option, but it is often easier to use the
+\f[CW][command-line-goals]\fP variable, and say something like
+.eB
+#if [not [match %1clean%2 [command-line-goals]]]
+#include-cooked [fromto %.o %.c.d [obj]]
+#endif
+.eE
+This construct means that whenever an explicit ``\f[CW]clean\fP'' goal
+(or similar) is requested, the \f[CW]#include-cooked\fP lines will not
+be performed.  This is sensible, because cleaning actions usually remove
+dependency files; there is no point making sure they are up-to-date first.
+.H 3 "include-cooked-nowarn"
+This directive is almost identical to the one above,
+but no warning is issued for absent files.
+.eB
+#include-cooked-nowarn \fIfilename\fP...
+.eE
+You may name several filenames on the line,
+and they may be expressions.
+.H 3 "if"
+The #if directive may be used to conditionally pass tokens to
+the syntax and semantics processing.
+Directives take the form
+.eB
+#if \fIexpression1\fP
+\fIsomething1\fP
+#elif \fIexpression2\fP
+\fIsomething2\fP
+#else
+\fIsomething3\fP
+#endif
+.eE
+There may be any number of \f(CWelif\fP clauses,
+and the \f(CWelse\fP
+clause is optional.
+Only one of the
+.I somethings
+will be passed through.
+.H 3 "ifdef"
+This directive takes a similar form to the \f(CWif\fP directive,
+but with a different first line:
+.eB
+#ifdef \fIvariable\fP
+.eE
+This is syntactic sugar for
+.eB
+#if [defined \fIvariable\fP]
+.eE
+This is of most use in bracketing \f(CW#include\fP directives.
+.H 3 "ifndef"
+This directive takes a similar form to the \f(CWif\fP directive,
+but with a different first line:
+.eB
+#ifndef \fIvariable\fP
+.eE
+This is syntactic sugar for
+.eB
+#if [not [defined \fIvariable\fP]]
+.eE
+This is of most use in bracketing \f(CW#include\fP directives.
+.H 3 "pragma"
+This is for the addition of extensions.
+.H 4 "once"
+This directive is to ensure that include files in which it appears are
+included exactly once.
+.P
+This directive has the form
+.eB
+#pragma once
+.eE
+.H 4 "unknown extensions"
+Any pragma extensions not recognized will be ignored.
+.SK
+.H 2 "Syntax and Semantics"
+The syntax is described using ``train track'' diagrams,
+with prose descriptions of the related semantics.
+.H 3 "Overall Structure"
+The general form of the cookbook is defined as
+.so lang.cook.pic
+A cookbook is defined as a sequence of statements.
+Each statement statement is executed.
+For a definition of what it means when a statement is executed,
+see the individual statement definitions.
+.P
+The nonterminal symbol
+.I statement
+will be defined in the sections below.
+.P
+Please note that a statement is not always evaluated when is is read,
+but at specific, well defined times.
+.H 3 "The Compound Statement"
+A nonterminal symbol which will be referred to below is the
+.I compound_statement
+symbol,
+defined as follows:
+.so lang.cstmt.pic
+The compound statement may be used anywhere a statement may be,
+and in particular
+.so lang.cstm2.pic
+.H 3 "Variables and Expressions"
+.B Cook
+provides variables to the user to simplify things.
+.H 4 "The Assignment Statement"
+It is possible to assign to variables with the following statement.
+.so lang.asign.pic
+When this statement is executed,
+the variable whose name the left hand expression evaluates to will be
+assigned the value that the right hand expression list evaluates to.
+.P
+For example:
+.eB
+program_obj = foo.o bar.o baz.o;
+.eE
+.P
+\fBNote:\fP
+It is possible to over-ride the value of built-in functions and variables
+with this statement.  This will not produce an error message, however
+it is usually not desirable as it will change the meaning of the rest
+of your cookbook.
+.H 4 "The Assign-Append Statement"
+It is possible to append to the value of variables with the following statement.
+.so lang.asig2.pic
+When this statement is executed, the variable whose name the left hand
+expression evaluates to will have its value appended by the value that
+the right hand expression list evaluates to.  Expression values are lists
+of words, appending means to append to the word list; it does \fInot\fP
+mean appending to the last string of the value.
+.P
+For example:
+.eB
+program_obj += [glob "deeper/*.o" ];
+.eE
+.P
+\fBNote:\fP
+It is possible to over-ride the value of built-in functions and variables
+with this statement.  This will not produce an error message (unless
+evaluating them with no arguments is an error), however it is usually
+not desirable as it will change the meaning of the rest of your cookbook.
+.H 4 "The Setenv Statement"
+It is possible to assign to environment variables with the following statement.
+.so lang.seten.pic
+When this statement is executed, the environment variable whose name
+the left hand expression evaluates to will be assigned the value that
+the right hand expression list evaluates to.
+It is an error if the variable does not already exist.
+.P
+For example:
+.eB
+setenv PATH = [getenv PATH]":"[getenv HOME]/more-bin;
+.eE
+.H 4 "The Setenv-Append Statement"
+It is possible to append to the value of an environment variables with
+the following statement.
+.so lang.sete2.pic
+When this statement is executed, the environment variable whose name the
+left hand expression evaluates to will have its value appended by the
+value that the right hand expression list evaluates to.  Evaluation is
+analogous to the assign-append statement.
+.P
+For example:
+.eB
+setenv FRED += nurk;
+.eE
+.H 4 "Expressions"
+Many definitions make reference to the
+.IR expr,
+.I elist
+and
+.I exprs
+nonterminal symbols.
+These are defined as follows.
+.P
+The
+.I elist
+is a list of at least one expression,
+.so lang.elist.pic
+whereas the
+.I exprs
+is a list of zero or more expressions.
+.so lang.exprs.pic
+.P
+An expression is composed of words,
+variable references,
+function invocations,
+or concatenation of expressions.
+The concatenation is implied by abutting the two parts of the expression
+together,
+\fIe.g.:\fP "\f(CW[fred]>thing\fP" is an
+indirection on
+.I fred
+concatenated with the literal word "\f(CW>thing\fP".
+.so lang.expr.pic
+.P
+When an
+.BI [ elist ]
+expression is evaluated,
+the
+.I elist
+is evaluated first.
+If the result is a single word, then a variable of that name is
+searched for.
+If found the value of an expression of this form is the value of the variable.
+.P
+If there is no variable of the given name,
+or the
+.I elist
+evaluated to more than one word,
+the first word is taken to be a built-in function name.
+If there is no function of this name it is an error.
+.P
+The
+.I cat
+operator works as one would expect,
+joining the last word of the left
+expression and the first word of the right expression together,
+and otherwise leaving the order of the expressions alone.
+One usually uses the trivial case of single word expressions.
+For more complex concatenations, see the [catenate] and [join] built-in
+functions.
+.H 3 "Recipes"
+A number of forms of
+.I statement
+are concerned with telling
+.B cook
+how to cook things.
+There are three forms,
+the
+.I explicit
+recipe,
+the
+.I implicit
+recipe,
+and the
+.I ingredients
+recipe.
+.H 3 "The Explicit Recipe Statement"
+The explicit recipe has the form
+.so lang.recip.pic
+The target(s) of the recipe are to the left of the colon,
+and the ingredients, if any, are to the right.
+The statements, usually commands, which are to be performed to
+(re)construct the target(s) are contained in the compound statement.
+The expressions are only evaluated into words when the recipe is
+executed.
+Recipe bodies may have local variables.
+.P
+For example:
+.eB
+program: [program_obj]
+{
+        /* use [need] rather than [program_obj] in case
+           there are additional ingredients recipes
+           (see below).  */
+        cc -o program [need];
+}
+.eE
+.P
+The target expressions and recipe flags are evaluated when the recipe is
+instantiated.  The ingredients expressions and the recipe gate are
+evaluated at graph building time.  The body and use statements are
+executed at graph walking time.
+.P
+The recipes also take a ``\fIhost-binding\fP'' attribute.
+See the chapter on Cooking in Parallel for how this is attribute is
+written and used.
+If the host binding flag is given, it is always used, even when not
+cooking in parallel.  If it is not given \fIand\fP you are cooking
+in parallel, it will default to the contents of the [parallel_hosts]
+variable.
+.so langu.flags.so
+.H 4 "Recipe Gate"
+Each recipe may have a
+.IR gate .
+The gate is a way of specifying a conditional recipe;
+if the condition is not true, the recipe is not used.
+The condition is in addition to the condition that
+the ingredients are cookable.
+.so lang.gate.pic
+.P
+For example:
+.eB
+program: [program_obj]
+        if [not [in horrible.o [program_obj]]]
+{
+        cc -o program [program_obj];
+}
+.eE
+.H 4 "Then Clause"
+There are times when it is necessary to know that a recipe has been applied,
+but because the recipe was up-to-date, the recipe body was not run.
+.so lang.usecl.pic
+The then-clause is run every time the recipe is applied,
+even if the recipe is up-to-date.
+It will be run after the recipe body,
+if the recipe body is run.
+All of the usual percent (%) substitutions and automatic variables will apply.
+Recipe then-clauses may have local variables.
+.P
+For example:
+.eB
+program: [program_obj]
+{
+        cc -o program [program_obj];
+}
+then
+{
+        install-set += program;
+}
+.eE
+.H 4 "Double Colon"
+Most cookbooks are constructed so that if
+.B cook
+finds a suitable recipe for the target it is currently constructing,
+it will apply the recipe and then conclude that it has finished constructing
+the target.
+In some rare cases you will want
+.B cook
+to keep going after applying a recipe.
+To specify this use a ``double colon'' construction:
+.so lang.reci2.pic
+This operates like a normal explicit recipe, but
+.B cook
+will continue on looking for recipes after applying this one.
+As soon as an applicable ``single colon'' recipe is found and applied,
+.B cook
+will conclude that it has finished constructing the target.
+.P
+For example:
+.eB
+all:: programs
+{
+        [print "all programs done"];
+}
+all:: libraries
+{
+        [print "all libraries done"];
+}
+.eE
+.H 3 "The Implicit Recipe Statement"
+Implicit recipes are distinguished from explicit recipes in that
+and implicit recipe has a target with a '\fB%\fP' character in it.
+.H 4 "Simple Form"
+.P
+In general the user will rarely need to use the implicit recipe
+form, as there are a huge range of implicit recipes already
+defined in the system default recipes.
+.P
+An example of this recipe form is
+.eB
+%: %.gz
+{
+        gzcat %.gz > %;
+}
+.eE
+This recipe tells
+.B cook
+how to use the
+.IR gzcat (1)
+program.
+.H 4 "Complex Form"
+The implicit recipe recipe has a second form
+where there are two sets of ingredients,
+separated by another colon.
+In this form,
+the ingredients specified in
+the first ingredients list
+are used to determine the applicability of the recipe;
+if these are all constructible then the recipe will be applied,
+if any are not constructible then the recipe will not be applied.
+If the recipe is applied,
+the ingredients specified in
+the second ingredients list
+are required to be constructible.
+The
+the second ingredients list
+section is known as the
+.I "forced ingredients"
+section.
+.P
+.B Note:
+if you want the
+first ingredients list
+to be empty you
+.I must
+separate the two colons with a space,
+otherwise
+.B cook
+will think this is a ``double colon'' recipe.
+.P
+An example of this is the C recipe
+.eB
+%.o: %.c: [collect c_incl -api %.c]
+{
+        cc -c %.c;
+}
+.eE
+This recipe is applied if the
+.I %.c
+file can be constructed,
+and is not applied if it cannot be constructed.
+The include dependencies are only expressed if the recipe
+is going to be applied;
+but if they are expressed, they
+.I must
+be constructible.
+This means that absent include files generate an error\*F.
+.FS
+This is not the recommended way of determining C include dependencies,
+see the ``Include Dependencies'' chapter for more information.
+.FE
+.P
+The naive form of this recipe
+.eB
+%.o: %.c [collect c_incl -api %.c]
+{
+        cc -c %.c;
+}
+.eE
+will attempt to apply the
+.I c_incl
+command before the
+.I %.c
+file is guaranteed to exist.
+This is because the
+.I exprs2
+is performed after the
+.I exprs1
+all exist (because they are constructible, they have been constructed).
+In this naive form,
+absent include files result in the recipe not being applied.
+.H 4 "Double Colon"
+Just as explicit recipes have a ``double colon'' form,
+so do both types of implicit recipes.
+The semantics are identical, with
+.B cook
+looking for more than one applicable implicit recipe,
+but stopping if it finds an applicable ``single colon'' implicit recipe.
+.P
+As stated earlier in this manual,
+.B cook
+first scans for explicit recipes
+before scanning for implicit recipes.
+If an explicit recipe has been applied,
+.B cook
+will not also look for applicable implicit recipes,
+even if all the applicable explicit recipes were double colon recipes.
+.H 3 "The Ingredients Recipe Statement"
+The ingredients recipe has the form
+.so lang.reci3.pic
+The target(s) of the recipe are to the left of the colon,
+and the prerequisites are to the right.
+There are no statements to perform to cook the targets
+of this recipe, it is simply supplementary to any other recipe,
+usually an implicit recipe.
+.P
+For example:
+.eB
+program: batman.o robin.o;
+.eE
+.P
+The right-hand-side expressions are only evaluated into words when the
+recipe is instantiated.
+.P
+Ingredients recipes are usually explicit, but it is also valid to use
+implicit ingredients recipes.
+.P
+For example:
+.eB
+some-%-program: %.o;
+.eE
+.H 3 "The Cascade Recipe Statement"
+The cascade recipe statement has the form
+.so lang.casca.pic
+This recipe specifies on its right-hand-side additional ingredients for
+any recipe which has ingredients mentioned on the left-hand-side of this
+cascade recipe.
+.P
+Unlike all other recipe forms, both the left-hand-side \fIand\fP the
+right-hand-side are evaluated when the recipe is instantiated.
+.P
+For example:
+.eB
+cascade batman.c = robin.h;
+cascade somelib.a = some-deeper-lib.a;
+.eE
+.H 3 "Commands"
+Commands may take several forms in
+.BR cook .
+They all have one thing in common; they execute a command.
+.H 3 "The Simple Command Statement"
+The simplest command form is
+.so lang.cmd1.pic
+When executed,
+the
+.I elist
+is evaluated into a word list
+and used as a command to be passed to the operating system.
+On UNIX this usually means that a shell is invoked to run the command,
+unless the string contains no shell meta-characters.
+.P
+The
+.I flags
+are those which may be specified
+in the explicit recipe statement.
+They have a higher precedence than either the
+.I set
+statement or the
+recipe flags.
+.P
+Some characters in commands are special both to the shell and to cook.
+You will need to quote or escape these characters.
+Each command is executed in a separate process,
+so the \f(CWcd\fP command will not work,
+you will need to combine it with the relevant commands,
+not forgetting to escape the semicolon (\f(CW;\fP) characters.
+.P
+When Cook needs to invoke a shell to execute a command, it uses the
+shell named in the \f[CW]SHELL\fP environment variable.
+If the cookbook is to be used by a variety of users, each with a different
+shell setting, it may be useful to add a
+.eB
+setenv SHELL = /bin/sh;
+.eE
+line at the top of your cookbook.
+.P
+It is also important to note that unless the \fIerrok\fP flag has been
+specified, the shell will be given the \f[CW]\fP-e\fP option, which will
+cause it to exit immediately after the first command which returns a
+non-zero exit status.
+This can be important when commands in the \fI.profile\fP or \fI.bashrc\fP
+(or similar) file fails.
+.H 3 "The Data Command Statement"
+For programs which require
+.I stdin
+to be supplied by
+.B cook
+to perform their functions,
+the data command statement has been provided.
+.so lang.cmd2.pic
+In this form,
+the
+.I expr
+is evaluated and used as input to the
+command.
+Between the
+.B data
+and
+.B dataend
+keywords the definition of the special symbols and whitespace change.
+There are only two special symbols,
+.B [
+and
+.BR ] ,
+to allow functions and variable references to appear in the expression.
+In addition,
+whitespace ceases to have its usual specialness;
+it is handed to the command,
+instead.
+.P
+For those of you familiar with writing shell scripts, this is analogous
+to \fIhere\fP documents.  It allows you to create an input file without
+creating an explicit temporary file.  It also allows you to create files
+that you could not create using \fIecho\fP redirected into the file\*F.
+.FS
+For example, Windows NT has a ludicrously small command line length limit.
+.FE
+.P
+The
+.B data
+keyword must be the last on a line,
+whitespace after the
+.B data
+keyword up to and including end-of-line,
+will
+.I not
+be given to the command.
+.P
+The
+.B dataend
+keyword must appear alone on a line,
+optionally surrounded by whitespace;
+if it is not alone,
+it is not a
+.B dataend
+keyword and will not terminate the expression.
+.P
+An example of this may be useful.
+.eB
+/usr/fred/%: %
+{
+        newgrp fred;
+data
+cp % /usr/fred/%
+dataend
+}
+.eE
+The \fInewgrp\fP(1) command is used to change the default group of
+a process, and then throw a shell; so the ``cp'' is executed by this
+sub-shell when it reads its standard input.
+If the directory
+.I /usr/fred
+has read-only permissions for others,
+and group write permissions,
+and belonged to group
+.IR fred ,
+and you were a member of group
+.IR fred ,
+the above implicit recipe could be used to copy the file.
+.P
+Here is an example of how to cope with stupidly short NT command lines:
+.eB
+%.LIB: [%_obj]
+{
+        cat > %.contents;
+data
+[unsplit "\en" [unix-to-dos [need]]]
+dataend
+        link -lib "/out:"[unix-to-dos [target]] @%.contents;
+        rm %.contents;
+}
+.eE
+The ``@\fIsomething\fP'' means the linker should read file names from
+the \fIsomething\fP file.
+.P
+This technique will also work with Unix if you have more then 5MB of
+command line arguments \fIand\fP the program is written to have an
+option something like this (many have a \fB-f\fP option).
+.H 3 "The Set Statement"
+It is possible to override the defaults
+used by
+.B cook
+or even those specified by the
+.I COOK
+environment variable,
+by using the
+.I set
+statement.
+.so lang.set.pic
+The flag values are those mentioned in the
+.I flags
+clause of the explicit recipe statement.
+Many command-line options have equivalent flag settings.
+There is no ``unset'' statement,
+to restore the default settings,
+but it is possible to set flags the other way,
+by adding or removing the ``no'' prefix.
+.P
+To set flags for individual recipes,
+use the
+.I flags
+clause of the recipe statements.
+.P
+To set flags for individual commands,
+use the
+.I flags
+clause of the command statements.
+.H 4 "Examples"
+Fingerprinting is not used by default,
+because it can cause a few surprises,
+and takes a little more CPU.
+To enable fingerprinting for you project,
+place the statement
+.eB
+set fingerprint;
+.eE
+somewhere near the start of your
+.I Howto.cook
+file.
+The
+.B -No_FingerPrint
+command line option can still override this,
+but the default behavior will be to use fingerprints.
+.P
+To prevent echoing of commands as they are executed,
+place
+.eB
+set silent;
+.eE
+somewhere in your
+.I Howto.cook
+file.
+The
+.B -NoSilent
+command line option can still override this,
+but the default behavior will be not to echo commands.
+.H 3 "The Fail Statement"
+.B Cook
+can be forced to think that a recipe has failed
+by the uses of the
+.B fail
+statement.
+.so lang.fail.pic
+This is hugely useful when programs do not return a useful exit
+status,
+but
+.I do
+fail.
+If they have printed an error message,
+but not produced the output file, you could use the Fail statement
+without arguments:
+.eB
+fred: other stuff
+        set unlink
+{
+        brain-dead [need] -o [target];
+        if [not [exists [target]]] then
+                fail;
+}
+.eE
+.P
+If you give the Fail statement any arguments,
+they will be printed as an error message before the recipe fails:
+.eB
+fred: other stuff
+        set unlink
+{
+        brain-dead [need] -o [target];
+        if [not [exists [target]]] then
+                fail Did not produce [target] file.;
+}
+.eE
+.H 3 "The If Statement"
+The if statement has one of two forms.
+.so lang.if.pic
+.P
+In nested if statements, the \fBelse\fP will bind to the closest
+\fIelse\fP-less \fIif\fP.
+An expression is false if and only if all of its words are null or it
+has no words.
+.P
+Note that one or both of the subordinate statements may be compound
+statements, should you need to say something more complex than a single
+statement.
+.H 3 "The Loop and Loopend Statements"
+Looping is provided for in \fBcook\fP by the generic infinite loop
+construct defined below.
+.so lang.loop.pic
+A facility is provided to break out of a loop at any point.
+.so lang.loop2.pic
+The statement following the \fBloop\fP directive is executed repeatedly
+forever.  The \fBloopstop\fP statement is only semantically valid within
+the scope of a \fBloop\fP statement.
+.P
+Here is an example of how to use the loop statement:
+.eB
+dirs = a b c d;
+src = ;
+
+tmp = [dirs];
+loop
+{
+        tmp_dir = [head [tmp]];
+        if [not [tmp_dir]] then
+                loopstop;
+        tmp = [tail [tmp]];
+        src = [src] [glob [tmp_dir]"/*.c"];
+}
+.eE
+.P
+There is also a ``for each'' loop variant,
+allowing a more terse expression of exactly the same thing
+.eB
+dirs = a b c d;
+src = ;
+
+loop tmp_dir = [dirs]
+{
+        src = [src] [glob [tmp_dir]"/*.c"];
+}
+.eE
+You can use loopstop within such a loop.
+Note that the loop body \fImust\fP be a compound statement.
+.H 3 "Functions"
+It is possible to define your own functions.
+.H 4 "Function Definition"
+User-defined functions are specified using something similar to an assignment.
+.so lang.func.pic
+Functions must be defined before they are used.
+.P
+You need to make sure you do not re-define a built-in-function
+as this may have dire consequences.
+.H 4 "The Return Statement"
+.P
+You return values from a function by
+using the return statement:
+.so lang.func2.pic
+Note that return statements are not meaningful outside a function definition.
+.H 4 "Function Arguments"
+The arguments to the function are passed in the ``arg'' variable.
+Each argument is also separately defined in the ``@1'' to ``@9'' variables
+for direct access.
+(If there are more than 9,
+you will need to use ``[word \fIn\fP [arg]]'' for argument 10 and later).
+These variables are unique for each function invocation,
+even if they are nested.
+.P
+You can use the ``@1'' to ``@9'' variables as local
+variables if you have no need of their values.
+.P
+All of these special names are thread safe and recursion safe.
+Every function invokation receives its own set of them.
+.H 4 "Example"
+An example of a function definition is a ``capitalize'' function:
+.eB
+function capitalize =
+{
+        @1 = ;
+        loop @2 = [downcase [arg]]
+        {
+                @1 += [upcase [substr 1 1 [@2]]][substr 2 99 [@2]];
+        }
+        return [@1];
+}
+.eE
+This function capitalizes the first letter of each of its arguments.
+.P
+User-defined functions are invoked in the same way a built-in functions.
+.eB
+host = [os node];
+Host = [capitalize [host]];
+.eE
+.P
+See the ``Function Library'' section for additional function examples
+which are distributed with Cook.
+.H 4 "Function Call Statement"
+User defined functions may be invoked in the same way as built-in
+functions, but they may also be invoked in the same way as commands,
+providing a form of subroutine.
+.so lang.gosub.pic
+.P
+If the function return value is not zero, it is considered to fail,
+just as a command would fail.  The commonest use of this is to invoke
+the built-in print function for debugging cookbooks.
+.eB
+function print [__FILE__] [__LINE__] hello [getenv USER];
+.eE
+.P
+These function calls may be used in recipe bodies, or in the general cookbook.
+.H 4 "Local Variables"
+Functions can have local variables simply by using the word \f[CW]local\fP
+on the left-hand-side of the assignment.  Care needs to be taken with the
+\f[CW]loop\fP statement and the \f[CW]+=\fP assignment, as the variable
+needs to be established as a local variable \fIfirst\fP.
+.eB
+function capitalize =
+{
+        local result = ;
+        local tmp = ;
+        loop tmp = [downcase [arg]]
+        {
+                result += [upcase [substr 1 1 [tmp]]][substr 2 99 [tmp]];
+        }
+        return [result];
+}
+.eE
+Functions may have as many local variables as they like.
+.P
+Local variables are reentrant.  You can write recursive functions, and
+each invocation of the function has an independent set of local variables.
+.P
+Local variables are thread-safe.  You can use the same user-defined
+function in two parallel threads, and their local variables are completely
+independent.
+.P
+The ``arg'' and ``@1'' to ``@9'' variables are implicitly local.
+.nr Cl 2

@@ -1,0 +1,70 @@
+#!@PERL@
+
+use IO::File;
+
+my $script = undef;
+my %inc = ();
+my %use = ();
+my %def = (PERL => '/usr/bin/atperl');
+
+while (my $arg = shift) {
+  if ($arg eq '-I') {
+    $inc{shift} = 1;
+  } elsif ($arg =~ /^-I(.*)/) {
+    $inc{$1} = 1;
+  } elsif ($arg =~ /^-D([^=]*)=(.*)/) {
+    $def{$1} = $2;
+  } elsif (defined($script)) {
+    $use{$arg} = 1 unless $arg eq $script;
+  } else {
+    $script = $arg;
+  }
+}
+
+my @inc = keys(%inc);
+
+die("No source specified\n") unless defined($script);
+die("File not found: $script\n") unless -r $script;
+
+# Explore files to figure out in which order to concatenate them.
+# Some code relies on initializers being run in the proper order.
+my @use = ();
+my %explored = ();
+explore_file($script);
+
+sub explore_file {
+  my $file = shift;
+  my $fh = new IO::File;
+
+  $fh->open($file) || die("Failed to open $file: $!\n");
+
+  my $linenr = 0;
+  while (my $line = <$fh>) {
+    $linenr++;
+    while (my($key,$val) = each(%def)) {
+      $line =~ s/\%$key\%/$val/g;
+    }
+    if ($line =~ /^\s*\#\s*include\s+\"([^\s\"]+)\"/) {
+      # recursively explore "include" statements
+      if (defined(my $found = resolve_file($1))) {
+	explore_file($found);
+      } else {
+        print $line;
+      }
+    } else {
+      print $line;
+    }
+  }
+  $fh->close();
+}
+
+sub resolve_file {
+  my $use = shift;
+
+  for my $i (@inc) {
+    if (-r "$i/$use") {
+      return "$i/$use";
+    }
+  }
+  return undef;
+}

@@ -1,0 +1,50 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 1999, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Not
+.\"
+.H 2 "not"
+This function requires zero or more arguments,
+the value to be logically negated.
+It returns "1" (true) if all of the arguments are "" (false),
+or there are no arguments;
+and returns "" (false) otherwise.
+This is symmetric with the definition of true and false for
+.BR if .
+.H 3 "Example"
+This is often seen in recipes:
+.eB
+%1/%0%2.o: %1/%0%2.c
+        single-thread %2.o
+{
+        if [not [exists [dirname [target]]]] then
+                mkdir -p [dirname [target]]
+                        set clearstat;
+        [cc] [cc_flags] -I%1 %1/%0%2.c;
+        mv %2.o [target];
+}
+.eE
+Note that "\f(CW%0\fP" matches zero or more whole filename portions,
+including the trailing slash.
+See the chapter on pattern matching for more information.
+.P
+This is an example only.
+The ``mkdir'' recipe flag creates the directory more efficiently.
+.H 3 "See Also"
+and, or

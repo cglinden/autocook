@@ -1,0 +1,51 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2001, 2002, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.18 features
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" change 16, 19
+Some introduced with recent versions of GNU Bison have been fixed.
+Bison's include file insulation didn't use YY in the insulating symbol
+(just to be completely inconsistent) and in another case a namespace
+clash occurred for a function name.
+.PP
+.if n *
+.if t \(bu
+.\" change 15, 17, 18
+The generated Makefile has been improved, along with other small build
+and install improvements.
+.PP
+.if n *
+.if t \(bu
+.\" change 12
+A top-level \fIfail\fP statement how halts the parse as soon as it
+is executed.  This will make it more useful for checking build
+environments.
+.PP
+.if n *
+.if t \(bu
+.\" change 11
+Documentation about \fIcook_rsh\fP(1) has been added to the Parallel
+chapter of the User Guide.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.18 (2001-Oct-15)

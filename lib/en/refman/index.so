@@ -1,0 +1,306 @@
+.hy 0
+.TS
+l r lw(2.5i) lw(2.5i).
+cook_rsh(1)	\*[Page*Of*cook_rsh(1)]	T{
+.ad r
+cook_rsh - load
+T}	T{
+.ad l
+balancing rsh
+T}
+cook_bom(1)	\*[Page*Of*cook_bom(1)]	T{
+.ad r
+cook_bom -
+T}	T{
+.ad l
+bill of materials
+T}
+cook_bom(1)	\*[Page*Of*cook_bom(1)]	T{
+.ad r
+cook_
+T}	T{
+.ad l
+bom - bill of materials
+T}
+cookfp(1)	\*[Page*Of*cookfp(1)]	T{
+.ad r
+cookfp -
+T}	T{
+.ad l
+calculate file fingerprint
+T}
+c_incl(1)	\*[Page*Of*c_incl(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+c_incl - determine dependencies
+T}
+cook(1)	\*[Page*Of*cook(1)]	T{
+.ad r
+cook - a file
+T}	T{
+.ad l
+construction tool
+T}
+cook(1)	\*[Page*Of*cook(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+cook - a file construction tool
+T}
+cook_bom(1)	\*[Page*Of*cook_bom(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+cook_bom - bill of materials
+T}
+make2cook(1)	\*[Page*Of*make2cook(1)]	T{
+.ad r
+make2cook - translate makefiles into
+T}	T{
+.ad l
+cookbooks
+T}
+cookfp(1)	\*[Page*Of*cookfp(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+cookfp - calculate file fingerprint
+T}
+cook_rsh(1)	\*[Page*Of*cook_rsh(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+cook_rsh - load balancing rsh
+T}
+cooktime(1)	\*[Page*Of*cooktime(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+cooktime - set file times
+T}
+make2cook(1)	\*[Page*Of*make2cook(1)]	T{
+.ad r
+make2
+T}	T{
+.ad l
+cook - translate makefiles into cookbooks
+T}
+c_incl(1)	\*[Page*Of*c_incl(1)]	T{
+.ad r
+c_incl - determine
+T}	T{
+.ad l
+dependencies
+T}
+c_incl(1)	\*[Page*Of*c_incl(1)]	T{
+.ad r
+c_incl -
+T}	T{
+.ad l
+determine dependencies
+T}
+cook(1)	\*[Page*Of*cook(1)]	T{
+.ad r
+cook - a
+T}	T{
+.ad l
+file construction tool
+T}
+cookfp(1)	\*[Page*Of*cookfp(1)]	T{
+.ad r
+cookfp - calculate
+T}	T{
+.ad l
+file fingerprint
+T}
+cooktime(1)	\*[Page*Of*cooktime(1)]	T{
+.ad r
+cooktime - set
+T}	T{
+.ad l
+file times
+T}
+find_libs(1)	\*[Page*Of*find_libs(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+find_libs - find pathnames of libraries
+T}
+find_libs(1)	\*[Page*Of*find_libs(1)]	T{
+.ad r
+find_libs -
+T}	T{
+.ad l
+find pathnames of libraries
+T}
+cookfp(1)	\*[Page*Of*cookfp(1)]	T{
+.ad r
+cookfp - calculate file
+T}	T{
+.ad l
+fingerprint
+T}
+c_incl(1)	\*[Page*Of*c_incl(1)]	T{
+.ad r
+c_
+T}	T{
+.ad l
+incl - determine dependencies
+T}
+make2cook(1)	\*[Page*Of*make2cook(1)]	T{
+.ad r
+make2cook - translate makefiles
+T}	T{
+.ad l
+into cookbooks
+T}
+find_libs(1)	\*[Page*Of*find_libs(1)]	T{
+.ad r
+find_libs - find pathnames of
+T}	T{
+.ad l
+libraries
+T}
+find_libs(1)	\*[Page*Of*find_libs(1)]	T{
+.ad r
+find_
+T}	T{
+.ad l
+libs - find pathnames of libraries
+T}
+cook_rsh(1)	\*[Page*Of*cook_rsh(1)]	T{
+.ad r
+cook_rsh -
+T}	T{
+.ad l
+load balancing rsh
+T}
+make2cook(1)	\*[Page*Of*make2cook(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+make2cook - translate makefiles into cookbooks
+T}
+make2cook(1)	\*[Page*Of*make2cook(1)]	T{
+.ad r
+make2cook - translate
+T}	T{
+.ad l
+makefiles into cookbooks
+T}
+cook_bom(1)	\*[Page*Of*cook_bom(1)]	T{
+.ad r
+cook_bom - bill of
+T}	T{
+.ad l
+materials
+T}
+find_libs(1)	\*[Page*Of*find_libs(1)]	T{
+.ad r
+find_libs - find
+T}	T{
+.ad l
+pathnames of libraries
+T}
+roffpp(1)	\*[Page*Of*roffpp(1)]	T{
+.ad r
+roffpp -
+T}	T{
+.ad l
+replace .so requests within *roff sources
+T}
+roffpp(1)	\*[Page*Of*roffpp(1)]	T{
+.ad r
+roffpp - replace .so
+T}	T{
+.ad l
+requests within *roff sources
+T}
+roffpp(1)	\*[Page*Of*roffpp(1)]	T{
+.ad r
+
+T}	T{
+.ad l
+roffpp - replace .so requests within *roff sources
+T}
+roffpp(1)	\*[Page*Of*roffpp(1)]	T{
+.ad r
+roffpp - replace .so requests within *
+T}	T{
+.ad l
+roff sources
+T}
+cook_rsh(1)	\*[Page*Of*cook_rsh(1)]	T{
+.ad r
+cook_rsh - load balancing
+T}	T{
+.ad l
+rsh
+T}
+cook_rsh(1)	\*[Page*Of*cook_rsh(1)]	T{
+.ad r
+cook_
+T}	T{
+.ad l
+rsh - load balancing rsh
+T}
+cooktime(1)	\*[Page*Of*cooktime(1)]	T{
+.ad r
+cooktime -
+T}	T{
+.ad l
+set file times
+T}
+roffpp(1)	\*[Page*Of*roffpp(1)]	T{
+.ad r
+roffpp - replace .
+T}	T{
+.ad l
+so requests within *roff sources
+T}
+roffpp(1)	\*[Page*Of*roffpp(1)]	T{
+.ad r
+roffpp - replace .so requests within *roff
+T}	T{
+.ad l
+sources
+T}
+cooktime(1)	\*[Page*Of*cooktime(1)]	T{
+.ad r
+cooktime - set file
+T}	T{
+.ad l
+times
+T}
+cook(1)	\*[Page*Of*cook(1)]	T{
+.ad r
+cook - a file construction
+T}	T{
+.ad l
+tool
+T}
+make2cook(1)	\*[Page*Of*make2cook(1)]	T{
+.ad r
+make2cook -
+T}	T{
+.ad l
+translate makefiles into cookbooks
+T}
+roffpp(1)	\*[Page*Of*roffpp(1)]	T{
+.ad r
+roffpp - replace .so requests
+T}	T{
+.ad l
+within *roff sources
+T}
+.TE
+.ad b

@@ -1,0 +1,66 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+
+/* This function generates the actual build script execution code:
+ * It is assumed to be invoked after generating the build script
+ * itself within the build rule. The script will generate convenience
+ * symlinks to the actual build script in the source tree directory
+ * containing the DO subtree where the build script resides:
+ *   last_command  - the build script
+ *   last_error    - link to the output if the command failed
+ * On failure, it will also append the name of the derived object which
+ * the build script attempted to create to an "Errors-<n>" file under
+ * the top level DO subtree. This can be used in conjunction with
+ * the make/cook/bin/cook_catcr script to locate the possible error
+ * location in the source tree. This can be especially useful when
+ * you intersect the candidate source file list with a perforce change list.
+ */
+
+function run-build-script /* path-to-do */ = {
+  local do_full_path = [dir [@1]];
+  local do_file = [entryname [@1]];
+  local src_path =;
+  local do_path =;
+  local v = src_path;
+  local e =;
+  loop e = [split / [do_full_path]] {  
+    if [in [e] [do]] then v = do_path;
+    [v] = [[v]][e]/;
+  }
+      
+  return
+    [rm] [src_path]last_command-[thread-id]\;
+    [ln] [do_path][do_file][how_suffix] [src_path]last_command-[thread-id]\;
+    mv -f [src_path]last_command-[thread-id] [src_path]last_command\;
+    chmod +x [src_path][do_path][do_file][how_suffix]\;
+    [src_path][do_path][do_file][how_suffix] 2> [src_path][do_path][do_file][error_suffix] || (
+      [cat] [src_path][do_path][do_file][error_suffix]\;
+      [echo] "'### ("[thread-id]") -> Error Detected: '"[src_path][do_path][do_file][error_suffix]\;
+      [echo] "'### ("[thread-id]") -> Command run:    '"[src_path][do_path][do_file][how_suffix]\;
+      [mkdir] [do]\;
+      [echo] [src_path][do_path][do_file] >> [do]/Errors-[thread-id]\;
+      [rm] [src_path][do_path][do_file]\;
+      [ln] [do_path][do_file][error_suffix] [src_path]last_error-[thread-id]\;
+      mv -f [src_path]last_error-[thread-id] [src_path]last_error\;
+      exit 1
+    ) && [echo] "'          ("[thread-id]") -> '"[target];
+}

@@ -1,0 +1,12 @@
+jdk1.5.0_09_use_unpack = [thirdparty]/jdk1.5.0_09/[dummy];
+jdk1.5.0_09_use_dependency = ADD [__FILE__]':'[__LINE__] [__FILE__];
+
+jdk1.5.0_09_java_home  = [thirdparty]/jdk1.5.0_09;
+jdk1.5.0_09_java  = ADD [__FILE__]\:[__LINE__] [jdk1.5.0_09_java_home]/bin/java;
+jdk1.5.0_09_javah = ADD [__FILE__]\:[__LINE__] [jdk1.5.0_09_java_home]/bin/javah;
+jdk1.5.0_09_cc_I_flags = ADD [__FILE__]\:[__LINE__] -I[jdk1.5.0_09_java_home]/include -I[jdk1.5.0_09_java_home]/include/linux;
+jdk1.5.0_09_cpp_I_flags = ADD [__FILE__]\:[__LINE__] -I[jdk1.5.0_09_java_home]/include -I[jdk1.5.0_09_java_home]/include/linux;
+jdk1.5.0_09_sh_D_flags = ADD [__FILE__]\:[__LINE__] -DJAVA_HOME\=[pwd]/[jdk1.5.0_09_java_home];
+jdk1.5.0_09_perl_D_flags = ADD [__FILE__]\:[__LINE__] -DJAVA_HOME\=[pwd]/[jdk1.5.0_09_java_home];
+jdk1.5.0_09_bat_D_flags = ADD [__FILE__]\:[__LINE__] -DJAVA_HOME\=[pwd]/[jdk1.5.0_09_java_home];
+jdk1.5.0_09_rpmbuild_flags = ADD [__FILE__]\:[__LINE__] --define "'javahome "[pwd]/[jdk1.5.0_09_java_home]"'";

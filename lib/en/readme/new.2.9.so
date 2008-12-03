@@ -1,0 +1,99 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1999, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.9 features
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" change 31
+The \fI[print]\fP and \fI[write]\fP functions now work more sensably
+with the \fB\-SCript\fP option.
+.PP
+.if n *
+.if t \(bu
+.\" change 30
+The fingerprint code has been improved.
+It now does considerably fewer redundant fingeprint calculations,
+resulting is some very welcome speed improvements.
+.PP
+.if n *
+.if t \(bu
+.\" change 29
+The behaviour of the remote shell invocation to cope with rshd at the
+remote end failing to spawn a shell, and it copes with the default shell
+at the remote end not being the Bourne shell.
+.PP
+.if n *
+.if t \(bu
+.\" change 25
+The \fB\-PARallel\fP behaviour has been improved, so that it now looks
+for child process who have finished \fImore than\fP it looks for recipes
+to run.  This doesn't change the semantics any, but it matches user
+expectations far better (and results in shorter-lived zombie processes).
+.PP
+.if n *
+.if t \(bu
+.\" change 25
+The \fIset meter\fP recipe flag works once more.  (It stopped working
+when the parallel modifications were made, and mysteriously forgotten
+until now.)
+.PP
+.if n *
+.if t \(bu
+.\" change 22
+There are some changes made to the fingerprinting code to detect when
+files under ClearCase move backwards in time (because the underlying
+file version is ``uncovered'') meaning that the derived (object) files
+need to be rebuilt.
+.PP
+.if n *
+.if t \(bu
+.\" change 21
+There is a new [mtime-seconds] function, similar to the [mtime] function,
+except that it returns seconds since the epoch, rather than a human
+readable date.  More useful to handing to [expr].
+.PP
+.if n *
+.if t \(bu
+.\" change 20
+A bug has been fixed on SGI IRIX which failed to cope with not being
+able to create directories because they already exist.
+.PP
+.if n *
+.if t \(bu
+.\" change 17
+Ingredient recipes (ones with no body) may now have a double colon rather
+than a single colon, even when there is more than on target specified.
+Some users may find this a more natural syntax for ingredients recipes.
+.PP
+.if n *
+.if t \(bu
+.\" change 15
+The [expr] function now reports an error when given a number too big to
+represent, rather than quietly returning wrong answers.  The range of
+representable values depends on your system.
+.PP
+.if n *
+.if t \(bu
+.\" change 11
+Cook now works with GNU Regex correctly on Windows-NT.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.9 (1999-May-27)

@@ -1,0 +1,154 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1997, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Cook from the Outside
+.\"
+.H 1 "Cook from the Outside"
+This chapter is part of the tutorial on how to use the
+.B cook
+program.
+It focuses on how to use
+.BR cook ,
+without needing to know how
+.B cook
+works internally.
+.H 2 "What can cook do for me?"
+By far the most common use of cook,
+by experts and beginners alike,
+is to issue the command
+.eB
+cook
+.eE
+and cook will consult its cookbook to see what needs to be done.
+.P
+In general,
+.B cook
+is used to take a set of files and chew on them in some way to produce
+another set of files;
+such as the source files for a program,
+and how to turn them into the executable program file.
+In order for
+.B cook
+to do anything useful,
+it needs to know what to do.
+"What to do" is contained in a file called
+.IR Howto.cook
+in the same directory as the files it is going to work on.
+You need to execute the  \f(CWcook\fP command in
+the same directory as all of the files.
+.H 2 "What is cook doing?"
+The
+.I Howto.cook
+file was written by the same person who wrote the source files.
+It contains a set of recipes;
+each of which, among other things,
+contain commands for how to manipulate the files.
+The
+.B cook
+program echos each of the commands it is about to execute,
+so that you can watch what it is doing as it goes.
+.P
+If the
+.I Howto.cook
+file contained only commands,
+you would be better off using a shell script.
+In addition to the commands is information telling
+.B cook
+which files need to be constructed before other files can be,
+and from this information
+.B cook
+determines the order in which to execute the commands.
+Also,
+.B cook
+examines other information to determine which commands it need not do,
+because the associated files are already up-to-date.
+.H 2 "What can cook always do?"
+If you are in a directory with a
+.I Howto.cook
+file,
+you can expect a few common requests to work
+.VL 1.5i
+.LI "cook clobber"
+This command can be expected to remove any files from the directory which
+.B cook
+is able to reconstruct.
+.LI "cook all"
+This is the default action,
+and so can be obtained by a simple \f(CWcook\fP request.
+It causes
+.B cook
+to construct some specific file or set of files.
+.LI "cook clean"
+This is similar to "cook clobber" above,
+but it only removes intermediate files,
+and not not the final file or files which "cook all" constructs.
+.LE
+.P
+In addition to the above,
+many
+.I Howto.cook
+files will also define
+.VL 1.5i
+.LI "cook install"
+If a program or library or document is constructed in the directory,
+the this command will install it into the correct place in the
+system.
+.LI "cook uninstall"
+The reverse of the above,
+it removes something from the system.
+.LE
+.H 2 "If something goes wrong"
+Most errors while
+.B cook
+is constructing file are caused by errors in the source files,
+and not the
+.I Howto.cook
+file.
+In general,
+you can fix the problems in the source files,
+and execute the
+.B cook
+command again,
+and
+.B cook
+will resume from the command which incurred the error.
+.P
+To help you while editing the files with the errors,
+.B cook
+keeps a listing file of all the commands it executed,
+and any output of those commands,
+in a file called
+.I Howto.list
+in the current directory.
+.P
+You may want
+.B cook
+to find all the errors it can before you do any editing,
+do do this,
+use the
+.B -Continue
+option (it may be abbreviated to
+.B -c
+for convenience).
+.H 2 "The Reference Manual"
+For more information about the command line arguments and options
+of the various commands mentioned,
+you should consult the on-line manual pages.
+The Cook Reference Manual is also a good source of this information,
+and is available from the same place as you obtained this manual.

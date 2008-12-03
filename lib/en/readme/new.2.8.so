@@ -1,0 +1,82 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1999, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.8 features
+.\"
+.PP
+.if n *
+.if t \(bu
+There is a new ``for each'' style looping construct.
+See the User Guide for more information.
+.PP
+.if n *
+.if t \(bu
+It is now possible to use regular expression patterns, instead of Cook's
+native patterns.  You can set this for a whole cookbook or individual
+recipes.  The default is to use Cook's native patterns.  See the \fIFile
+Name Patterns\fP chapter of the User Guide for more information.
+.PP
+.if n *
+.if t \(bu
+A bug which caused \fIhost-binding\fP and \fIsingle-thread\fP to core
+dump has been fixed.
+.PP
+.if n *
+.if t \(bu
+All text file input now copes with CRLF sequences, so mixing NT and Unix
+builds on the one file server no longer creates problems.
+.PP
+.if n *
+.if t \(bu
+Fingerprints are now cached per-directory, rather than one huge file for
+an entire directory tree.  This is more useful in recursive build and
+[search_list] situations.
+.PP
+.if n *
+.if t \(bu
+The [cando], [cook] and [uptodate] functions now return lists of
+successful files, rather than a simple true/false result.
+.PP
+.if n *
+.if t \(bu
+The [in] and [matches] functions now return the list index (1 based)
+of the matching word.
+See the User Guide for more information.
+.PP
+.if n *
+.if t \(bu
+There is a new \fIcook -web\fP option, to print a HTML web page on the
+standard output, representing the dependency graph.  This is useful in
+documenting the build process, or debugging cookbooks.
+.PP
+.if n *
+.if t \(bu
+There is a new \fIcook --fingerprint-update\fP option which scans
+the directory tree below the current directory and updates the file
+fingerprints.  This helps when you use another tool (such as RCS or
+ClearCase) which alters the file but preserves the file's modification
+time.
+.PP
+.if n *
+.if t \(bu
+There is a new [write] function for writing text files.
+This is useful for coping with Windows-NT's absurdly short command lines.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.8 (1999-Feb-01)

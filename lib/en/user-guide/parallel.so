@@ -1,0 +1,267 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2001, 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Cooking in Parallel
+.\"
+.H 1 "Cooking in Parallel"
+Cook is able to use the dependency information in the cookbook to
+schedule more than one recipe body at once, where they are independent.
+In large projects this is almost always possible.
+.P
+Parallel processing is of most use on multi-processor systems.
+There are cases, however, when running two jobs at once on a workstation
+can take advantage of disk or network latencies.
+.P
+Parallel processing requires more resources than the simple case.
+Because more commands are running, more CPU is required,
+but also more virtual memory and more temporary file space.
+You need to be sure that cooking in parallel is a sensible thing to be doing.
+.H 2 "Command Line Option"
+The \f[CW]-PARallel\fP option is used to tell Cook to run the recipe
+bodies in parallel.
+By default, 4 jobs run in parallel.  You may specify the number of jobs
+after the option
+(\fIe.g.\fP \f[CW]--par=2\fP)
+if you wish.
+.H 2 "Cookbook Variable"
+It is also possible to set the number of jobs from within the cookbook
+by using the \f[CW]parallel_jobs\fP variable.  This can be used to
+automate the selection of the number of jobs, based on the current host
+name:
+.eB
+if [not [defined parallel_jobs]] then
+{
+        host = [os node];
+        if [in [host] cerberus] then
+                parallel_jobs = 3;
+        else if [in [host] zaphod] then
+                parallel_jobs = 2;
+        else if [in [host] hydra] then
+                parallel_jobs = 8;
+}
+.eE
+In this way, the number of jobs will be set appropriately for each machine,
+provided the number of jobs was not already set by the command line option.
+.H 2 "Recipe Writing"
+Most recipes run in parallel without difficulty, however some will
+require special treatment.  The problems arise from conflict for
+resources \- usually temporary files.
+.br
+.ne 1i
+.P
+The simplest example of this is \fIyacc\fP(1).
+The output filenames are hard-coded, even when you write a more general recipe:
+.eB
+%.c: %.y
+        single-thread yy.tab.c
+{
+        [yacc] [yacc_flags] %.y;
+        sed "'s/[yY][yY]/%_/g'" yy.tab.c > [target];
+        rm yy.tab.c;
+}
+.eE
+Replacing the \f[CW]YY\fP is a common method for getting more than one
+yacc grammar into a program.  We run into trouble with the
+\f[CW]yy.tab.c\fP file because every one of the yacc grammars will need
+to use the same temporary file name.
+.P
+The \f[CW]single-thread\fP clause tells cook to find something else to
+do if it discovers that it wants do two of these at the same time.
+.br
+.ne 2i
+.P
+The temporary file name may not be so evident as in the yacc case.  The
+GNU Autoconf utilities use a number of temporary files in the current
+directory, but none of them appear in the text of the recipes.
+.eB
+%: %.in: config.status
+        single-thread conftest.subs
+{
+        CONFIG_FILES\e=[target] CONFIG_HEADERS\e= config.status;
+}
+.eE
+It is common, if your project uses GNU Autoconf, to generate several
+files in this way.  Once the \f[CW]config.status\fP script is produced,
+all of these files will then be candidates for cook to generate \- but
+they can only be done one at a time.
+.P
+Other resources, such as tape drives, can also be described in the
+\f[CW]single-thread\fP clause.  You can do this by device name
+(\fIe.g.\fP \f[CW]/dev/rmt/0\fP) or by some descriptive string.  The
+single threading is performed by mutually exclusive string sets, not by
+inode.
+.H 3 "Concurrent Execution Threads"
+Each recipe, when its actions are executed,
+is executed within an execution thread.
+Execution threads share almost everything in common;
+this includes all of the variables, the state of the ``set'' statement,
+the stat cache, \fIetc\fP.
+.P
+If you need to create variable names, or temporary file names, which are
+unique to a thread, use the \f[CW][thread-id]\fP variable.  This
+variable has a unique value for the life of a thread.  No other
+concurrent thread will have the same value.
+.P
+Note, however, that the \f[CW][thread-id]\fP values of completed threads
+will be re-used; this ensures that when it is used to construct variable
+names, the variables will be re-used.  This prevents memory bloat
+when cooking large projects.
+.H 2 "File Locking"
+The above discussion applies to utilities which perform no file locking,
+and thus cannot detect or sequence multiple accesses to a resource.
+Other programs, such as those which access databases, may have quite
+capable file locking mechanisms and are able to manage multiple parallel
+updates on their own, obviating the need for the \f[CW]single-thread\fP
+clause.
+.H 2 "Virtual Machine"
+It is possible to simulate a parallel machine if you are on a network.
+Cook is able to distribute tasks to computers on a network, if it is
+given sufficient information.
+.P
+The first information Cook requires is the list of machines.
+This is done using the \f[CW]parallel_hosts\fP variable.
+\fBNote:\fP The tasks will be distributed amongst these machines
+independent of the setting of the \f[CW]parallel_jobs\fP variable.
+\fIi.e.\fP even if you are not doing parallel processing.
+.eB
+parallel_hosts = larry curly moe;
+.eE
+If you want to give one machine more wieghting than the others (say,
+because it is twice as fast) you simply name it more than once.  Cook
+will use these names in round-robin fashion.
+.H 3 "Remote Shell Command"
+Cook uses the Berkeley \fIrsh\fP(1) command to invoke the remote
+command.  You can set the command, or the command and some options,
+using the \f[CW]parallel_rsh\fP variable.  The default value is
+.eB
+parallel_rsh = rsh;
+.eE
+In order to work in a useful way, Cook makes some assumptions
+about your environment and your account:
+.BL
+.LI
+That your system administrators allow \fIrsh\fP(1) to be used on your network.
+.LI
+That your account name is the same on \fIall\fP machines
+(otherwise not even the \f[CW]rsh -l\fP \fIlogin-name\fP option will help).
+.LI
+That the \f[CW]/etc/hosts.equiv\fP file, or your \f[CW]~/.rhosts\fP file,
+is set on \fIall\fP machines so that you don't need to give a password.
+.LI
+That all of the necessary files and directories are mounted in exactly
+the same place on all of the machines; and that they are \fIthe same
+files\fP on all machines, via NFS or similar.
+Automounters can make this especially messy.
+.LI
+That your account start-up scripts set the necessary environment
+settings, \fIe.g.\fP command search \f[CW]PATH\fP, without any
+intervention required.
+.LI
+That all of the machines are of the same architecture, or that the
+architecture doesn't matter.
+.LI
+That the system time is synchronised on all machines, using
+\fIrdate\fP(1) from \fIcron\fP(8), or using NTP, or similar.
+.LE
+.H 3 "Limitations"
+There are some inherent limitations in the \fIrsh\fP(1) protocol.
+.BL
+.LI
+Your current environment variable settings are not transferred across.
+Neither are \fIulimit\fP settings, \fIetc\fP.  If any are important,
+you need to write the cookbook to explicitly replicate them.
+.LI
+The exit status of the remote command is not reported in the exit status
+of the \fIrsh\fP(1) command\*F.  There are internal contortions used by
+Cook to obtain the exit status; error about mysteriously named files
+usually indicate that one or more of the above assumptions is being broken.
+.FS
+The Berkeley sources certainly don't contain code to do this.
+Do any other vendors have a more useful implementation?
+.FE
+.LE
+.H 3 "Secure Shell"
+It is possible to use the Secure Shell (ssh) instead of Remote Shell
+(rsh).  This gives you fully authenticated, fully encrypted sessions,
+both over your intranet and even over the Internet.  Once you have it
+installed and configured correctly, you simply replace the \fIrsh\fP
+command in the above examples with the \fIssh\fP command.
+.P
+This is accomplised by setting
+.eB
+parallel_rsh = "ssh";
+.eE
+Somewhere near the top of your cookbook.
+.H 3 "Host Binding"
+In some cases, such as licensing conditions,
+some commands will only run on a limited set of hosts.
+Rather than perform all commands on those hosts,
+it is possible to bind recipes to specific hosts.
+This binding overrides the \f[CW]parallel_hosts\fP variable.
+.eB
+%.c: %.esql
+        host-binding shylock
+{
+        esql %.esql > [target];
+}
+.eE
+This example says that the embedded SQL preprocessor is only to be run
+on the database server called ``shylock'', probably due to usurious
+licensing fees.  However, you may want to perform your other development
+activities on more lightly loaded machines; this clause only applies to
+this one recipe, other recipes behave as normal.
+.P
+The \f[CW]host-binding\fP clause may have more than one host named, and
+they will be used in round-robin fashion.  This is a
+recipe-level variant of the \f[CW]parallel_hosts\fP variable.
+.P
+The \f[CW]host-binding\fP clause will apply independent of the setting
+of the settings \f[CW]parallel_jobs\fP and \f[CW]parallel_hosts\fP
+variables.
+.P
+The recipe level \f(CWhost-binding\fP overrides the cookbook level
+\f(CWparallel_hosts\fP when determining which remote hosts should be used.
+.P
+If the list of hosts given to the \f[CW]host-binding\fP clause is empty,
+the local host will be used (normal recipe execution will occur).
+.P
+If you need to include the local host in the round robin, use
+\f[CW]localhost\fP or \f[CW][os node]\fP, however this will behave exactly
+the same as for a remote host.  You should also consider hard coding the
+name, that way you get the same behavior no mater which of the machines
+in the rond robin the Cook command is executed on.
+.H 3 "Load Balancing"
+It is possible to use \fIhost-binding\fP to perform load balancing.
+This is accomplished by using \fIrup\fP(1) to discover which hosts
+are least busy, and then using this information to invoke the system's
+\fIrsh\fP(1).
+.P
+This may be accomplished by using
+.eB
+parallel_rsh = "cook_rsh";
+.eE
+somewhere near the top of your cookbook
+(or \fIcook_rsh \-s\fP for secure shell).
+You then give classes of hosts to the \fIhost-binding\fP clause of the recipes,
+rather than specific host names.
+See \fIcook_rsh\fP(1) for more information about setting up classes of hosts.
+.P
+If you still need to give specific host names to some recipes,
+\fIcook_rsh\fP(1) will cope with this, too.
+.so cook_rsh.so

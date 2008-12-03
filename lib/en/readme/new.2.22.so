@@ -1,0 +1,40 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2003, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.22 features
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" change 16
+Build problem encountered using newer bersions of GNU Bison mave been
+fixed.
+.PP
+.if n *
+.if t \(bu
+.\" change 15
+For Cook developers, there is now a \f[CW].ae\fP file on the web site.
+.PP
+.if n *
+.if t \(bu
+.\" change 12
+An error in the documentation of the \fIerrok\fP flag has been fixed.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.22 (2003-Feb-28)

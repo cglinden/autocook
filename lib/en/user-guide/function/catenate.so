@@ -1,0 +1,41 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Catenate
+.\"
+.H 2 "catenate"
+This function requires zero or more arguments.
+If no arguments are supplied,
+the result is an empty word list.
+If one or more arguments are supplied,
+the result is a word list of one word
+being the catenation of all of the arguments.
+.H 3 "Example"
+.TS
+center;
+l l.
+Expression      Result
+_
+[catenate a]    a
+[catenate a b]  ab
+[catenate a " " b]      "a b"
+.TE
+Quotes used in the results for clarity.
+.H 3 "See Also"
+split, unsplit, prepost, join

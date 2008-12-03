@@ -1,0 +1,2 @@
+dataend
+  run-build-script [target];

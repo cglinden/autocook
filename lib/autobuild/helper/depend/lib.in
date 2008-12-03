@@ -1,0 +1,83 @@
+#!@PERL@
+
+while (@ARGV) {
+  $_ = shift;
+  if ($_ eq '-lib_preamble') {
+    $lib_preamble = shift;
+  } elsif ($_ eq '-dep_preamble') {
+    $dep_preamble = shift;
+  } elsif ($_ eq '-suffix') {
+    $suffix = shift;
+  } elsif ($_ eq '-dep_suffix') {
+    $dep_suffix = shift;
+  } elsif ($_ eq '-linkto') {
+    my $linkto = shift;
+    my $prefix = $linkto;
+    $prefix =~ s,/DO/.*,,;
+    $linkto{$prefix} = $linkto;
+  } elsif ($_ eq '-o') {
+    $output = shift;
+  } elsif (index($_, '-') == 0) {
+    print STDERR "Unknown option: $_\n";
+    exit 1;
+  } else {
+    push(@input, $_);
+  }
+}
+
+@linkto = sort {$b cmp $a} keys(%linkto);
+
+$read_errors = 0;
+
+foreach $file (@input) {
+  if (open(F, $file)) {
+    while (my $line = <F>) {
+      my $found = '';
+      for my $prefix (@linkto) {
+	if (index($line, $prefix) == 0) {
+	  $found = $prefix;
+	  last;
+	}
+      }
+      $uses{$linkto{$found}}{$file}++ if $found;
+    }
+    close(F);
+  } else {
+    print STDERR "Couldn't read $file\n";
+    $read_errors++;
+  }
+}
+
+if (open(F, ">$output")) {
+  # the first batch is for actual link dependencies
+  print F "$lib_preamble\n";
+  while (($use, $users) = each(%uses)) {
+    # skip over "libraries" that are not supported for our current
+    # architecture/variant, since they might either not be libraries
+    # or might have come from #include's which were #ifdef'ed out.
+    $dir = $use;
+    $dir =~ s,(/DO/[^/]*/[^/]*)/[^/]*/[^/]*$,$1,;
+    # the "users" comment is just for info and for debugging
+    if (-d $dir) {
+      push(@deps, $use.$dep_suffix);
+      print F "$use\n /* ", join("\n  * ", keys(%{$users})), "\n  */\n";
+    } else {
+      print F "/* Cannot see \"$dir\" */\n";
+    }
+  }
+  print F "$suffix\n";
+
+  # the second batch ensures that the tsort dependencies are redone
+  print F "$dep_preamble\n";
+  foreach $dep (@deps) {
+    $dep =~ s,(/DO/[^/]*/[^/]*/)[^/]*/([^/]*)$,$1$2,;
+    print F "$dep\n";
+  }
+  print F "$suffix\n";
+  close(F);
+} else {
+  print STDERR "Couldn't write $output\n";
+  exit 2;
+}
+
+exit $read_errors;

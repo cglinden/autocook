@@ -1,0 +1,52 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2003, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.23 features
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" change 12
+A major problem with parallel execution and hangs has been fixed.
+The table indexed by process ID was now growing correctly.
+.PP
+.if n *
+.if t \(bu
+.\" change 19
+Some words have been added to the User Guide about the SHELL environment
+variable, and the effects of errors in the \&\fI.profile\fP file.
+.PP
+.if n *
+.if t \(bu
+.\" change 18, 16
+Building RPMs has been improved, and the spec file now uses more modern
+RPM features.
+.PP
+.if n *
+.if t \(bu
+.\" change 15
+Building on Cygwin has been improved.
+.PP
+.if n *
+.if t \(bu
+.\" change 11
+Building on AIX has been improved.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.23 (2003-May-01)

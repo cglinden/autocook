@@ -1,0 +1,889 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+
+/*==============================================================*
+ *								*
+ *  This is the central Howto.cook file. This file contains all	*
+ *  the rules, settings, definitions and targets used to build	*
+ *  everything in this source tree.                             *
+ *								*
+ *==============================================================*/
+
+/* default targets */
+default: [head [supported_variants]]
+   set default;
+
+all: [supported_variants];
+
+/*--- parse special targets ------------------------------------*/
+special_targets = fast skip myenv;
+
+/* This is kind of a hack, to allow people to specify flags as targets */
+#if [in fast [command-line-goals]]
+fast=y;
+#endif
+
+#if [in skip [command-line-goals]]
+skip=y;
+fast=y;
+#endif
+
+#if [in vc [command-line-goals]]
+version_control_only=y;
+#endif
+
+#if [in myenv [command-line-goals]]
+[print Allowing user settings to override build settings...];
+#else
+loop v = [sensitive_env_vars] {
+  setenv [v]=;
+}
+#endif
+
+/*--- only use time-adjust-back in dynamic Clearcase views ------*/
+#if [exists .@@/main/0]
+sync = 'sync && ';
+#else
+sync =;
+#endif
+
+set nostripdot fingerprint time-adjust gate-before-ingredients;
+
+/*--- return filtered list, assuming usual editing tools --------*/
+function filter-out-junk /* list */ =
+{
+ return
+  [filter_out %0.cook.fp
+  [filter_out %0Howto.list
+  [filter_out %0%~
+  [filter_out %0.%
+  [filter_out %0.%1/%
+  [filter_out %0%.contrib
+  [filter_out %0%.contrib.%1
+  [filter_out %0%.unloaded
+  [filter_out %0%.unloaded.%1
+  [filter_out %0%.bak
+  [filter_out %0%.keep
+  [filter_out %0%.keep.%1
+  [arg]]]]]]]]]]]]];
+}
+
+/*==============================================================*
+ *								*
+ *  Environment							*
+ *								*
+ *==============================================================*/
+
+setenv SHELL=/bin/sh;
+
+/*--- Source tree names ----------------------------------------*/
+build = @datadir@/autobuild;      /* location of Cook scripts and includes */
+test = Test;
+src = src;
+pkg = pkg;
+perlbin = perl/bin;
+perllib = perl/lib;
+
+/* The following setting controls whether a change in this
+ * file will cause a rebuild of everything. Most changes
+ * to this file do not require this, so activating this
+ * will cause unnecessary grief to all developers. If
+ * a change does invalidate previous build, set it to
+ * the value in comments.
+ */
+cookbook = /*Howto.cook*/;
+
+/*==============================================================*
+ *								*
+ *  Build system settings					*
+ *								*
+ *==============================================================*/
+unix = [collect [build]/helper/platform];
+pwd  = [collect '/bin/pwd'];
+
+/*--- variant is a different kind of build under the same architecture ---*/
+if [not [defined variant]] then
+  variant = debug; /* default variant */
+
+/*--- create list of build dirs ---*/
+if [not [defined top]] then
+  top = ;
+if [in [top] .] then
+  build_dirs = ;
+else
+  build_dirs = [split , [top]];
+
+if [count [build_dirs]] then
+  main_build_dir = [head [build_dirs]]/;
+else
+  main_build_dir =;
+
+up_from_main_build_dir =;
+
+loop e = [split / [main_build_dir]] {
+  up_from_main_build_dir = ../[up_from_main_build_dir];
+}
+
+#ifdef skip
+skip_prefix = [main_build_dir];
+#else
+skip_prefix = ;
+#endif
+
+/*--- derived object subdirectory names ------------------------*/
+do           = DO; /* top level dir of [objdir] */
+do_platform  = [do]/[unix];
+
+runtime = runtime;
+indy3party = 3party/noarch;
+thirdparty = 3party/[unix];
+
+/*--- filename suffixes, infixes, prefixes etc... --------------*/
+#include [build]/include/suffixes/[unix]
+
+/*--- Basics ---------------------------------------------------*/
+#include [build]/include/paths/[unix]
+
+/*--- top level rules ------------------------------------------*/
+#if [or [in help [command-line-goals]] [in version [command-line-goals]]]
+help: [build]/usage
+  set silent nodefault
+{
+  [cat] [build]/usage;
+}
+
+version: [build]/version
+  set silent nodefault
+{
+  [cat] [build]/version;
+}
+#else
+/*--- build supported variants target --------------------------*/
+
+/* again, a hack to allow specifying variants as add-on flags to other targets */
+do_default =;
+loop v = [command-line-goals] {
+  if [in [v] [supported_variants]] then
+    do_default += [do]/[unix]/[v];
+}
+
+#if [not [count [do_default]]]
+do_default = [do]/[unix]/[head [supported_variants]];
+#endif
+
+#if [count [stringset [command-line-goals] - [supported_variants] [special_targets]]]
+[supported_variants]: set silent nodefault {}
+#else
+%: [do]/[unix]/%/cr
+    set silent mkdir nodefault
+  if [in % [supported_variants]]
+{
+  [echo] "'====["[top]"]==== - all "[target]" done on'" [collect [date]];
+}
+#endif
+
+#if 0
+[print do_default [do_default]];
+#endif
+
+/*--- pseudo targets -------------------------------------------*/
+#if [count [stringset [command-line-goals] - [special_targets]]]
+vc [special_targets]: set nodefault {}
+#else
+[special_targets]: default set nodefault;
+#endif
+
+assembler: [addsuffix /assembler [do_default]]
+    set silent nodefault
+{
+  [echo] "'====["[top]"]==== - "[target]" done on'" [collect [date]];
+}
+
+install: [addsuffix /install-output [do_default]]
+    set silent nodefault
+{
+  test -x make/pack-rpms.sh && env COOK_platform\=[unix] make/pack-rpms.sh || true;
+  [echo] "'====["[top]"]==== - "[target]" done on'" [collect [date]];
+}
+
+install-%: [addprefix make/rpm/%/ [addsuffix /lms-%[rpminstall_suffix] [do_default]]]
+  set silent nodefault
+{
+  [echo] "'====["[top]"]==== - "[target]" done on'" [collect [date]];
+}
+
+lint: [addsuffix /lint-output [do_default]]
+    set silent nodefault
+{
+  [echo] "'====["[top]"]==== - "[target]" done on'" [collect [date]];
+}
+
+test: [addsuffix /test-output [do_default]]
+    set silent nodefault
+{
+  [echo] "'====["[top]"]==== - "[target]" done on'" [collect [date]];
+}
+
+/*--- Allow direct specification of object files ---------------*/
+%[obj_suffix]: [addprefix [main_build_dir] [addsuffix /%[obj_suffix] [do_default]]]
+  set silent nodefault
+{
+  [echo] "'====["[main_build_dir]"]==== - "[target]" done on'" [collect [date]];
+}
+
+/*--- Allow direct specification of assembler files ------------*/
+%[as_suffix]: [main_build_dir][do_default]/%[as_suffix]
+  set silent nodefault
+{
+  [echo] "'====["[main_build_dir]"]==== - "[target]" done on'" [collect [date]];
+}
+
+/*--- include function definitions -----------------------------*/
+functionfiles = [filter-out-junk [glob [build]/include/functions/"*"]];
+
+#include [functionfiles]
+
+/*--- platform and os-release specific customizations ----------*/
+once_only_parameters = ;
+cumulative_parameters = customized_in;
+inheritable_parameters = ;
+do_not_propagate_parameters = ;
+
+loop v = [supported_variants] {
+  target_list_[v] = ;
+  target_types_[v] = ;
+}
+
+initfiles = [filter-out-junk
+	       [glob [build]/include/defs/"*"]
+	       [glob [build]/include/make/"*"]
+	       [glob [build]/include/use/"*"]];
+
+cascade-for Howto.cook = [initfiles];
+#include [initfiles]
+
+/*==============================================================*
+ *								*
+ *  File Manifest, definition of derived objects.		*
+ *  This is done recursivly via the #include-cooked-nowarn	*
+ *  trick. The generated include files will contain the		*
+ *  source file manifest in variables called files_under_<dir>.	*
+ *  All files are in files_under_./ .				*
+ *								*
+ *==============================================================*/
+
+
+phase_1_rules = [filter-out-junk [glob [build]/include/rules/phase_1/"*"]];
+
+cascade-for [build]/include/rules/store-prerequisites [build]/include/functions/run-build-script = [phase_1_rules];
+
+#include [phase_1_rules]
+
+#if [print Checking Manifests]
+#endif
+
+[do]/Howto.cook.large-files: [skip_prefix][do_platform]/Whatto.cook;
+[build]/VersionControl: [skip_prefix][do_platform]/Whatto.cook;
+
+/* The include [cook ...] idiom is the centerpiece of the build system.
+ * it exists to allow incremental expansion of the dependencty knowledge
+ * as files change in the source tree. It forces the use of all rules
+ * -known-at-this-point- to construct the next set of cook files with
+ * new settings and dependencies. Those will then be used to construct the
+ * set after that - for a total of currently 6 sets of ever increasing
+ * dependency knowledge
+ */
+
+#if 0
+#include [cook [do]/Howto.cook.large-files [skip_prefix][do_platform]/Whatto.cook [build]/VersionControl]
+#endif
+
+#include [cook [skip_prefix][do_platform]/Whatto.cook]
+
+#ifndef version_control_only
+/*--- localize customizations ----------------------------------*/
+all_cook_src = ;
+loop v = [supported_variants] {
+  all_cook_src += [match_mask %1/%0Howto.cook [files_under_./[v]]];
+}
+all_cook_obj = [subst /![do]/ /[do]/
+                      [sort [fromto %1/%0Howto.cook %1/%0![do]/Howto.cook 
+                            [stringset [all_cook_src]]]]];
+/* The trick with inserting the bang (!) ensures that the result is
+ * sorted according to the directory hierarchy, and that inheritance
+ * of variable settings work.
+ */
+
+#if 0
+[print cook_obj [all_cook_obj]];
+#endif
+
+/*--- local, customized settings -------------------------------*/
+
+/* This section generates real cook snippets out of the local
+ * Howto.cook files. The reason why these are preprocessed is
+ * to allow scoping of variables and the use of non-native
+ * constructs like "use" and "make".
+ */
+
+phase_2_rules = [filter-out-junk [glob [build]/include/rules/phase_2/"*"]];
+
+cascade-for [build]/include/rules/store-prerequisites [build]/include/functions/run-build-script = [phase_2_rules];
+
+#include [phase_2_rules]
+
+#if [print Checking Localized Settings]
+#endif
+#include [cook [all_cook_obj]]
+
+loop v = [supported_variants] {
+  target_types_[v] = [stringset [target_types_[v]]];
+
+#if 0
+/* DEBUG output */
+  [print [v]];
+  loop t = [target_types_[v]] {
+    [print [t]_[v]    [target_list_for_[t]_[v]]];
+  }
+#endif
+}
+
+/*--- construct list of DOs ------------------------------------*/
+depend_files = ;
+jdep_files = ;
+loop v = [supported_variants] {
+  object_files_[v] = ;
+  generated_headers_[v] = ;
+  as_files_[v] = ;
+  lint_files_[v] = ;
+}
+
+/* collectors are snippets which map dependency and DO files from the
+ * now known list of source files.
+ */
+
+collectors = [filter-out-junk [glob [build]/include/collectors/"*"]];
+
+cascade-for Howto.cook = [collectors];
+
+#include [collectors]
+
+#if 0
+[print depend_files [depend_files]];
+#endif
+
+loop v = [supported_variants] {
+  depend_files += [fromto %0%[obj_suffix] %0%[dep_suffix] [object_files_[v]]]
+                  [addsuffix [ddep_suffix] [generated_headers_[v]]];
+}
+
+/*--- construct top level target specific DO collections -------*/
+
+/* The goal here is to create a data structure which lists all
+ * derived objects known to exist in a specific subdirectory.
+ * Most top level build targets will do some sort of aggregation,
+ * be it linking, archiving, packing or generating jar files,
+ * so having these structures simplifies writing the rules for 
+ * the aggregation ops.
+ */
+
+loop v = [supported_variants] {
+  loop target_dir = [target_list_[v]] {
+    do_u_v = [do]/[unix]/[v];
+    source_files_for_[target_dir][v] = [files_under_[target_dir][v]];
+    pom_files_for_[target_dir][v]    = [match_mask [target_dir]%0[do_u_v]/%
+				        [poms_[v]]];
+    perl_files_for_[target_dir][v]   = [match_mask [target_dir]%0[do_u_v]/%
+				        [perl_binaries_[v]]];
+    spec_files_for_[target_dir][v]   = [match_mask [target_dir]%0[do_u_v]/%
+				        [spec_binaries_[v]]];
+    xml_files_for_[target_dir][v]    = [match_mask [target_dir]%0[do_u_v]/%
+				        [xml_binaries_[v]]];
+    bat_files_for_[target_dir][v]    = [match_mask [target_dir]%0[do_u_v]/%
+				        [bat_binaries_[v]]];
+    sh_files_for_[target_dir][v]     = [match_mask [target_dir]%0[do_u_v]/%
+				        [sh_binaries_[v]]];
+    rpmbuild_files_for_[target_dir][v] = [match_mask [target_dir]%0[do_u_v]/%
+				          [rpmbuild_files_[v]]];
+    rpminstall_files_for_[target_dir][v] = [match_mask [target_dir]%0[do_u_v]/%
+				            [rpminstall_files_[v]]];
+    header_files_for_[target_dir][v] = [match_mask [target_dir]%0%[h_suffix]
+					[files_under_[target_dir][v]]]
+                                       [match_mask [target_dir]%0%[hpp_suffix]
+					[files_under_[target_dir][v]]];
+    object_files_for_[target_dir][v] = [match_mask [target_dir]%0[do_u_v]/%
+					[object_files_[v]]];
+    as_files_for_[target_dir][v]     = [match_mask [target_dir]%0[do_u_v]/%
+					[as_files_[v]]];
+    lint_files_for_[target_dir][v]   = [match_mask [target_dir]%0[do_u_v]/%
+					[lint_files_[v]]];
+    depend_files_for_[target_dir][v] = [match_mask [target_dir]%0[do_u_v]/%
+					[depend_files]];
+    jdep_files_for_[target_dir][v]   = [match_mask [target_dir]%0[do_u_v]/%
+					[jdep_files]];
+  }
+}
+
+/*--- shadow (remove) DOs from parent targets ------------------*/
+
+/* Any derived object is aggregated into exactly one top level
+ * target. We therefore subtract references to a DO used up
+ * in a low level aggregating target from the higher level
+ * aggregating target. In other words, if you build in
+ * executable in src/prog, and a test program in src/prog/test,
+ * all the DOs in src/prog/test go to that target, and not
+ * into the src/prog target.
+ */
+
+loop v = [supported_variants] {
+  loop target_dir = [target_list_[v]] {
+    parent_dir = [dir [target_dir]];
+    loop {
+      if [match_mask %0%/%1 [parent_dir]] then {
+	parent_dir = [dir [parent_dir]];
+	if [defined target_in_[parent_dir]/[v]] then {
+	  loop p = source pom perl spec bat sh xml rpmbuild rpminstall header object as lint depend jdep {
+	    [p]_files_for_[parent_dir]/[v] =
+	      [stringset [[p]_files_for_[parent_dir]/[v]]
+	               - [[p]_files_for_[target_dir][v]]];
+	  }
+	}
+      } else {
+	loopstop;
+      }
+    }
+  }
+}
+
+/*--- build depend file lists     -------------------------------*/
+lib_depend_files = ;
+bin_depend_files = ;
+
+/* Here we use the info gathered by including all the
+ * make/cook/include/make/... files to construct the actual
+ * aggregating targets.
+ */
+
+loop v = [supported_variants] {
+  build_targets_[v] = ;
+  install_targets_[v] = ;
+  linkto_targets_[v] = ;
+  classpath_targets_[v] = ;
+  as_targets_[v] = ;
+  lint_targets_[v] = ;
+  test_targets_[v] = ;
+  loop target_type = [target_types_[v]] {
+    loop target_dir = [target_list_for_[target_type]_[v]] {
+      /* remove depend files if not required for target */
+      if [not [defined generate_src_depend_for_[target_type]]] then {
+	depend_files = [stringset [depend_files]
+		                - [depend_files_for_[target_dir][v]]];
+	depend_files_for_[target_dir][v] = ;
+      }
+
+      /* generate copy targets if requested */
+      if [defined generate_copy_files_for_[target_type]] then {
+	copy_targets_for_[target_dir][v] =
+          [make_copy_targets_[target_type] [target_dir] [v]];
+      } else {
+	copy_targets_for_[target_dir][v] = ;
+      }
+
+      /* generate lint targets if requested */
+      if [defined generate_lint_files_for_[target_type]] then {
+        lint_targets_for_[target_dir][v] =
+          [make_lint_target_[target_type] [target_dir] [v]];
+      } else {
+        lint_targets_for_[target_dir][v] = ;
+      }
+
+      /* generate install targets if requested */
+      if [defined generate_install_files_for_[target_type]] then {
+	install_targets_for_[target_dir][v] =
+          [make_install_target_[target_type] [target_dir] [v]];
+      } else {
+	install_targets_for_[target_dir][v] = ;
+      }
+
+      /* generate test targets if requested */
+      if [defined generate_test_files_for_[target_type]] then {
+	test_targets_for_[target_dir][v] =
+          [make_test_target_[target_type] [target_dir] [v]];
+      } else {
+	test_targets_for_[target_dir][v] = ;
+      }
+
+      /* generate lib depend targets */
+      if [defined generate_lib_depend_for_[target_type]] then {
+	linkto_target_for_[target_dir][v] =
+          [make_linkto_[target_type] [target_dir] [v]];
+        short_name = [entryname [linkto_target_for_[target_dir][v]]];
+        if [defined [short_name]_defined_[v]] then {
+	  [print [short_name] 'not unique. Found in:'];
+	  [print [[short_name]_defined_[v]]];
+	  [print [target_dir]];
+	  fail;
+        } else {
+	  [short_name]_defined_[v] = [target_dir];
+	}
+	lib_depend_files +=
+          [make_libdep_[target_type] [target_dir] [v]];
+        linkto_targets_[v] += [linkto_target_for_[target_dir][v]];
+      }
+
+      /* generate jar depend targets */
+      if [defined generate_jar_depend_for_[target_type]] then {
+	classpath_target_for_[target_dir][v] =
+          [make_classpath_[target_type] [target_dir] [v]];
+        classpath_targets_[v] += [classpath_target_for_[target_dir][v]];
+      }
+
+      build_target_for_[target_dir][v] =
+	[make_target_[target_type] [target_dir] [v]];
+
+      /* always generate dependencies, never know who may need them */
+      if [defined generate_bin_depend_for_[target_type]] then {
+        bin_depend_files +=
+          [make_bindep_[target_type] [target_dir] [v]];
+      }
+
+      if [count [build_dirs]] then {
+	/* we passed in top (i.e ran "b" in a subdir) */
+	loop build_dir = [build_dirs] {
+	  if [match_mask [build_dir]%0 [target_dir]] then {
+            lint_targets_[v] += [lint_targets_for_[target_dir][v]];
+	    build_targets_[v] += [build_target_for_[target_dir][v]];
+	    as_targets_[v] += [as_files_for_[target_dir][v]];
+	    test_targets_[v] += [test_targets_for_[target_dir][v]];
+	    loopstop;
+	  }
+	} 
+        /* we always install everything */
+        install_targets_[v] += [install_targets_for_[target_dir][v]];
+      } else {
+	/* we build everything */
+        lint_targets_[v] += [lint_targets_for_[target_dir][v]];
+        install_targets_[v] += [install_targets_for_[target_dir][v]];
+        build_targets_[v] += [build_target_for_[target_dir][v]];
+        as_targets_[v] += [as_files_for_[target_dir][v]];
+        test_targets_[v] += [test_targets_for_[target_dir][v]];
+      }
+    }
+  }
+
+  /* we ran b in a subdir below any top level build target */
+  if [and [not [count [build_targets_[v]]]] [count [build_dirs]]] then {
+    loop build_dir = [build_dirs] {
+      build_target = ;
+      loop target_dir = [sort [target_list_[v]]] {
+	/* the sort ensures we find the longest match - a reverse sort would be better */
+	if [match_mask [target_dir]%0 [build_dir]/] then {
+	  build_target = [target_dir];
+	}
+      }
+      if [build_target] then {
+	build_target_for_[build_target][v]
+           = [make_target_[target_in_[build_target][v]] [build_target] [v]];
+	build_targets_[v] += [build_target_for_[build_target][v]];
+      }
+    }
+  }
+
+#if 0
+  loop target_dir = [target_list_[v]] {
+    [print ---- [v] [target_in_[target_dir][v]] [target_dir] ----];
+    /*[print source_files_for_[target_dir][v] [source_files_for_[target_dir][v]]];*/
+    /*[print header_files_for_[target_dir][v] [header_files_for_[target_dir][v]]];*/
+    /*[print object_files_for_[target_dir][v] [object_files_for_[target_dir][v]]];*/
+    /*[print jdep_files_for_[target_dir][v] [jdep_files_for_[target_dir][v]]];*/
+    [print depend_files_for_[target_dir][v] [depend_files_for_[target_dir][v]]];
+    /*[print copy_targets_for_[target_dir][v] [copy_targets_for_[target_dir][v]]];*/
+    /*[print test_targets_for_[target_dir][v] [test_targets_for_[target_dir][v]]];*/
+  }
+#endif
+
+#if 0
+  [print ---- [v] ------------];
+  [print linkto_targets_[v] [linkto_targets_[v]]];
+  [print build_targets_[v] [build_targets_[v]]];
+  [print install_targets_[v] [install_targets_[v]]];
+  [print as_targets_[v] [as_targets_[v]]];
+  [print classpath_targets_[v] [classpath_targets_[v]]];
+  [print lint_targets_[v] [lint_targets_[v]]];
+  [print test_targets_[v] [test_targets_[v]]];
+#endif
+}
+
+#if 0
+[print ----------------];
+[print depend_files [depend_files]];
+[print bin_depend_files [bin_depend_files]];
+#endif
+
+/* At this point we have all of our aggregating targets defined, and
+ * now we need to decorate them with additional dependencies
+ * extracted from the source
+ */
+
+/*--- First order dependencies ----------------------------------*/
+
+/* These are dependencies via include or use or import statements
+ */
+
+multiple_providers =;
+
+#ifndef fast
+phase_3_rules = [filter-out-junk [glob [build]/include/rules/phase_3/"*"]];
+
+cascade-for [build]/include/rules/store-prerequisites [build]/include/functions/run-build-script = [phase_3_rules];
+
+#include [phase_3_rules]
+
+#if [print Checking Include Dependencies]
+#endif
+#include [cook [depend_files]]
+#else
+#if [count [depend_files]]
+[depend_files]:
+set silent
+{
+  [echo] 'WARNING: Include dependencies may be out of date:';
+  [echo] '"  "'[target];
+}
+#include [depend_files]
+#endif
+#endif
+
+if [count [multiple_providers]] then {
+  [print 'Multiple providers for the following java classes:'];
+  loop class = [multiple_providers] {
+    [print '  '[class]':'];
+    loop provider = [provider_of_[class]] {
+      [print '    '[provider]];
+    }
+  }
+}
+
+/*--- link dependencies ----------------------------------------*/
+
+/* These are second order dependencies derived by combining the
+ * information gathered in the previous run with the aggregation.
+ * The assumption is: You #include it, you link against it.
+ */
+
+#if [count [lib_depend_files] [bin_depend_files]]
+#ifndef fast
+
+phase_4_rules = [filter-out-junk [glob [build]/include/rules/phase_4/"*"]];
+
+cascade-for [build]/include/rules/store-prerequisites [build]/include/functions/run-build-script = [phase_4_rules];
+
+#include [phase_4_rules]
+
+#if [print Checking Library Dependencies ]
+#endif
+
+#include [cook [lib_depend_files] [bin_depend_files]]
+
+#else
+[lib_depend_files] [bin_depend_files]:
+set silent
+{
+  [echo] 'WARNING: Library dependencies may be out of date:';
+  [echo] '"  "'[target];
+}
+#include [lib_depend_files] [bin_depend_files]
+#endif
+#endif
+
+/*--- tsort link dependencies to create link line --------------*/
+
+/* This section generates the actual link lines by running a
+ * topological sort over the second order dependencies. This
+ * section will also cause the inheritance of link flags to
+ * occur.
+ */
+
+tsort_files = [fromto %0%[bindep_suffix]
+	              %0%[tsort_suffix]
+	              [bin_depend_files]];
+
+#ifndef fast
+
+phase_5_rules = [filter-out-junk [glob [build]/include/rules/phase_5/"*"]];
+
+cascade-for [build]/include/rules/store-prerequisites [build]/include/functions/run-build-script = [phase_5_rules];
+
+#include [phase_5_rules]
+
+#if [print Checking Link Lines]
+#endif
+#include [cook [tsort_files]]
+#else
+#if [count [tsort_files]]
+[tsort_files]:
+set silent
+{
+  [echo] 'WARNING: Link lines may be out of date:';
+  [echo] '"  "'[target];
+}
+#include [tsort_files]
+#endif
+#endif
+
+#if [print Compiling & Linking]
+#endif 
+
+/*--- Compile --------------------------------------------------*/
+
+/* At this point, we are practically done. All we need to do is to
+ * include all the actual compile rules and then link up the
+ * aggregating targets to the pseudo-targets defined at the beginning
+ * of this file.
+ */
+
+phase_6_rules = [filter-out-junk [glob [build]/include/rules/phase_6/"*"]];
+
+cascade-for [build]/include/rules/store-prerequisites [build]/include/functions/run-build-script = [phase_6_rules];
+
+#include [phase_6_rules]
+
+
+/*==============================================================*
+ *								*
+ *	Create file containing list of build targets		*
+ *								*
+ *==============================================================*/
+
+[do]/[unix]/%9/cr: [build_targets_%9]:
+  set silent nodefault mkdir force
+{
+  [echo] "'    Target Files: .../* ->'" [target];
+  [cat] > [target];
+data
+[unsplit "\n" [build_targets_%9]]
+dataend
+  tgts = [count [build_targets_%9]];
+  if [tgts] then {
+    [echo] "' => Top level targets built:'" [tgts] >&2;
+  } else {
+    [echo] "'WARNING: No top level targets built!'" >&2;
+  }
+}
+
+[do]/[unix]/%9/assembler: [as_targets_%9]
+  set silent mkdir nodefault force
+{
+  [cat] > [target][need_suffix];
+data
+[unsplit "\n" [need]]
+dataend
+  [cat] > [target][why_suffix];
+data
+[unsplit "\n" [younger]]
+dataend
+  [cat] > [target];
+data
+[unsplit "\n" [as_targets_%9]]
+dataend
+  tgts = [count [as_targets_%9]];
+  if [tgts] then {
+    [echo] "' => Assembler targets built:'" [tgts] >&2;
+  } else {
+    [echo] "'WARNING: No assembler targets built!'" >&2;
+  }
+}
+
+[do]/[unix]/%9/lint-output: [lint_targets_%9]
+  set silent force mkdir nodefault
+{
+  [cat] > [target][need_suffix];
+data
+[unsplit "\n" [need]]
+dataend
+  [cat] > [target][why_suffix];
+data
+[unsplit "\n" [younger]]
+dataend
+  [cat] > [target];
+data
+[unsplit "\n" [lint_targets_%9]]
+dataend
+  [echo] "'    Lint Output: ->'" [target];
+  tgts = [count [lint_targets_%9]];
+  if [tgts] then {
+    [echo] "' => Lint targets built:'" [tgts] >&2;
+  } else {
+    [echo] "'WARNING: No lint targets built!'" >&2;
+  }
+}
+
+[do]/[unix]/%9/install-output: [install_targets_%9]
+  set silent force mkdir nodefault
+{
+  [cat] > [target][need_suffix];
+data
+[unsplit "\n" [need]]
+dataend
+  [cat] > [target][why_suffix];
+data
+[unsplit "\n" [younger]]
+dataend
+  [cat] > [target];
+data
+[unsplit "\n" [install_targets_%9]]
+dataend
+  [echo] "'    Install Output: ->'" [target];
+  tgts = [count [install_targets_%9]];
+  if [tgts] then {
+    [echo] "' => Install targets built:'" [tgts] >&2;
+  } else {
+    [echo] "'WARNING: No install targets built!'" >&2;
+  }
+}
+
+[do]/[unix]/%9/test-output: [test_targets_%9]
+  set silent force mkdir nodefault
+{
+  [cat] > [target][need_suffix];
+data
+[unsplit "\n" [need]]
+dataend
+  [cat] > [target][why_suffix];
+data
+[unsplit "\n" [younger]]
+dataend
+  [cat] > [target];
+data
+[unsplit "\n" [test_targets_%9]]
+dataend
+  [echo] "'    Test Output: ->'" [target];
+  tgts = [count [test_targets_%9]];
+  if [tgts] then {
+    [echo] "' => Test targets built:'" [tgts] >&2;
+  } else {
+    [echo] "'WARNING: No test targets built!'" >&2;
+  }
+}
+
+#endif
+#endif

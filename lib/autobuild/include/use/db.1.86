@@ -1,0 +1,9 @@
+/* db186_ld_l_flags=-ldb; */
+db.1.86_dir = [thirdparty]/db.1.86 ;
+db.1.86_use_unpack  = [db.1.86_dir]/[dummy];
+db.1.86_cc_I_flags  = ADD [__FILE__]':'[__LINE__] -I[db.1.86_dir]/include -I[db.1.86_dir]/PORT/linux -I[db.1.86_dir]/PORT/linux/include;
+db.1.86_external_obj = ADD [__FILE__]':'[__LINE__] [db.1.86_dir]/PORT/linux/libdb.a ;
+
+[combine [db.1.86_external_obj]]: [db.1.86_use_unpack];
+
+db.1.86_use_dependency = ADD [__FILE__]':'[__LINE__] [__FILE__];

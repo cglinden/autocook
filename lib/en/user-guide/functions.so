@@ -1,0 +1,96 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 1999, 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Functions Library
+.\"
+.H 1 "Functions Library"
+There is a file of functions available to you by using a
+.eB
+#include "functions"
+.eE
+line in your cookbook.
+The file defines a number of useful functions.
+.P
+The functions in the file also serve as examples of how you can write
+your own functions.
+.H 2 capitalize
+The
+.I capitalize
+function maps all of its arguments into lower case, and then the first
+letter of each argument is mapped to upper case.  Zero, one or more
+arguments may be given.
+.H 2 defined-or-null
+The
+.I defined-or-null
+function may be used to determine if a
+variable has been set (on the command line, for example) and
+return its value if so, otherwise return the empty list.
+.P
+This function should only be given one argument - the name of
+the variable to look for.  Additional arguments will be ignored.
+Too few arguments will produce a complaint about the "" variable
+being undefined.
+.H 2 defined-or-default
+The
+.I defined-or-default
+function may be used to determine if a
+variable has been set (on the command line, for example) and
+return its value if so, otherwise return the given default value.
+.P
+The first argument is the name of the variable to look for.
+.P
+The second and later arguments (if present) are the default
+value to be used if the named variable is not defined.  Optional.
+.H 2 repeat
+The
+.I repeat
+function is used to repeatedly call another function,
+once for each of the specified arguments.  The can be useful
+when dealing with functions which do not automaticly accept
+argument lists in the form you require.
+.P
+There are many instances where the repeat function call be used
+to elegantly avoid used to the ``loop { loopstop }'' construct.
+.P
+The first argument is the name of the function you want called.
+This function must accept a single argument.
+.P
+The second and subsequent arguments are argument values to be
+passed to the named function, one at a time.
+.P
+The results of the invocations of the function are accumulated
+in the order in which they were calculated.  The accumulated
+results are returned.
+.H 2 "variable_by_path"
+The \fIvariable_by_path\fP function is used to extract the union
+of option settings relevant to a particular compilation or link.
+By using a variable prefix, this function may be used to obtain
+the setting of a wide variety of options and commands.
+.P
+Global variables are searched in a no particular order for the
+necessary information.  All are searched, all found are used.
+.P
+For example, the function call \f[CW][variable_by_path cc_flags
+foo/bar/baz.c]\fP will hunt for variables with the following names:
+\f[CW]cc_flags_foo/bar/baz.c\fP and
+\f[CW]cc_flags_foo/bar\fP and
+\f[CW]cc_flags_foo\fP and
+\f[CW]cc_flags\fP.
+It is expected that the vast majority of these variables will
+not be set.  Duplicates are removed.

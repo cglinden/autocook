@@ -1,0 +1,1075 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1998-2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Building Large Projects
+.\"
+.H 1 "Building Large Projects"
+This chapter covers some of the  issues you may come across in building
+large projects.  It gives a skeleton for how you could use Cook to build a
+medium-to-large projects, and even covers some heterogenous build issues.
+It is expected that you will use this chapter as a guide;
+your development environment, and the shape of each individual project,
+mean that you will probably change this to suit your own needs.
+.P
+The material in this chapter uses many, many features of Cook.  If you
+are not familiar with Cook, you may want to read the rest of this User
+Guide to get a good idea of Cook's features and capabilities.  Even if
+you are familiar with Cook, you may need to refer to the language guide
+and built-in function descriptions from time to time.
+.H 2 "Whole Project Build"
+The skeleton given here builds the whole project as a single Cook
+invocation, even when the project consists of tens thousands of individual
+source files.  This is distinct from a build process which has Cook
+recursively invoking itself in deeper directories, or a shell script
+doing much the same.  Some of the advantages of doing whole project
+builds will be discussed in a later section.  For now it is sufficient
+to say that experience has shown repeatedly that this method does scale
+to significant projects.
+.P
+The first thing about a single build pass is that it happens
+relative to a single fixed place.
+The logical place is the top of the
+project source tree\*F.
+.FS
+If you ever want to use Aegis for configuration management,
+this is what Aegis expects.
+.FE
+This works well with the \fIsearch_list\fP functionality, mentioned below,
+which simplifies the structure of private work areas.
+.H 3 "Project Directory Structure"
+In the examples use in this chapter,
+the following directory structure is assumed:
+.PS c
+dir_factor = 0.6
+
+folder_height = 0.16 * dir_factor
+folder_width  = 0.25 * dir_factor
+folder_miter  = 0.03 * dir_factor
+
+define folder {
+B: box invis wid folder_width ht folder_height
+line from B.sw \
+        then to B.nw-(0,folder_miter) \
+        then to B.nw+(folder_miter,0) \
+        then to B.n-(folder_miter/2,0) \
+        then to B.n+(folder_miter/2,-folder_miter) \
+        then to B.ne-(0,folder_miter) \
+        then to B.se \
+        then to B.sw
+}
+
+document_height = 0.22 * dir_factor
+document_width  = 0.16 * dir_factor
+document_miter  = 0.05 * dir_factor
+
+define document {
+B: box invis wid document_width ht document_height
+line from B.sw \
+        then to B.nw \
+        then to B.ne-(document_miter,0) \
+        then to B.ne-(0,document_miter) \
+        then to B.se \
+        then to B.sw
+line from B.ne-(document_miter,0) \
+        then to B.ne-(document_miter,document_miter) \
+        then to B.ne-(0,document_miter)
+}
+
+dir_wid = 0.35 * dir_factor
+dir_ht = 0.26 * dir_factor
+
+boxwid = dir_wid
+boxht = dir_ht
+A: box invis
+   [ folder ] with .c at A.c
+   "\fIProject\fP" ljust at A.e
+
+   line from A.s then down boxht/2 then right boxwid/2
+B: box invis
+   [ document ] with .c at B.c
+   "\f(CWHowto.cook\fP" ljust at B.e
+
+   line from A.s then down 3*boxht/2 then right boxwid/2
+C: box invis
+   [ folder ] with .c at C.c
+   "\f(CWlibrary\fP" ljust at C.e
+
+   line from C.s then down boxht/2 then right boxwid/2
+C1: box invis
+   [ document ] with .c at C1.c
+   "\fIsource1\fP\f(CW.c\fP" ljust at C1.e
+
+   line from C.s then down 3*boxht/2 then right boxwid/2
+C2: box invis
+   [ document ] with .c at C2.c
+   "\fIsource2\fP\f(CW.c\fP" ljust at C2.e
+
+   line from C.s then down 5*boxht/2 then right boxwid/2
+C3: box invis
+   [ document ] with .c at C3.c
+   "\fIetc...\fP" ljust at C3.e
+
+   line from A.s then down 11*boxht/2 then right boxwid/2
+I: box invis
+   [ folder ] with .c at I.c
+   "\f(CWinclude\fP" ljust at I.e
+
+   line from I.s then down boxht/2 then right boxwid/2
+I1: box invis
+   [ document ] with .c at I1.c
+   "\fIapi1\fP\f(CW.h\fP" ljust at I1.e
+
+   line from I.s then down 3*boxht/2 then right boxwid/2
+I2: box invis
+   [ document ] with .c at I2.c
+   "\fIapi2\fP\f(CW.h\fP" ljust at I2.e
+
+   line from I.s then down 5*boxht/2 then right boxwid/2
+I3: box invis
+   [ document ] with .c at I3.c
+   "\fIetc...\fP" ljust at I3.e
+
+   line from A.s then down 19*boxht/2 then right boxwid/2
+D: box invis
+   [ folder ] with .c at D.c
+   "\fIprogram1\fP" ljust at D.e
+
+   line from D.s then down boxht/2 then right boxwid/2
+D1: box invis
+   [ document ] with .c at D1.c
+   "\fIsource3\fP\f(CW.c\fP" ljust at D1.e
+
+   line from D.s then down 3*boxht/2 then right boxwid/2
+D2: box invis
+   [ document ] with .c at D2.c
+   "\fIsource4\fP\f(CW.c\fP" ljust at D2.e
+
+   line from D.s then down 5*boxht/2 then right boxwid/2
+D3: box invis
+   [ document ] with .c at D3.c
+   "\fIetc...\fP" ljust at D3.e
+
+   line from A.s then down 27*boxht/2 then right boxwid/2
+E: box invis
+   [ folder ] with .c at E.c
+   "\fIprogram2\fP" ljust at E.e
+
+   line from E.s then down boxht/2 then right boxwid/2
+E1: box invis
+   [ document ] with .c at E1.c
+   "\fIsource5\fP\f(CW.c\fP" ljust at E1.e
+
+   line from E.s then down 3*boxht/2 then right boxwid/2
+E2: box invis
+   [ document ] with .c at E2.c
+   "\fIsource6\fP\f(CW.c\fP" ljust at E2.e
+
+   line from E.s then down 5*boxht/2 then right boxwid/2
+E3: box invis
+   [ document ] with .c at E3.c
+   "\fIetc...\fP" ljust at E3.e
+
+.\" Make sure the width of the text is taken into account when the
+.\" picture is centered within the column.
+box invis wid 1 with .w at E3.e
+.PE
+Below the project directory is a \f(CWlibrary\fP directory, which
+contains functions common to all of the programs.  All source files in
+this directory are to be compiled, and linked into a library.  When the
+programs are linked, they will all reference this library.
+.P
+Next to the \f(CWlibrary\fP directory is the \f(CWinclude\fP directory.
+This describes interfaces and data shared by the project.  Information
+which is private to the internals of the library or a programs belongs
+there, not in the shared include space.
+.P
+The rest of the directories below the project directory are programs
+to be built.  The sources files in each are to be compiled and linked,
+together with the common library, to form the programs.
+The name of the program will be taken from the directory.
+.P
+This is a common enough picture, repeated for many projects.  Your
+individual projects may vary in the details; you may have more directory
+levels below the \f(CWlibrary\fP directory, or all of your programs may
+be below a single \f(CWcommand\fP directory.  With simple changes to
+the examples given in this chapter, you will be able to cope with just
+about any project structure.
+.H 3 "File Manifest"
+There are many ways of discovering the source files you are working with.
+Many configuration management systems are able to give you a list of them.
+For example, if you were using Aegis, you would say
+.eB
+change_files =
+        [collect aegis -l cf -terse -p [project] -c [change]];
+project_files =
+        [collect aegis -l pf -terse -p [project] -c [change]];
+manifest =
+        [sort [change_files] [project_files]];
+.eE
+.P
+If you were using RCS, you could find all of the RCS files, and
+reconstruct the original filenames from them, \fIviz:\fP
+.eB
+manifest =
+        [fromto ./%0RCS/%,v %0%
+                [collect find .  -path "*/RCS/*,v" -print]
+        ];
+.eE
+.P
+Or you could simply scan the directory tree:
+.eB
+manifest =
+        [fromto ./%0% %0%
+                [collect find .  ! -type d -print]
+        ];
+.eE
+This is will find too much, but what follows will not be altered by this.
+If you want to get more advanced, however, it helps to have an accurate
+primary source file manifest.
+.H 3 "Compiling C Sources"
+Recalling that the build will take place from the top of the source tree,
+this means that there it is going to have to be directory components in
+the filenames in the command executed by Cook, and in the recipes Cook
+is to use.
+.P
+This chapter uses C examples, but the same techniques work just as will
+with Fortran or Groff, or anything else.  Most of it maps directly;
+you may need to adjust for your specific compiler behavior.
+.P
+This chapter starts with the lowest level of building a project, the
+individual source files, and works its way upwards, building on the
+examples until the whole project, including the library and all programs
+are linked in a single pass.
+.P
+So, when cooking C sources, you need recipes of the form
+.eB
+cc = gcc;
+cc_flags = -g -Wall -O;
+
+%0%.o: %0%.c
+{
+        [cc] [cc_flags] -c %0%.c
+                -o [target];
+}
+.eE
+The ``\f(CW%0\fP'' part of the patterns matches zero or more directory parts.
+If your compiler insists on putting the output (\f(CW.o\fP) file into
+the current directory (the top level one) you will need to move it, after:
+.eB
+%0%.o: %0%.c
+{
+        [cc] [cc_flags] -c %0%.c;
+        mv %.o [target];
+}
+.eE
+But, most existing sources will be assuming that most of their include
+files are in the same directory as the source files.  We need include
+options to indicate this.  This is most easily done by using more
+pattern elements
+.eB
+%1/%0%.o: %1/%0%.c
+{
+        [cc] [cc_flags] -I%1 -c %0%.c
+                -o [target];
+}
+.eE
+Or by using the dirname of the source file
+.eB
+%0%.o: %0%.c
+{
+        [cc] [cc_flags] -I[dirname %0%.c] -c %0%.c
+                -o [target];
+}
+.eE
+For structures more than 2 directories deep, these two produce different
+options.  Depending on your project structure, if you have deep
+directories, one will probably be more suitable than the other.
+One elegant use for deeper directory structures is to reflect the C++
+inheritance hierarchy directly in the directory hierarchy.
+.P
+The simple \f[CW][cc_flags]\fP variable is often not sufficient.  Instead,
+you may want to replace it with \f[CW][variable_by_path "cc_flags"
+%0%.c]\fP which will look for several variables (all prefixed with
+"cc_flags") based on the name of the source file.  See the \fIFunctions
+Library\fP chapter for a description of this function.
+.P
+The common include file will also need to be searched.  Because of where
+the command is issued, it is rather simple to add the \f(CWinclude\fP
+directory, \fIviz:\fP
+.eB
+%0%.o: %0%.c
+{
+        [cc] [cc_flags]
+                -I[dirname %0%.c] -Iinclude
+                -c %0%.c -o [target];
+}
+.eE
+It is important to note that all of these recipes, and the commands
+they execute, are independent of the location of the source file.  It is
+possible to customize the \f(CWcc-flags\fP used, based on the target file,
+or even the directory containing the file,
+without compromising the generality of the recipe\*F.
+.FS
+Hint: use a function, and pass \f(CW[target]\fP as the argument.
+.FE
+.H 3 "Tracking Include Dependencies"
+When it comes to tracking include dependencies using \fIc_incl\fP,
+you need to remember, again, that the Cook happens from a single place.
+All of the recipes that \fIc_incl\fP writes for you must be \fIrelative
+to that place\fP.
+.P
+Continuing our example, and assuming we are using the cascade include
+method described in the previous chapter, we need include dependency
+files which look similar to
+.eB
+cascade \fIprogram1\fP/\fIsource3\fP.c =
+include/\fIapi1\fP.h
+;
+.eE
+Working backwards, we need to create the dependency file using
+the following recipe:
+.eB
+%0%.c.d: %0%.c
+        set nocascade
+{
+        c_incl -nc -ns -nrec
+                -I[dirname %0%.c] -Iinclude
+                %0%.c
+                -prefix "'cascade %0%.c ='"
+                -suffix "';'"
+                -o [target];
+}
+.eE
+For other source languages, you will need to
+use the \fIc_incl --language\fP option.
+.P
+The dependency files need to be included in the magic way so that Cook
+will build them again if they are out of date.  This method needs the
+source file manifest to know their names.
+.eB
+dep-files =
+        [addsuffix .d
+                [match_mask %0%.c [manifest] ]
+                [match_mask %0%.h [manifest] ]
+        ];
+#include-cooked [dep-files]
+.eE
+These files will only be re-calculated if they are out of date; they
+are small and often zero-length, and so are usually very quick to read,
+adding little to the time it takes to read the cookbook.
+.P
+Notice that adding a new source file will automatically cause it to be
+scanned for include dependencies, without modification to the cookbook.
+.H 3 "Linking Libraries"
+To link libraries with a generic recipe, you need a generalized way of
+specifying their contents.  A little trickery with constructed variable
+names does the job:
+.eB
+%/lib%.a: [[target]_obj]
+        set unlink
+{
+        ar cq [target] [[target]_obj];
+}
+.eE
+The right-hand-side of recipes has late binding, and we use the name of
+the target to tell us the name of the variable which holds all of the
+object files.  Assigning this variable looks bizarre, but it looks more
+logical as you have more and more of them...
+.eB
+library/liblibrary.a_obj =
+        [fromto %0%.c %0%.o
+                [match_mask "library/%0%.c" [manifest] ]
+        ];
+.eE
+The great thing about this construct is that you can build a loop,
+using Cook's loop statement, that assigns a variable for each of your
+libraries, if you have more than one.
+.P
+Notice that adding a new library source file will automatically cause it to be
+compiled into the library, without modification to the cookbook.
+.H 3 "Linking Commands"
+We'll use a similar trick for each of the programs you want to link...
+First the link line
+.eB
+bin/%: [[target]_obj]
+        set mkdir
+{
+        [cc] -o [target] [[target]_obj];
+}
+.eE
+Then the objects variable.  Note how we add a library \fIfilename\fP
+here, this will still only use the library portions actually referenced,
+not the whole library, so it won't bloat your programs.
+.eB
+bin/\fIprogram\fP_obj =
+        [fromto %0%.c %0%.o
+                [match_mask \fIprogram\fP/%0%.c [manifest] ]
+        ]
+        library/liblibrary.a
+        ;
+.eE
+.P
+Notice that adding a new program source file will automatically cause it to be
+compiled and linked into the program, without modification to the cookbook.
+.P
+The loop construct tends to obscure things, which is why the essential
+assignment was given first.
+This next fragment shows the whole loop.
+.eB
+programs =
+        [fromto %/main.c %
+                [match_mask %/main.c [manifest] ]
+        ];
+.eE
+.eB
+program_list = [programs];
+loop
+{
+        program = [head [program_list]];
+        if [not [count [program]]] then
+                loopstop;
+        program_list = [tail [program_list]];
+
+        bin/[program]_obj =
+                [fromto %0%.c %0%.o
+                        [match_mask [program]/%0%.c
+                                [manifest]
+                        ]
+                ]
+                library/liblibrary.a
+                ;
+}
+.eE
+And now tell Cook you actually want it to do something,
+like build all of the programs...
+.eB
+all: [addprefix bin/ [programs]];
+.eE
+.P
+Notice they way the \f(CWcommands\fP variable is constructed: just adding
+a new command (and its \f(CWmain.c\fP file) will automatically cause it
+to be built, without modification to the cookbook.
+
+.H 2 "Private Work Areas"
+This chapter is about large projects, but large projects usually means
+large numbers of developers.  The directory structure and cookbook
+presented so far does not immediately lend itself to use by multiple
+developers.
+.H 3 "Directory Structure"
+The method suggested here uses Cook's \fIsearch_list\fP functionality,
+which nominates a search list of directories that Cook looks in to find
+the files named in the recipes.  This can be used to overlay a private
+work area on top of a master repository.
+.PS
+golden = (1+sqrt(5))/2
+boxht = 0.7
+boxwid = boxht * golden
+B1: box "\fIRepository\fP" "\f(CWmain.c\fP" "\f(CWpart1.c\fP" "" fill 0.05
+B2: box "\fIWork Area\fP" "\f(CWmain.c\fP" "" "\f(CWpart2.c\fP" \
+        fill 0 with .nw at B1.nw-(0.5,boxht*0.8)
+B3: box "\fICombined View\fP" "\f(CWmain.c\fP" "\f(CWpart1.c\fP" \
+        "\f(CWpart2.c\fP" with .w at 1/2<B1.e,B2.e>+(1,0)
+arrow from B1.e to 1/3<B3.nw,B3.sw>
+arrow from B2.e to 2/3<B3.nw,B3.sw>
+line dashed from B1.ne to B2.ne
+line dashed from B1.nw to B2.nw
+line dashed from B1.se to B2.se
+.PE
+When recipes are run, the results are written into the work area,
+which means that the repository can be completely read-only.
+.P
+It follows from this, that the directory structure of the work
+area exactly parallels the directory structure of the repository.
+\fIExcept\fP you only check out files into your work area that you
+actually need to change.
+.H 3 "Finding the Cookbook"
+Setting the search list is done with a simple assignment.
+In your work area, create a simple \f(CWHowto.cook\fP file,
+containing only 3 lines:
+.eB
+set mkdir;
+search_list = . /project/repository ;
+#include /project/repository/Howto.cook
+.eE
+You only use this file if you don't need to modify the cookbook itself.
+You can make it work always, even if you are modifying the cookbook, by
+giving the cookbook a different name (\f(CWmain.cook\fP), and changing
+\f(CWHowto.cook\fP to always read
+.eB
+set mkdir;
+search_list = . /project/repository ;
+#include [resolve main.cook]
+.eE
+The \f(CW[resolve]\fP function walks the search list, looking for
+the file\*F.
+.FS
+The search list defaults to just dot (the current directory) if not set.
+.FE
+This gives you access to Cook's internal search mechanism.
+However, we also need to modify each of the recipes to take the search
+list into account.
+.P
+The unexplained \f(CWmkdir\fP flag is used to request that directories
+be automatically created before recipe bodies are run.  This is common
+for large projects, where the source files are structured into several
+sub-directories, rather than all lumped together in the one place.
+This may be necessary, for example, if a \f(CW.c\fP file in the repository
+needs to be recompiled because a \f(CW.h\fP file in the work area has
+been changed.
+.H 3 "File Manifest"
+The files could be in either of two places.  You need to merge them.
+Most configuration management tools do this for you; in this example
+we'll scan the directory trees again.
+Fortunately, Cook comes with a tool to do this efficiently.
+.eB
+all_files_in_. = ;
+#include manifest.cook
+manifest = [all_files_in_.];
+
+/* This reduces re-scanning to a minimum. */
+set fingerprint;
+
+%0manifest.cook: ["if" [in "%0" ""] "then" "." "else" "%0"]
+        set mkdir
+{
+        cook_bom /* Bill Of Materials */
+                [addprefix '--dir=' [search_list]]
+                [need] [target] ;
+}
+.eE
+At the end of this fragment, the \f[CW]manifest\fP variable contains a
+complete list of all files in the directory tree(s).  This variable may
+then be taken apart with the \f[CW]match_mask\fP function to build
+ingredients lists.
+.P
+The \f[CW]if\fP function is different to the \fIif\fP statement.
+It allows you to select one of two values (the \f[CW]then\fP part or the
+\f[CW]else\fP part) without creating a dummy variable.  In this example,
+it would be impossible to create a dummy variable.  Remember to quote
+the \f[CW]if\fP, \f[CW]then\fP and \f[CW]else\fP strings, otherwise
+Cook will think they are \fIif\fP, \fIthen\fP and \fIelse\fP keywords,
+and give you a syntax error.
+.P
+The constructed \fImanifest.cook\fP files work for both
+the top-level directory and individual sub-directories.
+.H 3 "Compiling C Sources"
+The C compilation recipe needs to be changed to read...
+.eB
+%0%.o: %0%.c
+{
+        [cc] [cc_flags]
+                [prepost "-I" /[dirname %0%.c] [search_list]]
+                [prepost "-I" "/include" [search_list]]
+                -c [resolve %0%.c]
+                -o [target];
+}
+.eE
+This ensures that the rights places are searched for
+include files.
+.P
+The \f[CW]prepost\fP function is used to add a prefix and a suffix to
+each of the remaining strings.  This is very useful when constructing
+filenames, as are the \f[CW]addprefix\fP and \f[CW]addsuffix\fP functions.
+.H 3 "Tracking Include Dependencies"
+A similar change needs to be made to the include dependencies recipe...
+.eB
+%0%.c.d: %0%.c
+        set nocascade
+{
+        c_incl -nc -ns -nrec
+                [prepost "-I" /[dirname %0%.c] [search_list]]
+                [prepost "-I" "/include" [search_list]]
+                [resolve %0%.c]
+                -prefix "'cascade %0%.c ='"
+                -suffix "';'"
+                [addsuffix "-rp=" [search_list]]
+                -o [target];
+}
+.eE
+Note that the form of the output of this recipe \fIdoes not\fP change.
+This means that the recipes it writes work even if you subsequently
+copy a file from the repository to the work area, or uncopy one.
+.H 3 "Linking Libraries"
+The library recipe needs few modifications.
+.eB
+%/lib%.a: [[target]_obj]
+        set unlink
+{
+        ar cq [target] [resolve [[target]_obj]];
+}
+.eE
+The variable assignment given above requires no modifications.
+.H 3 "Linking Commands"
+The command linking recipe requires few modifications.
+.eB
+bin/%: [[target]_obj]
+        set mkdir
+{
+        [cc] -o [target] [resolve [[target]_obj]];
+}
+.eE
+The variable assignment needs no modifications.
+.H 2 "Whole Project Build Advantages"
+The advantage of using a whole project build is that the dependency
+graph is complete, and the order of traversal may be freely determined
+by Cook.  Breaking the build into fractured segments denies Cook access
+to the whole graph, and dictates the order of traversal to one which,
+in the light of the entire graph, would be incorrect.
+.P
+It greatly simplifies the creating of work areas for developers,
+by using Cook's \fIsearch_list\fP functionality.
+.P
+A whole project build also permits the \fIcook -continue\fP option to
+work in the presence of a wider range of errors.
+.P
+The whole project build also permits the \fIcook -parallel\fP option to
+parallelize more operations.
+.H 2 "Heterogenous Build"
+Large projects frequently involve numerous target architectures.
+This may be in the form a multiple native compilations, performed in
+suitable hosts, or it may take the form of cross-compilation.
+.P
+In this example, we assume that the GNU C Compiler (GCC) is being used.
+When GCC is installed as a cross compiler, the command names (\f(CWcc\fP,
+\f(CWas\fP, \f(CWld\fP, \fIetc\fP) are installed with the architecture
+name as a prefix.  For consistency, the native compiler is installed
+with its own architecture names as a prefix, in addition to the more
+commonly used \f(CWgcc\fP command.  This example will exploit this normal
+installation practice.
+.H 3 "Cross Compiling C Sources"
+In order to support cross compiling,
+the C compilation recipe needs to be changed to read...
+.eB
+%1/%0%.o: %0%.c
+        host-binding [defined-or-null %1-hosts]
+{
+        %1-gcc [cc_flags]
+                [prepost "-I" /[dirname %0%.c] [search_list]]
+                [prepost "-I" "/include" [search_list]]
+                -c [resolve %0%.c]
+                -o [target];
+}
+.eE
+This uses the first directory element of the \fItarget\fP to be the
+architecture name.  This allows multiple architectures to be compiled
+in the same source tree, simultaneously.
+.P
+Because of the practice of installing a duplicate GCC in the same form as
+the cross compilers, this same recipe continues to work for native builds.
+.P
+The \fIhost-binding\fP line tells Cook to run the command on one of
+the hosts nominated in a variable named for the architecture (or as a
+native cross-compiler of no such variable exists).
+(The \f(CWdefined-or-null\fP function is available in the ``functions''
+library distributed with Cook.)
+.P
+Remembering these architectures follow the GNU convention,
+these lines could read
+.eB
+i386-linux-hosts = fast faster fastest ;
+.eE
+This will do two things for you: first, it will always execute linux
+compiles on linux hosts even when Cook is not executed on one; second, it
+will use more than one of them when you use the \f(CW--parallel\fP option.
+.P
+It is possible to use implicit ingredients recipes to say that all object
+of a given architecture depend on a magic include file, \fIe.g.\fP
+.eB
+i386-linux/%0%.o: include/linux-special.h;
+.eE
+could be used to say that all Linux object files depend on this include file.
+(This is a sledge-hammer approach, and a more subtle method is preferable,
+but it is sometimes required.)
+.H 3 "Tracking Include Dependencies"
+Because of the cascade form of include dependency, there is no need to
+do anything different for include dependencies, even if you add another
+architecture some time in the future.
+.H 3 "Linking Libraries"
+The library recipe needs few modifications.
+.eB
+%1/%/lib%.a: [%/lib%.a_obj]
+        set unlink
+{
+        %1-ar cq [target] [resolve [%/lib%.a_obj]];
+}
+.eE
+The variable assignment given above requires no modifications.
+.H 3 "Linking Commands"
+The command linking recipe requires few modifications.
+.eB
+%1/bin/%: [bin/%_obj]
+        set mkdir
+{
+        %1-gcc -o [target] [resolve [bin/%_obj]];
+}
+.eE
+The variable assignment needs no modifications.
+.H 3 "What to Build"
+The list of what to build becomes more interesting.
+You can nominate any and all architectures for which you have cross
+compilers, or native compilers and native hosts.
+.eB
+all:
+        [addprefix i386-linux/bin/ [commands]]
+        [addprefix sparc-linux/bin/ [commands]]
+        [addprefix sparc-solaris2.0/bin/ [commands]]
+        [addprefix m68k-sunos4.1.3/bin/ [commands]]
+        ;
+.eE
+.P
+All of these architectures will be built in a single Cook invocation,
+on appropriate machines if necessary.  The use of \f(CW--continue\fP
+and \f(CW--parallel\fP work over the entire scope of the build.
+.H 2 "Installing Things"
+The biggest hassle is that the \fIinstall\fP(1) command, which should know
+how to do most installation tasks, has completely incompatible interfaces
+on the various platforms.  This is why the GNU autoconf system comes with
+an \fIinstall-sh\fP script, which faithfully emulates the BSD options.
+Once you have a reliable command line interface to an \fIinstall\fP(1)
+program (be it perl or shell) you can then write sensible installation
+cookbooks.
+.P
+If we have a list of commands, we would install as follows:
+.eB
+prefix = /usr/local;
+bindir = [prefix]/bin;
+install = install;
+
+install: [addprefix [bindir]/ [commands]];
+.eE
+.eB
+[bindir]/%0%: bin/%0% bin/%0.mkdir
+{
+        [install] -m 755 bin/%0% [bindir]/%0%;
+}
+.eE
+That magic \f(CWbin/%0.mkdir\fP file is used to record that the
+destination directory exists.  While you can often assume this, it is
+not always true when you are building things like RPM packages.
+.eB
+bin/%0.mkdir:
+{
+        [install] -d [bindir]/%0
+                set errok;
+        touch [target];
+}
+.eE
+The alternative is to use
+.eB
+set mkdir;
+.eE
+at the top of your cookbook.  This creates directories for targets before
+rules are run.  The install recipe then reads
+.eB
+set mkdir;
+
+[bindir]/%0%: bin/%0%
+{
+        [install] -m 755 bin/%0% [bindir]/%0%;
+}
+.eE
+because there is no need for the ``\f[CW]\.mkdir\fP'' recipe.  This,
+however gives you less crontrol over the directories permission modes,
+and it doesn't help when you want to create empty directories as part
+of the install.  Use the appropriate technique for your needs.
+.H 2 "Miscellaneous"
+This section contains assorted material that covers a variety of topics.
+(As the manual expands, it will probably be moved somewhere else.)
+.H 3 "Lots of Dependencies"
+There are cases where you may want to nominate a whole category of
+files as depending on something else.
+For example, you may want to say that
+all your fubar-language sources depend on your fubar compiler
+You could say something such as
+.eB
+cascade [match_mask %0%.fubar [manifest]] = fubarcompiler;
+.eE
+but recall that \fIeverything\fP which has a \f(CW.fubar\fP file
+as an ingredient will
+also have \f(CWfubarcomplier\fP as an ingredient.
+This may not be what you wanted.
+.P
+Recall, also, that compiler recipes carry specific information.
+You could more specifically nominate the compiler by saying
+.eB
+%0%.o: %0%.fubar: fubarcompiler
+{
+        fubarcompiler -c %0%.fubar -o [target];
+}
+.eE
+which would be much more selective about which uses of \f(CW.fubar\fP files
+also depend on \f(CWfubarcompiler\fP.
+.P
+There are times when writing cross-compilation recipes when
+you want to nominate an operating-system-specific include file
+for all of the object files:
+.eB
+%1/%0%.o: %0%.c
+{
+        /* general cross compiler recipe */
+        %1-gcc -c %0%.c -o [target];
+}
+.eE
+.eB
+/* All windows NT objects depend on this include file */
+i386-NT/%0%.o: winnt.h;
+.eE
+.P
+You can also use \fIgates\fP to make you recipes more selective.
+The gating expression may be just about anything,
+but is often a pattern match or simple set membership.
+.eB
+%.o: %.c
+        if [in [target] foo.o bar.o]
+{
+        /* foo.o and bar.o are magic */
+        cc -DMAGIC [cc_flags] -c %.c;
+}
+.eE
+The gate is most easily read as ``if \fI(this condition)\fP use this recipe''.
+.H 3 "Error Processing"
+Cook stops processing a recipe at the first error.
+If the error occurs when constructing a command to be executed,
+the command is \fInot\fP executed.
+If a recipe body contains more than one command,
+and one of them gets an error (and doesn't have the \fIerrok\fP flag set)
+the rest of the command will \fInot\fP be executed.
+.P
+In addition, if an error occurs while executing a recipe body,
+the targets of the recipe will be deleted (on the assumption that they
+are probably only partially completed, or otherwise defective).
+To override this behavior, use the \fIprecious\fP flag.
+.H 3 "NFS"
+A perennial problem for building projects over networks is that the clocks
+don't match.
+If you use the \fItime-adjust\fP flag, this problem is largely solved.
+The simplest method is to put
+.eB
+set time-adjust;
+.eE
+at the top of your cookbook.
+.P
+File fingerprints, while not directly relevant to NFS, can offer
+significant performance improvements, as they can eliminate many cases
+of unnecessary re-compilation.  To turn them on, use
+.eB
+set fingerprint;
+.eE
+at the top of your cookbook.  See below for more discussion of fingerprints.
+.H 3 "Symbolic Links"
+Symbolic links are followed to the actual file, when determining file
+modification times.  The modification time of the symbolic link itself is
+not used.  This means that ``symlink farms'' can be used when constructing
+work areas, particularly when you want functionality more complex than
+\f(CWsearch_list\fP can provide.
+.H 2 "File Fingerprints"
+Cook has the ability to supplement the last-modified time-stamps the
+operating system supplies for each file with a ``fingerprint''.  This is
+a cryptographically strong checksum, with an mind-bogglingly low probability
+that two different files will have the same fingerprint.
+.P
+When Cook needs to know if a file has changed, it looks at the
+last-modified time-stamp.  If it has changed since the last time the
+fingerprint was calculated, the fingerprint is re-calculated.  If the
+fingerprints match, Cook knows the file contents are unchanged, and
+uses the old time-stamp, and also suppress any recipe actions which
+would otherwise happen if the file contents had actually changed.
+(Cook remembers the both the new and old time-stamps, so that it can
+be efficient about re-calculating checksums and still use the old time
+stamp for out-of-date calculations.)
+.P
+When recipe bodies are run, Cook knows that the target(s) have been
+modified, so it doesn't need to re-examine the operating system's idea
+of the last-modified time-stamp, it simply re-fingerprints.
+.P
+It is tempting to try to achieve something similar by writing recipe
+bodies which only over-write their targets if they actually changed.
+\fIE.g.\fP
+.eB
+%.o: %.c
+{
+        if [exists [target]] then
+        {
+                [CC] -o %.tmp -c %.c;
+                if cmp %.tmp %.o\e;
+                then mv %.tmp %.o\e;
+                else rm %.tmp;
+        }
+        else
+                [CC] -o %.o -c %.c;
+}
+.eE
+However, this will not work (whether or not you have fingerprints turned
+on).  Largely as a defense against NFS time synchronization problems
+and stupid systems with very coarse file time-stamps, Cook ``knows''
+that because the recipe body was run the target ``changed'', causing
+all down stream dependencies to be considered out-of-date.
+.P
+In addition, this recipe would leave the last-modified time-stamp
+out-of-date if the file was unchanged.  This means the recipe would
+trigger again in the next Cook execution, negating many of the intended
+savings.
+.P
+Fingerprints are intended for this purpose, but have the advantage
+of leaving the last-modified time-stamps correct, and they need to do
+half the I/O that the \fIcmp\fP(1) command does.  Also, all down stream
+dependent files are touched, to ensure their last-modified time-stamps
+are also consistent.  Naturally, if they needed to be re-built for some other
+reason, then they would be re-built, not simply touched.
+.P
+While there is some overhead in initially calculating the fingerprints
+for a new work area, they repay that overhead many times over.  This is
+especially true if your system has generated code in it, particularly
+generated include files, but there are also savings for simpler,
+smaller projects.
+.H 3 "Turning Fingerprints On"
+To turn fingerprints on, you need to add the lines
+.eB
+set fingerprint;
+set time-adjust;
+.eE
+to your cookbook.  That second line is no essential, but it corrects
+last-modified time-stamps when NFS time synchronization problems would
+otherwise cause inconsistent behavior.
+.P
+While it is possible to turn fingerprints on for a subset of the files in
+your project, it is not as straightforward as it may seem.  There is no
+way to bind the fingerprint request to a single file, only to recipes,
+so you need to use the ``\f[CW]set fingerprint\fP'' recipe flag on
+all recipes between the relevant source file and the ultimate target.
+This tends to be messy.
+.H 3 "Vanishing Dependencies"
+It is quite common that you need to re-build a file if one of the
+dependencies is removed.
+Usually, this is quite hard to detect, because Cook has trouble seeing
+something that isn't there, compared to the previous execution.
+However an ingenious method has been described by
+Gilles Lamiral <lamiral@mail.dotcom.fr>
+which ``remembers'' though a file:
+.eB
+function contents-remember =
+{
+        /* @1 = name of contents file */
+        /* @2..N = the value of [need] */
+        [write [args]];
+}
+.eE
+.eB
+function contents-changed =
+{
+        /* @1 = name of contents file *
+        /* @2..N = the value of [need] */
+        if [not [exists [resolve [@1]]]] then
+                return 0;
+        local old-contents = [collect_lines cat [resolve [@1]]];
+        /* return 0 if nothing disappeared, >0 if did disappear */
+        return [count [stringset [old-contents] - [tail [arg]]]];
+}
+.eE
+.eB
+libfred.a libfred.contents: [fred_obj]
+        set ["if" [contents-changed libfred.contents [fred_obj]]
+                "then" forced]
+            unlink
+{
+        ar cq [target] [resolve [fred_obj]];
+        [contents-remember libfred.contents [fred_obj]];
+}
+.eE
+.P
+Note: because the set clause is evaluated when the target is evaluated,
+the [need] variable is not available.  In this example, you must have
+calculated the final value of [fred_obj] before the recipe appears
+in the cookbook.  The evaluation of the set clause also limits the
+application of this technique to explicit recipes; it will not work for
+implicit (pattern) recipes, because the value of the pattern elements
+is not known at the time the set clause is evaluated.
+.H 2 "Coping with Links"
+You will notice that the deafult operation of Cook copes with links
+(hard links and symbolic links) rather poorly.
+For example, the recipe
+.eB
+two: one
+{
+        ln one two;
+}
+.eE
+will always conclude that file \fItwo\fP is out-of-date.
+This is bacause files \fIone\fP and \fItwo\fP have exactly the same time stamp.
+.P
+If you specify a weaker time constraint, Cook will allow this kind of
+recipe to be written, and \fInot\fP conclude the files is always out
+of date:
+.eB
+two: one(weak)
+{
+        ln one two;
+}
+.eE
+The ``\f[CW](weak)\fP'' on the end of the ingredient name tells Cook to
+use the weak edge type, rather than the strict edge type.
+.P
+This technique is useful for symbolic links, too.
+.P
+One other thing which can be very useful for both link types, but
+particularly symbolic links to directories, is the ``set unlink''
+recipe flag.
+.eB
+two: one(weak)
+        set unlink
+{
+        ln -s one two;
+}
+.eE
+This removes the target (if necessary) before the recipe body is run.
+.H 2 "Coping with Version Stamps"
+In some systems, the version stamp is regenerated for every build,
+but you don't want to relink zillions of executables just becaise the
+version stamp has changed, but nothing else has.
+.P
+By using the ``\f[CW](exists)\fP'' edge type, you can tell Cook that an
+ingredient is needed for a given target, but that it should never be
+considered to make the target out-of-date.  For example:
+.eB
+#include "c"
+all: prog1 prog2;
+.eE
+.eB
+version.c:
+        set forced
+{
+        date "'+#define VERSION \e"%C\e"'" > [target];
+}
+.eE
+.eB
+prog1: prog1.o mylib.a version.o(exists)
+{
+        gcc -o [target] [need];
+}
+.eE
+.eB
+prog2: prog2.o mylib.a version.o(exists)
+{
+        gcc -o [target] [need];
+}
+.eE
+This cookbook will generate a new \fIversion.c\fP file every time that Cook
+is run, and thus a new \fIversion.o\fP file.  However, the \fIprog1\fP
+and \fIprog2\fP files will not be re-linked unless something else
+changed as well.

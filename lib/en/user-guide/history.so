@@ -1,0 +1,67 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1997, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Ancient History
+.\"
+.H 2 "Ancient History"
+.B Cook
+was originally developed because I was marooned on an operating
+system without anything even vaguely resembling
+\fImake\fP(1).
+This was in 1988.
+Since I had to write my own,
+I added a few improvements.
+When I finally escaped back to \s-4UNIX\s+4,
+in 1990,
+it took only two days to port
+.B cook
+to SystemV.
+I have since deleted all code for that original operating system,
+although clues to its identity are still present.
+.P
+After I had
+.B cook
+up on \s-4UNIX\s+4,
+the progress the world had made caught up with me.
+It was gratifying that
+many of the features other make-oid authors had thought necessary
+were either already present,
+or easily and seamlessly added.
+.P
+.B Cook
+was written with portability in mind.
+This does not means it is entirely portable,
+but it comes close.
+.B Cook
+has been tested on numerous \s-4UNIX\s+4 flavors.  This was made much
+simpler in 1994 when I started using the GNU Autoconf utility.  This
+means that when you obtain the sources for Cook, all you have to do is
+run the \fIconfigure\fP script included in the distribution and Cook
+will be configured for your system.  See the \f[CW]BUILDING\fP file in
+the source distribution for more information.
+.P
+In 1996 Cook had internationalization support added, so that users could
+have error messages and other warning and informational messages printed
+in their native language.  This was made possible by the GNU Gettext
+utilities.
+.P
+In 1997 Cook had a major re-write of significant portions of its
+inference engine.  This enabled the addition of parallel processing
+support, and simplified adding user-defined functions to the cookbook
+language.

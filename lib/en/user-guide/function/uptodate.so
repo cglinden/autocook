@@ -1,0 +1,33 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 1999, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Uptodate
+.\"
+.H 2 "uptodate"
+This function may be used to determine if files are up-to-date.
+It returns a word list containing the names of the up-to-date files,
+or empty if none of them are up-to-date.
+They are \fInot\fP brought up to date if they are not already.
+This function requires one or more arguments.
+.H 3 "Caveat"
+This will use as much of the cookbook as has been read in up to the
+point where this function is used.  This can mean that crucial recipes
+have yet to be parsed and instanciated.
+.H 3 "See Also"
+cando, cook

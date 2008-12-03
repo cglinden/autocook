@@ -1,0 +1,75 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1996, 1997, 2001, 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing the ``program'' cookbook
+.\"
+.H 2 "program"
+This cookbook defines how to construct a program.
+.P
+If your program uses any libraries,
+you will have to append them to [ld_libraries] in your
+.I Howto.cook
+file.
+.H 3 "variables"
+.VL 1i
+.LI all
+Targets of the all recipe.
+.LI install
+targets of the install recipe
+.LI ld
+The name of the linker command.
+Not altered if already defined.
+Set to the same as the ``cc'' variable if set,
+otherwise set to the same as the ``f77'' variable if set,
+otherwise set to ``ld''.
+.LI ld_flags
+Not altered if already defined.
+The default is empty.
+.LI ld_libraries
+Options passed to the C compiler when linking,
+these are typically library search paths (\f(CW-L\fP) and libraries
+(\f(CW-l\fP).
+Not altered if already defined.
+The default is empty.
+.LI me
+The name of the program to be constructed.
+Defaults to the last component of the pathname of the current directory.
+.LE
+.H 3 "recipes"
+.VL 1i
+.LI all
+Construct the targets named in [all].
+.LI clean
+Remove the files named in [dot_clean].
+.LI clobber
+Remove the files named in [dot_clean] and [all].
+.LI install
+Construct the files named in [install].
+Only defined if the [lib] variable is defined.
+.LI uninstall
+Remove the files named in [install].
+Only defined if the [lib] variable is defined.
+.LE
+.H 3 "See Also"
+The ``c'' cookbook, for C sources.
+.br
+The ``f77'' cookbook, for Fortran sources.
+.br
+The ``usr'' or ``usr.local'' or ``home'' cookbooks,
+for defining install locations.

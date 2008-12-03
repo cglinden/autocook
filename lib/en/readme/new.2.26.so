@@ -1,0 +1,59 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.26 features
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" Change 62, 61, 60, 59, 58, 57, 50, 39, 38, 37, 36, 29, 28, 27, 26,
+.\" 25, 23, 22, 21, 20
+An ANSI C compiler is now required to build Cook.
+.PP
+.if n *
+.if t \(bu
+.\" cook.2.26.D025
+.\" Change 52
+.\" pmiller, Mon Feb 26 10:04:22 2007, cook_bom --prefix
+A bug has been fixed in the \f[I]cook_bom\fP command's
+\f[B]\-prefix\fP and \f[B]\-suffix\fP options.
+.PP
+.if n *
+.if t \(bu
+.\" Change 33
+The fingerprint code is now more robust when faced with
+file modification time trickery by users.
+.PP
+.if n *
+.if t \(bu
+.\" cook.2.26.D009
+.\" Change 12
+.\" pmiller, Wed Nov  1 15:29:51 2006, cygwin
+A few things have been improved for using Cook on Cygwin.
+.PP
+.if n *
+.if t \(bu
+.\" cook.2.26.D003
+.\" Change 15
+.\" pmiller, Mon Jun  5 17:43:17 2006, c_incl -r vs .PSPIC
+The \f[B]c_incl \-r\fP option now understands \f[CW]\.PSPIC\fP
+directives, as well as \f[CW].so\fP directives.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.26 (2006-Jan-17)

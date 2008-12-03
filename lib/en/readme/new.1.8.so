@@ -1,0 +1,55 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1995, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 1.8 features
+.\"
+.SS "Release 1.8"
+.PP
+.if n *
+.if t \(bu
+The fingerprint code has been improved to
+work better with the search_list functionality.
+.PP
+.if n *
+.if t \(bu
+The diagnostics have been improved
+when cook ``don't know how''.
+A list of attempted ingredients is included in the error message.
+.PP
+.if n *
+.if t \(bu
+There is a new \fImkdir\fP recipe flag.
+This creates recipe target directories
+before the recipe body is run.
+See the Reference Manual for more information.
+.PP
+.if n *
+.if t \(bu
+There is a new \fIunlink\fP recipe flag.
+This unlinks recipe targets
+before the recipe body is run.
+See the Reference Manual for more information.
+.PP
+.if n *
+.if t \(bu
+There is a new \fIrecurse\fP recipe flag.
+This overrides the infinite loop recipe heuristic,
+allowing recipes to recuse upon themselves if one of their ingredients
+matches one of their targets.
+See the Reference Manual for more information.

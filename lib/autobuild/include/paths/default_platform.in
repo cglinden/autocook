@@ -1,0 +1,59 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+
+/*--- Basics ------------------------------------------------*/
+awk = /bin/awk;     
+c_incl = @bindir@/c_incl;
+cat = /bin/cat;
+cd = cd;
+chmod = /bin/chmod; 
+cp = /bin/cp -f;       
+date = /bin/date;
+echo = [sync]/bin/echo;   
+extract = /usr/bin/tail -20;
+find = /bin/find;   
+grep = /bin/grep;   
+ln = /bin/ln -sf;    
+lorder = /bin/lorder;
+ls = /bin/ls;       
+mkdir = /bin/mkdir -p; 
+mv = /bin/mv;       
+pkgmk = /bin/pkgmk;
+pkgtrans = /bin/pkgtrans;
+rm = /bin/rm -f;
+rmdir = /bin/rm -rf;
+sed = /bin/sed;     
+sh = /bin/sh;  
+sleep = /bin/sleep; 
+tar_extract = /bin/tar xvfmz;
+tee = /bin/tee;
+touch = /bin/touch; 
+tsort = /usr/bin/tsort;
+ungrep = /bin/grep -v;
+xmllint = /usr/bin/xmllint;
+
+perl          = @PERL@; /* command to invoke the perl interpreter */
+sh	      = @SH@; /* command to invoke the bourne shell */
+ksh	      = /bin/ksh; /* command to invoke the corn shell */
+csh	      = /bin/csh; /* command to invoke the c shell */
+
+null_device = /dev/null; /* /dev/null - which isn't always /dev/null */

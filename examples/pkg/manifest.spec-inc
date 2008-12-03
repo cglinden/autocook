@@ -1,0 +1,55 @@
+#!/bin/sh
+
+manifest()
+{
+  local name="$1"; shift
+  local version="$1"; shift
+  local install_prefix="$1"; shift
+
+  find "$install_prefix"\
+     -name DO -o\
+     -name '.project' -o\
+     -name '.classpath' -o\
+     -name '*~*' -o\
+     -name '*%%*' -o\
+     -name '*#*' -o\
+     -name '.cook*' -o\
+     -name '.do_not*' -o\
+     -name 'Howto.list' -o\
+     -name '*-' -o\
+     -name '*.bak'\
+     -print -prune\
+    | xargs rm -rf
+
+  mkdir -p "$install_prefix/$version/rpm/$name"
+  cp "%{cook_top}/pkg/MANIFEST.preamble"\
+     "$install_prefix/$version/rpm/$name/MANIFEST"
+
+  chmod +w "$install_prefix/$version/rpm/$name/MANIFEST"
+
+  for manifest in files symlinks dirs
+  do
+    cp /dev/null "$install_prefix/$version/rpm/$name/MANIFEST-$manifest"
+    chmod +w     "$install_prefix/$version/rpm/$name/MANIFEST-$manifest"
+  done
+
+  find ".%{prefix}" -type f\
+     | sed 's:^\./:/:'\
+    >> "$install_prefix/$version/rpm/$name/MANIFEST-files"
+
+  find ".%{prefix}" -type l\
+     | sed 's:^\./:/:'\
+    >> "$install_prefix/$version/rpm/$name/MANIFEST-symlinks"
+
+  find ".%{prefix}" -type d\
+     | sed 's:^\./:/:'\
+    >> "$install_prefix/$version/rpm/$name/MANIFEST-dirs"
+
+  sed 's:^:%%dir :'\
+      "$install_prefix/$version/rpm/$name/MANIFEST-dirs"\
+   >> "$install_prefix/$version/rpm/$name/MANIFEST"
+
+  cat "$install_prefix/$version/rpm/$name/MANIFEST-files"\
+      "$install_prefix/$version/rpm/$name/MANIFEST-symlinks"\
+   >> "$install_prefix/$version/rpm/$name/MANIFEST"
+}

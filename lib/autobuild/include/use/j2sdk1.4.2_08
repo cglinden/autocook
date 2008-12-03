@@ -1,0 +1,13 @@
+j2sdk1.4.2_08_use_dependency = ADD [__FILE__]':'[__LINE__] [__FILE__];
+j2sdk1.4.2_08_use_unpack = [thirdparty]/j2sdk1.4.2_08/[dummy];
+
+j2sdk1.4.2_08_java_home  = [thirdparty]/j2sdk1.4.2_08;
+j2sdk1.4.2_08_java  = ADD [__FILE__]\:[__LINE__] [j2sdk1.4.2_08_java_home]/bin/java;
+j2sdk1.4.2_08_javah = ADD [__FILE__]\:[__LINE__] [j2sdk1.4.2_08_java_home]/bin/javah;
+j2sdk1.4.2_08_cc_I_flags = ADD [__FILE__]\:[__LINE__] -I[j2sdk1.4.2_08_java_home]/include -I[j2sdk1.4.2_08_java_home]/include/linux;
+j2sdk1.4.2_08_cpp_I_flags = ADD [__FILE__]\:[__LINE__] -I[j2sdk1.4.2_08_java_home]/include -I[j2sdk1.4.2_08_java_home]/include/linux;
+j2sdk1.4.2_08_rpmbuild_flags = ADD [__FILE__]\:[__LINE__] --define "'javahome "[j2sdk1.4.2_08_java_home]"'";
+j2sdk1.4.2_08_sh_D_flags = ADD [__FILE__]\:[__LINE__] -DJAVA_HOME\=[pwd]/[j2sdk1.4.2_08_java_home];
+j2sdk1.4.2_08_perl_D_flags = ADD [__FILE__]\:[__LINE__] -DJAVA_HOME\=[pwd]/[j2sdk1.4.2_08_java_home];
+j2sdk1.4.2_08_bat_D_flags = ADD [__FILE__]\:[__LINE__] -DJAVA_HOME\=[pwd]/[j2sdk1.4.2_08_java_home];
+

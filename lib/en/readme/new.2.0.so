@@ -1,0 +1,64 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.0 features
+.\"
+.PP
+.if n *
+.if t \(bu
+It is possible to specify that a command is to be executed on a specific
+machine or machines.  This can be useful for restrictively licensed
+third party software tools.
+.PP
+.if n *
+.if t \(bu
+The parallel functionality has been extended to implement a virtual
+parallel machine on a LAN.
+.PP
+.if n *
+.if t \(bu
+Fingerprinting has been enhanced to be more informative, and to adjust
+file modification times so that subsequest fingerprint-less runs will
+not find too much to do.
+.PP
+.if n *
+.if t \(bu
+The \f[CW]#line\fP directive is now available, for better diagnostics of
+generated cookbooks.  The \f[CW]__FILE__\fP and \f[CW]__LINE__\fP
+variable are also available.
+.PP
+.if n *
+.if t \(bu
+There is now a \f[CW]thread-id\fP variable, to obtain a thread-unique
+value for use in generating temporary file names or variable names,
+\fIetc\fP, which are unique to a thread.
+.PP
+.if n *
+.if t \(bu
+Added the \f[CW]wordlist\fP function and the \f[CW]command-line-goals\fP
+variable for compatibility with GNU Make.  Updated \fImake2cook\fP to
+understand them.
+.SS "Release 2.0.1"
+.PP
+.if n *
+.if t \(bu
+An install problem in the generated Makefile, to do with the the
+manuals, has been fixed.
+.\" ---------------------- Add New Notes Above This Line ----------------------
+.SS "Release 2.0 (1997-Sep-11)"

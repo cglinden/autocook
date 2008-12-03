@@ -1,0 +1,14 @@
+#!@SH@
+
+testprog="$1/test-$$.c"
+
+mkdir -p "$1"
+cat >$testprog <<EOF
+#include <this-file-does-not-exist-I-hope>
+EOF
+
+$2 -c -o $testprog.o -v $testprog 2>&1\
+  | sed -e '1,/^#include </d'\
+        -e '/^[^ ]/d'\
+        -e 's/^ /-I/'
+rm -f $testprog $testprog.o

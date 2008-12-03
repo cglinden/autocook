@@ -1,0 +1,29 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+
+loop v = debug optimized {
+  if [and [exists /usr/bin/gcc32] [exists /usr/bin/g++32]] then {
+    gcc32_cc_[unix]_[v]  = ADD [__FILE__]':'[__LINE__] /usr/bin/gcc32;
+    gcc32_cpp_[unix]_[v] = ADD [__FILE__]':'[__LINE__] /usr/bin/g++32;
+  }
+}
+gcc32_use_dependency = ADD [__FILE__]':'[__LINE__] [__FILE__];

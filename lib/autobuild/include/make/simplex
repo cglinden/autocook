@@ -1,0 +1,49 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+/* The following initializes the directory lists for specific targets */
+/* The presence of an entry here makes the "make <target>" legal      */
+
+[set-variant-value target_list_for_simplex];
+
+/* The following variables control the generation of global depends   */
+generate_src_depend_for_simplex = 1;
+generate_bin_depend_for_simplex = 1;
+generate_lint_files_for_simplex = 1;
+
+/* This function transforms a directory into the actual build target  */
+function make_target_simplex /* dir */ =
+{
+  return [fromto %0[do]/[unix]/[@2]/%[obj_suffix]
+                 %0[do]/[unix]/[@2]/simplex/%[bin_suffix] [object_files_for_[@1][@2]]];
+}
+
+function make_lint_target_simplex /* dir */ =
+{
+  return [fromto %0[do]/[unix]/[@2]/%[lint_suffix]
+                 %0[do]/[unix]/[@2]/simplex/%[lints_suffix] [lint_files_for_[@1][@2]]];
+}
+
+function make_bindep_simplex /* dir */ =
+{
+  return [fromto %0[do]/[unix]/[@2]/%[obj_suffix]
+                 %0[do]/[unix]/[@2]/%[bin_suffix][bindep_suffix] [object_files_for_[@1][@2]]];
+}

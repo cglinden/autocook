@@ -1,0 +1,180 @@
+.\"
+.\"     aegis - project change supervisor
+.\"     Copyright (C) 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: Cook Tutorial
+.\"
+.PS
+dir_factor = 0.6
+
+folder_height = 0.16 * dir_factor
+folder_width  = 0.25 * dir_factor
+folder_miter  = 0.03 * dir_factor
+
+define folder {
+B: box invis wid folder_width ht folder_height
+line from B.sw \
+        then to B.nw-(0,folder_miter) \
+        then to B.nw+(folder_miter,0) \
+        then to B.n-(folder_miter/2,0) \
+        then to B.n+(folder_miter/2,-folder_miter) \
+        then to B.ne-(0,folder_miter) \
+        then to B.se \
+        then to B.sw
+}
+
+document_height = 0.22 * dir_factor
+document_width  = 0.16 * dir_factor
+document_miter  = 0.05 * dir_factor
+
+define document {
+B: box invis wid document_width ht document_height
+line from B.sw \
+        then to B.nw \
+        then to B.ne-(document_miter,0) \
+        then to B.ne-(0,document_miter) \
+        then to B.se \
+        then to B.sw
+line from B.ne-(document_miter,0) \
+        then to B.ne-(document_miter,document_miter) \
+        then to B.ne-(0,document_miter)
+}
+
+dir_wid = 0.35 * dir_factor
+dir_ht = 0.26 * dir_factor
+
+.\" A: project/
+.\" S:   Howto.cook
+.\" B:   lib/
+.\" C:     lib1.c
+.\" D:     lib2.c
+.\" E:     lib.h
+.\" F:   prog1/
+.\" G:     src1.c
+.\" H:     src2.c
+.\" I:     main.c
+.\" J:   prog2/
+.\" K:     src1.y
+.\" L:     src2.c
+.\" M:     main.c
+.\" N:   doc/
+.\" O:     prog1/
+.\" P:       manual
+.\" Q:     prog2/
+.\" R:       manual
+
+boxwid = dir_wid
+boxht = dir_ht
+A: box invis
+   [ folder ] with .c at A.c
+   "\fIProject\fP" ljust at A.e
+
+   line from A.s then down boxht/2 then right boxwid/2
+S: box invis
+   [ document ] with .c at S.c
+   "\f(CWHowto.cook\fP" ljust at S.e
+
+   line from A.s then down 3*boxht/2 then right boxwid/2
+B: box invis
+   [ folder ] with .c at B.c
+   "\f(CWlib\fP" ljust at B.e
+
+   line from B.s then down boxht/2 then right boxwid/2
+C: box invis
+   [ document ] with .c at C.c
+   "\f(CWlib1.c\fP" ljust at C.e
+
+   line from B.s then down 3*boxht/2 then right boxwid/2
+D: box invis
+   [ document ] with .c at D.c
+   "\f(CWlib2.c\fP" ljust at D.e
+
+   line from B.s then down 5*boxht/2 then right boxwid/2
+E: box invis
+   [ document ] with .c at E.c
+   "\f(CWlib.h\fP" ljust at E.e
+
+   line from A.s then down 11*boxht/2 then right boxwid/2
+F: box invis
+   [ folder ] with .c at F.c
+   "\f(CWprog1\fP" ljust at F.e
+
+   line from F.s then down boxht/2 then right boxwid/2
+G: box invis
+   [ document ] with .c at G.c
+   "\f(CWsrc1.c\fP" ljust at G.e
+
+   line from F.s then down 3*boxht/2 then right boxwid/2
+H: box invis
+   [ document ] with .c at H.c
+   "\f(CWsrc2.c\fP" ljust at H.e
+
+   line from F.s then down 5*boxht/2 then right boxwid/2
+I: box invis
+   [ document ] with .c at I.c
+   "\f(CWmain.c\fP" ljust at I.e
+
+   line from A.s then down 19*boxht/2 then right boxwid/2
+J: box invis
+   [ folder ] with .c at J.c
+   "\f(CWprog2\fP" ljust at J.e
+
+   line from J.s then down boxht/2 then right boxwid/2
+K: box invis
+   [ document ] with .c at K.c
+   "\f(CWsrc1.c\fP" ljust at K.e
+
+   line from J.s then down 3*boxht/2 then right boxwid/2
+L: box invis
+   [ document ] with .c at L.c
+   "\f(CWsrc2.c\fP" ljust at L.e
+
+   line from J.s then down 5*boxht/2 then right boxwid/2
+M: box invis
+   [ document ] with .c at M.c
+   "\f(CWmain.c\fP" ljust at M.e
+
+   line from A.s then down 27*boxht/2 then right boxwid/2
+N: box invis
+   [ folder ] with .c at N.c
+   "\f(CWdoc\fP" ljust at N.e
+
+   line from N.s then down boxht/2 then right boxwid/2
+O: box invis
+   [ folder ] with .c at O.c
+   "\f(CWprog1\fP" ljust at O.e
+
+   line from O.s then down boxht/2 then right boxwid/2
+P: box invis
+   [ document ] with .c at P.c
+   "\f(CWmanual\fP" ljust at P.e
+
+   line from N.s then down 5*boxht/2 then right boxwid/2
+Q: box invis
+   [ folder ] with .c at Q.c
+   "\f(CWprog2\fP" ljust at Q.e
+
+   line from Q.s then down boxht/2 then right boxwid/2
+R: box invis
+   [ document ] with .c at R.c
+   "\f(CWmanual\fP" ljust at R.e
+
+.\" Make sure the width of the text is taken into account when the
+.\" picture is centered within the column.
+box invis wid 1 with .w at R.e
+.PE

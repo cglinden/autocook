@@ -1,0 +1,51 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1994, 1997, 2000, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Builtin Functions, Split
+.\"
+.H 2 "split"
+The
+.I split
+function is used to split strings into multiple strings,
+given the separator.
+This function requires at least one argument.
+The first argument is the separator character,
+the second and subsequent arguments are to be separated.
+The result is the separated strings, each as a separate word.
+.H 3 Example
+.TS
+center,tab(;);
+l l.
+Expression;Result
+_
+[split ":" "foo:bar:baz"];foo bar baz
+[split " " "New York"];New York
+.TE
+Each of the words in the result is a separate string.
+.P
+This can be useful in splitting an environment variable into separate words.
+For example:
+.eB
+path = [split ":" [getenv PATH]];
+.eE
+.H 3 "See Also"
+unsplit,
+join,
+catenate,
+strip

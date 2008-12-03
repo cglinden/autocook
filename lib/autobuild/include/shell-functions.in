@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# This include file defines some shell functions often used within
+# builds.
+
+set_and_export_env_var() {
+  if eval 'test -z "$'$1'"'; then
+    eval export $1='"'"$2"'"'
+  else
+    echo 'WARNING: '$1' set by user. This build is not a certifiable build' >&2
+  fi
+}
+
+import_or_set_env_var() {
+  if eval 'test -z "$'$1'"'; then
+    eval export $1='"'"$2"'"'
+    echo 'WARNING: '$1' not set, defaulting to '$2 >&2
+  fi
+}
+
+nuke_jar_signature() {
+  local signature="$1"; shift
+
+  while [ "$1" ]; do
+    echo "    Nuke JarSig: $1" >&2
+    zip -d "$1"\
+      META-INF/"$signature".SF\
+      META-INF/"$signature".RSA\
+      2>/dev/null
+    shift
+  done 
+}
+
+join_path_components() {
+  local var="$1"; shift
+  local prefix="$1"; shift
+  local path=
+
+  if eval 'test "$'$var'"'; then
+    echo 'WARNING: '$1' set by user. This build is not a certifiable build' >&2
+    eval path='$'"$var"
+  fi
+
+  while test "$1"; do
+    local p="$1"; shift
+    case "$p" in
+    *:*) ;; # allow appending to existing path
+    *) if [ -r "$prefix/$p" ]; then
+         p="$prefix/$p"
+       elif [ ! -r "$p" ]; then
+         echo "WARNING: $p or $prefix/$p not found, not including it in $var" >&2
+         continue
+       fi ;;
+    esac
+    if [ "$path" ]; then
+      path="$path":"$p"
+    else
+      path="$p"
+    fi
+    shift
+  done
+  eval export $var='"'"$path"'"'
+}
+
+if [ -z "$COOK_top" ]; then
+  local dir=`pwd`
+  while [ "$dir" != / ]; do
+    test -r "$dir/Howto.cook" && COOK_top="$dir"
+    dir=`cd $dir/.. && pwd`
+  done
+  if [ -z "$COOK_top" ]; then
+    echo 'ERROR: Failed to determine COOK_top' >&2
+    exit 1
+  fi
+fi
+
+import_or_set_env_var COOK_test      false
+import_or_set_env_var COOK_variant   debug
+import_or_set_env_var COOK_platform `$COOK_top/make/platform --rpm`
+
+if [ -r "$COOK_top/make/cook/VersionControl.sh" ]; then
+  . "$COOK_top/make/cook/VersionControl.sh"
+else
+  echo 'WARNING: Missing perforce information file.' >&2
+fi
+
+#eof

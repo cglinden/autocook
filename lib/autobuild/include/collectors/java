@@ -1,0 +1,40 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+/* collector files create the following lists of intermediary files:
+ *
+ *	depend_files	all dependency files except for those implied
+ *			by object_files.
+ */
+
+java_files =;
+jar_files =;
+
+/*
+ * loop v = [supported_variants] {
+ *   if [count [defined-or-null files_under_./[v]]] then {
+ *     java_files += [match_mask %0%[java_suffix] [files_under_./[v]]];
+ *     jar_files  += [match_mask %0%[jar_suffix]  [files_under_./[v]]];
+ * 
+ *   }
+ * }
+ * depend_files += [fromto %0% %0[do]/%[dep_suffix] [stringset [java_files] [jar_files]]];
+ */

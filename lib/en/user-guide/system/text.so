@@ -1,0 +1,47 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1996, 1997, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing the ``text'' cookbook
+.\"
+.H 2 "text"
+This cookbook is used to process text documents.
+.P
+Include file dependencies are automatically detected.
+The requirements for various preprocessors are automatically detected
+(\fIe.g.\fP eqn, tbl, pic, graf).
+.H 3 "recipes"
+.VL 1i
+.LI "%.ps: %.t"
+PostScript for generic *roff source.
+.LI "%: %.t"
+Straight text from *roff source.
+.LE
+.H 3 "variables"
+.VL 1i
+.LI text_incl
+The text_incl command (finds include dependencies).
+Not altered if already set.
+.LI text_roff
+The text_roff command (finds preprocessor requirements).
+Not altered if already set.
+.LI roff_flags
+Arguments passed to text_roff, and indirectly to the *roff program.
+Not altered if already set.
+Defaults to empty.
+.LE

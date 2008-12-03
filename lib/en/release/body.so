@@ -1,0 +1,49 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1999, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing body.so
+.\"
+.br
+Subject: \*(N) \*(v) \- file construction tool
+.br
+Reply-To: Peter Miller <millerp@canb.auug.org.au>
+.sp
+I am pleased to announce that \*(N) \*(v) is now available.
+.sp
+The cook program is a tool for constructing files,
+and maintaining referential integrity between files.
+.sp
+Cook is a replacement for the traditional \fImake\fP(1) tool.
+However, it is necessary to convert makefiles into cookbooks using
+the \fImake2cook\fP utility included in the distribution.
+.sp
+You are invited to visit
+.ce 1
+http://www.canb.auug.org.au/~millerp/\*(n)/
+for a more complete description of what \*(N) is, and access to the
+download files.
+New features and bug fixes are described in the \*(n)-\*(v).README file.
+.sp
+If you are putting together a source-code distribution and planning to
+write a makefile, consider writing a cookbook instead.  Although
+Cook takes a day or two to learn, it is much more powerful and a bit
+more intuitive than the traditional \fImake\fP(1) tool.
+And Cook doesn't interpret tab differently to 8 space characters!
+.sp
+\fIput your \f(CW.sig\fI file here

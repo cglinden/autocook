@@ -1,0 +1,38 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Sort_newest
+.\"
+.H 2 "sort_newest"
+The arguments are sorted by file last-modified time,
+youngest to oldest.
+File names are resolved first (see the resolve function, below).
+Absent files will be sorted to the start of the list.
+.H 3 "Example"
+This function is often used to "shorten the wait" when building large project,
+so that the file you edited most recently is recompiled almost immediately:
+.eB
+src = [glob *.c];
+obj = [sort_newest [fromto %.c %.o [src]]];
+.eE
+.P
+This trick does not always work as expected,
+and can take significant time for little result.
+.H 3 "See Also"
+fromto, glob, sort

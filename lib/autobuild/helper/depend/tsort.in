@@ -1,0 +1,94 @@
+#!@PERL@
+
+use FindBin;
+
+%linkto = ();
+
+while (@ARGV) {
+  $_ = shift;
+  if ($_ eq '-linkto') {
+    my $linkto = shift;
+    $linkto{$linkto} = 1;
+  } elsif ($_ eq '-prefix') {
+    $prefix = shift;
+  } elsif ($_ eq '-suffix') {
+    $suffix = shift;
+  } elsif ($_ eq '-libdep_suffix') {
+    $libdep_suffix = shift;
+  } elsif ($_ eq '-tsort') {
+    $tsort = shift;
+  } elsif ($_ eq '-o') {
+    $output = shift;
+  } elsif (index($_, '-') == 0) {
+    print STDERR "Unknown option: $_\n";
+    exit 1;
+  } else {
+    push(@input, $_);
+  }
+}
+
+$read_errors = 0;
+
+if (open(O, "> $output")) {
+  print O "$prefix\n";
+  close(O);
+} else {
+  print STDERR "Could't write to $tsort > $output\n";
+  exit 99;
+}
+
+%processed = ();
+%dependency = ();
+if (open(O, "| ( $tsort >> $output ) 2>&1 | $FindBin::Bin/tsort_filter")) {
+  foreach $file (@input) {
+    $read_errors += &process($file, "BEGIN") unless $processed{$file};
+    while (($target, $deps) = each(%dependency)) {
+      foreach $dep (keys(%$deps)) {
+	print O "$target $dep\n";
+      }
+    }
+  }
+  close(O);
+} else {
+  print STDERR "Could't write to $tsort > $output\n";
+  exit 99;
+}
+
+if (open(O, ">> $output")) {
+  print O "$suffix\n";
+  close(O);
+} else {
+  print STDERR "Could't write to $tsort > $output\n";
+  exit 99;
+}
+
+exit $read_errors;
+
+sub process {
+  my ($file, $target) = @_;
+  my $read_errors = 0;
+  my @unprocessed = ();
+  my ($nextfile, $lib);
+
+  $processed{$file}++;
+  if (open(I, $file)) {
+    while (<I>) {
+      chomp;
+      if ($linkto{$_}) {
+	$dependency{$target}{$_}++ if $target;
+	my $nextfile = $_.$libdep_suffix;
+	$nextfile =~ s,(/DO/[^/]*/[^/]*/)[^/]*(/[^/]*)$,$1$2,;
+	push(@unprocessed, [$nextfile, $_])
+	  unless $processed{$nextfile};
+      }
+    }
+    close(I);
+  } else {
+    print STDERR "ERROR: Couldn't open $file\n";
+    $read_errors++;
+  }
+  foreach $args (@unprocessed) {
+    $read_errors += &process(@$args);
+  }
+  $read_errors;
+}

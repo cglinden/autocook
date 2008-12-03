@@ -1,0 +1,131 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2001 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Managing remote execution of Parallel builds
+.\"
+.H 2 "Virtual Machine, Revisited"
+It is also possible to have Cook run multiple processes in parallel
+without having to know what machines are available.  This method puts
+control of the network resources in the hands of an external program,
+one example of which is \f[CW]cook_rsh\fP, distributed with Cook.
+.P
+Once you have such a virtual network defined it becomes very easy to
+build projects for multiple platforms or architectures in the same
+build.  It also allows easily adding new machines, or disabling machines
+for maintenance.  The virtual network can be changed at any time
+without disturbing ongoing development.
+.P
+The following examples will have the form allowing multiple
+architecture builds, but of course they will work for single
+architecture as well.
+.H 3 "cook_rsh"
+The \f[CW]cook_rsh\fP system is just one way of defining the
+capabilities of a given network in a way that a single program can
+make the best choice of machine for a given job.  It does so in a way
+that is reliable and does a decent job of balancing loads across
+available machines, even with multiple developers doing builds at
+the same time.
+.P
+Each job that requested via \f[CW]cook_rsh\fP picks the appropriate
+machine from those able to do the job at that instant in time.  In
+contrast to \f[CW]parallel_hosts\fP or \f[CW]host-binding hostA hostB
+etc\fP, it does not work from a list which was current at the time a
+cook process was started.  Thus it is less vulnerable to machines going
+off line or becoming overloaded as time passes.
+.P
+Currently \f[CW]cook_rsh\fP uses \f[CW]rsh\fP to actually execute the
+job, so requires the same network setup.  The next version may use
+\f[CW]multicast\fP instead for even finer control and reliability.
+.P
+There are minor differences in the setup to use \f[CW]cook_rsh\fP control.
+The first is that Cook no longer requires a list of machines.
+It is not necessary to set the \f[CW]parallel_hosts\fP variable.
+The \f[CW]parallel_rsh\fP variable is set as:
+.eB
+parallel_rsh = cook_rsh -v;
+.eE
+The \f[CW]-v\fP option produces information as to what machine was
+actually picked for each job.
+.H 3 "Host Binding"
+All recipe bodies which should run in parallel need a
+\f[CW]host-binding\fP setting.  Rather than list the hosts to be used
+we form a name which is used by \f[CW]cook_rsh\fP to select an
+appropriate machine.  This name may include an \f[CW]architecture\fP
+component and a \f[CW]operation\fP component.
+.eB
+%1/%.o: %.c
+        host-binding %1_C
+{
+        [%1_cc] -o [target] -c [resolve %.c];
+}
+
+%1/%2: [addprefix %1/ [%2_objs]]
+        host-binding %1_L
+{
+        [%1_ld] -o [target] [resolve [need]];
+}
+.eE
+This example says that the compiles for a certain architecture should
+take place on any machine designated as a compile host for that
+architecture.  And linking jobs should go to machines designated as a
+link host for that architecture.  Of course the same machine could
+probably do both jobs, but you get to define it as you see fit, and
+change the designations from moment to moment.
+Current designations per architecture are:
+.TS c
+tab(;);
+c l l.
+_C;Compile;(Compile source code)
+_L;Link;(link binary programs)
+_T;Test;(run automatic tests)
+_B;Build;(including cooking, or generic jobs)
+.TE
+And others may be added if necessary by simple extension.
+.H 3 "Administration of cook_rsh"
+The definition of the virtual network used by \f[CW]cook_rsh\fP is
+contained in just a two configuration files.  One file lists
+designations, and lists machines belonging to each designation.  The
+other is an \fBexclude\fP file, which lists machines which should not
+be used for whatever reason.
+.P
+The designations file may be created by hand if desired but a utility
+called \f[CW]rate_hosts\fP is provided that can generate the
+\f[CW]host_lists.pl\fP file, possibly after being customized for the
+particular requirements of a given environment.
+.P
+The exclusion file lists machines that should never be selected.  The
+exclusion file can be edited at any time and adding a machine will
+prevent any further jobs from going its way.  Removing the name will
+again allow selection of that machine.  How soon a job actually goes
+there depends greatly on the network utilization.  The
+\f[CW]exclude_hosts\fP file contains machine names and optional
+comments.  An example \f[CW]exclude_hosts\fP file might contain:
+.eB
+# list of hosts to exclude from arch_hosts lists
+# for whatever reason.
+monolith        # not a development machine - the ftp host
+namshub         # developer test station
+tiamat          # unreliable configuration
+locutus         # Being upgraded
+.eE
+This is handy for maintenance on machines.  If a particular
+machine needs to be brought down you simply add its name to the
+exclusion file.  Checking its process list will tell when any currently
+running remove jobs are done.  After that it can safely be brought down
+without affecting any active builds.

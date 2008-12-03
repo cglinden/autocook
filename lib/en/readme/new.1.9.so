@@ -1,0 +1,67 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1996, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 1.9 features
+.\"
+.SS "Release 1.9"
+.PP
+.if n *
+.if t \(bu
+There are new ``f77'' and ``g77'' cookbooks,
+to allow Fortran sources, in addition to C sources.
+.PP
+.if n *
+.if t \(bu
+There is a new [options] function,
+which expands to the current settings of the command line options.
+This is useful for recursive cook directory structures.
+See the Reference Manual for more information.
+.PP
+.if n *
+.if t \(bu
+There is a new ``recursive'' cookbook,
+to assist in constructing recursive cook structures.
+.PP
+.if n *
+.if t \(bu
+The
+.I find_libs
+program now understands about shared libraries.
+.PP
+.if n *
+.if t \(bu
+A bug which made the builtin [glob] function
+far to generous has been corrected.
+.PP
+.if n *
+.if t \(bu
+A bug which caused some expression evaluation errors to be ignored
+has been corrected.
+.PP
+.if n *
+.if t \(bu
+The ``set update'' flag has been re-named the ``set time-adjust'' flag,
+to more closely describe what it does.
+The old name will continue to work indefinitely.
+.PP
+.if n *
+.if t \(bu
+There is a new ``set time-adjust-back'' flag, which sets recipe target times
+to be exactly one (1) second younger than the youngest ingredient.
+This is usually an adjustment into the recent past.

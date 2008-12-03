@@ -1,0 +1,71 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1996, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing the ``c'' cookbook
+.\"
+.H 2 "c"
+This cookbook describes how to work with C files.
+Include file dependencies are automatically determined.
+.H 3 "recipes"
+.VL 1i
+.LI "%.o: %.c"
+Construct object files form C source files,
+with automatic include file dependency detection.
+.LI "%.ln: %.c"
+Construct lint object files from C source files,
+with automatic include file dependency detection.
+.LE
+.H 3 "variables"
+.VL 1i
+.LI c_incl
+The C include dependency sniffer command.
+Not altered if already defined.
+.LI cc
+The C compiler command.
+Not altered if already defined.
+.LI lint
+The lint command.
+Not altered if already defined.
+.LI cc_flags
+Options to pass to the C compiler command.
+Not altered if already defined.
+The default is "-O".
+.LI cc_include_flags
+Options passed to the C compiler and c_incl
+controlling include file searching.
+Not altered if already defined.
+The default is empty.
+.LI cc_src
+C source files in the current directory.
+.LI dot_src
+Source files constructable in the current directory
+(unioned with existing setting, if necessary).
+.LI dot_obj
+Object files constructable in the current directory
+(unioned with existing setting, if necessary).
+.LI dot_clean
+Files which may be removed from the current directory in a clean target.
+.LI dot_lint_obj
+Lint object files constructable in the current directory
+(unioned with existing setting, if necessary).
+.LE
+.H 3 "See Also"
+The ``library'' cookbook, for linking C sources into a library.
+.br
+The ``program'' cookbook, for linking C sources into a program.

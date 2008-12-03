@@ -1,0 +1,86 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2004, 2006, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.25 features
+.\"
+.\" You can create the initial cut of this file using the
+.\"     aereport -f `aefind -p aegis.cur -bl -baserel . -name chan_so.rpt` \
+.\"         -p cook.2 -c 25 -unf
+.\" command, and then editing it to be more appropriate.
+.\"
+.\" .PP
+.\" .if n *
+.\" .if t \(bu
+.\" .\" change NN
+.PP
+.if n *
+.if t \(bu
+.\" Change 27, 26, 21
+A number of build problems have been fixed.
+.PP
+.if n *
+.if t \(bu
+.\" Change 25
+A bug has been fixed in the tell-position flag. It wasn't
+actually giving the file name and line number when executing
+commands if you used the "\f[CW]set tell-position\fP" variants, only the
+\f[CW]\-tell-position\fP command line option.
+.PP
+.if n *
+.if t \(bu
+.\" Change 23
+The email address in the LSM file has been fixed,
+.PP
+.if n *
+.if t \(bu
+.\" Change 22
+A bug has been fixed in the \fIcook \-fp-update\fP command, it would
+segfault in some cases.
+.PP
+.if n *
+.if t \(bu
+A bug has been fixed in the cookbook include file processing.
+.PP
+.if n *
+.if t \(bu
+.\" Change 20
+A bug has been fixed in the negative flag setting (comamnd line options
+and "set" clauses).
+.PP
+.if n *
+.if t \(bu
+.\" Change 15
+The \f[CW]find_command\fP command now copes better with directories it is
+not allowed to access.
+.PP
+.if n *
+.if t \(bu
+.\" Change 18
+A Java cookbook has been added to to the distribution.
+.PP
+.if n *
+.if t \(bu
+.\" Change 12
+A bug has been fixed in the execution of some commands.  If any
+words of the command had spaces in them, it did not pass it to a
+shell to be executed, but instead constructed a command of a
+different shape than the user expected.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.25 (2004-Jun-10)

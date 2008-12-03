@@ -1,0 +1,74 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+
+/* These functions implement the ADD/SUB/RESET logic explained in the
+ * get-local-value functions file.
+ */
+
+/*--- append all entries in the list to the variable prefix and extract the value of that variable -------------*/
+function combine /* option list */ =
+{
+  local add = ;
+  local del = ;
+  local mode = ADD;
+  local skip = ;
+  local option = ;
+  loop option = [arg] {
+    if [skip] then {
+      skip = ;
+    } else if [in [option] USE ADD DEL] then {
+      mode = [option];
+      skip = 1;
+    } else if [in [option] RESET] then {
+      add = ;
+      del = ;
+      mode = ADD;
+      skip = 1;
+    } else if [in [mode] ADD USE ] then {
+      add += [option];
+    } else if [in [mode] DEL ] then {
+      del += [option];
+    } else {
+      add += [option];
+    }
+  }
+  return [stringset [add] - [del]];
+}
+
+function trace-combination /* option list */ =
+{
+  local history = ;
+  local skip = ;
+  local option = ;
+  loop option = [arg] {
+    if [skip] then {
+      history += [option]")";
+      skip = ;
+    } else if [in [option] ADD DEL USE RESET] then {
+      history += "\n#  ("[option] in;
+      skip = 1;
+    } else {
+      history += "\n#   "[option];
+    }
+  }
+  return [history];
+}

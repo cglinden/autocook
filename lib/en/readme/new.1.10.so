@@ -1,0 +1,43 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1996, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 1.10 features
+.\"
+.SS "Release 1.10"
+.PP
+.if n *
+.if t \(bu
+Error messages have been internationalized.  It is now possible to
+get error messages in your native language, if it is supported.
+.PP
+.if n *
+.if t \(bu
+The cook command now accepts a -no-include-cooked option,
+to disable any cooking of the #include-cooked files.
+.PP
+.if n *
+.if t \(bu
+The cook -TRace option has been renamed -Reason.
+This is thought to more accurately reflect what it does.
+.PP
+.if n *
+.if t \(bu
+The cook -Reason output has been changed to cite cookbook file names
+and line numbers, in order to be more useful.
+In addition, more reason messages carry location information.

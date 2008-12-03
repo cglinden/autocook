@@ -1,0 +1,204 @@
+#!@PERL@
+
+my $objdir = shift || 'DO/Linux';
+my $manifest_file = shift || 'Whatto.cook';
+my $start_dir = shift || './';
+my $dirs_only = shift;
+
+my %exclude = ('Howto.list', 1,
+	       '.', 2,
+	       '..', 3,
+	       'DO', 4,
+	       'ROOT', 5,
+	       'lost+found', 6,
+	       'Codemgr_wsdata', 7,
+	       'SCCS', 8,
+	       '.cook.fp', 9,
+	       'runtime', 10,
+	       'make.large-files', 11,
+	       'make.inc', 12,
+	       'make.d', 13,
+               'target', 14,
+               '.m2', 15,
+	      );
+
+my $filter = '(\.bak|~|\#|-)$';
+
+my $always_include = 'make/rpm/';
+
+my %p4 = ();
+my $root = undef;
+
+unless ($dirs_only) {
+  if (0) { # temporarily disable this code
+  #if ((index(`/sbin/ifconfig`, 'inet addr:10.0.1') > 0)
+  #    && (!exists($ENV{P4PORT}) || index($ENV{P4PORT}, 'localhost') != 0)) {
+    open(P4, "p4 files ... |") || die;
+    while (<P4>) {
+      chomp;
+      next if /\#\d+ - delete/;
+      s/\#.*//;
+      unless ($root) {
+	$root = $1 if m,^(//.+/)[^/]+$,;
+      }
+      s,^$root,,;
+      $p4{$_} = 1;
+    }
+    close(P4);
+    open(P4, "p4 opened |") || die;
+    while (<P4>) {
+      chomp;
+      next if /\#\d+ - .*delete/;
+      s/\#.*//;
+      s,^$root,,;
+      $p4{$_} = 1;
+    }
+    close(P4);
+  } else {
+    #print STDERR "Warning: p4 not reachable, skipping version control check.\n";
+  }
+}
+
+my $excluded = do_dir('./', @ARGV)->{Excluded};
+#if (@$excluded) {
+#  print STDERR "Warning: the following files are not under version control:\n";
+#  print STDERR map("  '$_'\n", @$excluded);
+#}
+
+1;
+
+sub do_dir {
+  my $path = shift;
+
+  my %active_variants = ();
+  opendir(D, $path) || die("Failed to opendir($path): $!\n");
+  my $prefix = ($path eq './' ? '' : $path);
+  my @entries = readdir(D);
+  closedir(D);
+  return undef if (grep($_ eq '.do_not_cook', @entries));
+
+  if (grep($_ eq 'Howto.cook', @entries)) {
+    my $platform = $objdir;
+    $platform =~ s,.*/,,;
+    my $ignored = 0;
+    open(H, "$path/Howto.cook") || die;
+    while (<H>) {
+      if (/^\s*(in|ex)clude-platform\s+([^;]*);/) {
+	my $polarity = $1;
+        my @platforms = split(/\s+/,$2);
+        if (grep($_ eq $platform, @platforms)) {
+	  $ignored = ($polarity eq 'ex' ? 1 : 0);
+        }
+      } elsif (/^\s*(in|ex)clude-variant\s+([^;]*);/) {
+	my %variant_listed = ();
+	my $polarity = $1;
+	grep($variant_listed{$_} = 1, split(/\s+/,$2));
+	for my $v (@_) {
+	  if ($polarity eq 'ex') {
+	    $active_variants{$v} = 1 unless exists($variant_listed{$v});
+	  } else {
+	    $active_variants{$v} = 1 if exists($variant_listed{$v});
+	  }
+	}
+      }
+    }
+    close(H);
+    print $prefix.'Howto.cook'."\n" if $dirs_only;
+    return undef if $ignored;
+  }
+
+  my $above_start_dir = 1;
+  if ($start_dir eq './') {
+    $above_start_dir = 0;
+  } elsif (index($path, $always_include) == 0) {
+    # always include the make subtree
+    $above_start_dir = 0;
+  } elsif (index($path, $start_dir) == 0) {
+    $above_start_dir = 0;
+  }
+
+  my @dirs = ();
+  my %files = ();
+  my @excluded = ();
+  my @active_variants = keys(%active_variants);
+  @active_variants = @_ unless @active_variants;
+  my $at_least_one_file = 0;
+  for my $entry (@entries) {
+    next if exists($exclude{$entry});
+    next if $entry =~ m,$filter,;
+    if ($entry =~ /([\s\'\"\\\@,:])/) {
+      print STDERR "Dangerous character ($1) in file/directory name: $prefix$entry\n"
+	if $dirs_only;
+      next;
+    } 
+    my $e = $prefix.$entry;
+    next if -l $e;
+    if (-d $e) {
+      push(@dirs, $e) unless $above_start_dir && index($start_dir, "$e/") != 0 && index($always_include, "$e/") != 0;
+    }
+    if (-f $e) {
+      next if $e eq $entry; # ignore files at the top level
+      if (defined($root) && !exists($p4{$e})) {
+	push(@excluded, $e);
+      } else {
+	for my $v (@active_variants) {
+	  $at_least_one_file = 1;
+	  push(@{$files{$v}}, $e) unless $above_start_dir && $entry ne 'Howto.cook';
+	}
+      }
+    }
+  }
+
+  if ($at_least_one_file && !$dirs_only) {
+    for my $v (@active_variants) {
+      print "'files_in_$path$v' = \n";
+      print map("  '$_'\n", @{$files{$v}});
+      print ";\n";
+    }
+  }
+
+  if (@dirs) {
+    if ($dirs_only) {
+      print "@dirs\n";
+    } else {
+      print "'dirs_in_$path' = \n";
+      print map("  '$_'\n", @dirs);
+      print ";\n";
+    }
+
+    for my $dir (@dirs) {
+      if (my $result = do_dir($dir.'/', @active_variants)) {
+	for my $v (@active_variants) {
+	  if (exists($result->{Files}->{$v}) && @{$result->{Files}->{$v}}) {
+	    $at_least_one_file = 1;
+	    push(@{$files{$v}}, @{$result->{Files}->{$v}});
+	  }
+	}
+	push(@dirs, @{result->{Dirs}});
+	push(@excluded, @{$result->{Excluded}});
+      }
+    }
+  }
+
+  unless ($dirs_only) {
+    if ($at_least_one_file) {
+      for my $v (@active_variants) {
+	print "'files_under_$path$v' = \n";
+	print map("  '$_'\n", @{$files{$v}});
+	print ";\n";
+      }
+    }
+
+    if (@dirs) {
+      print "'dirs_under_$path' = \n";
+      print map("  '$_'\n", @dirs);
+      print ";\n";
+    }
+  }
+
+  return { Files => \%files,
+	   Dirs  => \@dirs,
+	   Excluded => \@excluded };
+}
+
+

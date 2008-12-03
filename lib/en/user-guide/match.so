@@ -1,0 +1,303 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1991-1993, 1997, 1999-2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, File name patterns
+.\"
+.H 1 "File name patterns"
+There are two pattern matchers to choose from.
+.P
+The tough part about designing a pattern matcher for something like Cook is
+that \fIideally\fP the patterns must be reversible.
+That is,
+it must be possible to use
+the same string both as a pattern to be matched against and as a template
+for building a string once a pattern has matched.
+Rather like the
+difference between the left and right sides of an editor search-and-replace
+command in an editor using the same description for both the search pattern
+and the replace template.
+This is why classic regular expressions are not the default.
+.P
+The choice of which pattern matcher to use is dictated by flag settings:
+.VL 0.5i
+.LI "set match-mode-cook"
+.br
+This causes patterns to be matched using Cook's native patterns.
+This is the default.
+.LI "set match-mode-regex"
+.br
+This causes patterns to be matched using regular expressions.
+.LE
+.P
+The match mode to use may be set at the cookbook level
+.eB
+set match-mode-cook;
+.eE
+or at the recipe level
+.eB
+%.o: %.c
+        set match-mode-cook
+{
+        [cc] -o %.o -c %.c;
+}
+.eE
+if you want to change your mind temporarily.
+.P
+The match mode also affects match functions, such as \fIfilter\fP,
+\fIfilter_out\fP, \fIfromto\fP, \fImatch_mask\fP, \fImatches\fP and
+\fIpatsubst\fP.  If you use these in your user-defined functions, you
+need to be extra careful about this.
+.P
+The match mode also affects the graph variables, used to specify explicit
+graph interior and leaf files.
+.H 2 "Cook Patterns"
+The native Cook pattern matcher has symmetric left-hand-side and
+right-hand-side patterns.  This is best demonstrated with an example
+recipe:
+.eB
+%.c %.h: %.y
+        set match-mode-cook
+{
+        yacc -d %.y;
+        mv yy.tab.c %.c;
+        mv yy.tab.h %.h;
+}
+.eE
+Notice how the left-hand-side of the recipe (the targets) uses the
+same style of patterns as the right-hand-side (the ingredients and the
+recipe body).
+.P
+This matcher has eleven match "fields",
+referenced as
+.B %
+and
+.B %0
+to
+.BR %9 .
+The
+.B %
+character can be escaped as
+.B %% .
+The
+.B %
+and
+.B %1
+to
+.B %9
+forms match any character except
+slash (\fB/\fP);
+these forms may not match a leading empty string,
+to avoid problems with false matches against absolute paths.
+The
+.B %0
+form matches all characters,
+but must be either empty,
+or have whole path components,
+including the trailing
+.B /
+on each component.
+.P
+A few examples will make this clearer:
+.TS
+box, center, tab(;);
+l l.
+string;does not match
+_
+%.c;snot/fred.c
+%1/%2.c;etc/boo/fred.c
+.TE
+.TS
+box, center, tab(;);
+l l lw(1.5i).
+string;matches;setting
+_
+%.c;fred.c;%="fred"
+%1/%2.c;snot/fred.c;T{
+%1="snot"
+.br
+%2="fred"
+T}
+%0%5.c;fred.c;T{
+%0=""
+.br
+%5="fred"
+T}
+%0%6.c;snot/fred.c;T{
+%0="snot/"
+.br
+%6="fred"
+T}
+%0%7.c;etc/boo/fred.c;T{
+%0="etc/boo/"
+.br
+%7="fred"
+T}
+/usr/%1/%1%2/%3.%2%4;/usr/man/man1/fred.1x;T{
+%1="man"
+.br
+%2="1"
+.br
+%3="fred"
+.br
+%4="x"
+T}
+.TE
+.P
+The
+.B %0
+behavior is designed to allow patterns to range over subtrees in a
+controlled manner.
+Note that the use of this sort of pattern in a recipe
+will result in deeper searches than the naive recipe designer would expect.
+.H 3 "Examples"
+There are two main places where patterns are used:
+with the \fImatch_mask\fP and \fIfromto\fP functions, and in recipes.
+.P
+You can perform file name filtering and rewriting as follows:
+.eB
+source_files = [collect cat MANIFEST];
+object_files =
+        [fromto %0%.c %0%.o [match_mask %0%.c [manifest]]]
+        [fromto %0%.y %0%.gen.o [match_mask %0%.y [manifest]]]
+        ;
+.eE
+.P
+The recipes to go with the above files may be
+.eB
+%0%.o: %0%.c
+        single-thread ["if" %0 "then" %.o]
+{
+        /* note: no slash before dot */
+        cc -c -I%0. %0%.c;
+        if %0 then
+                mv %.o %0%.o;
+}
+.eE
+This recipe can compile files in a large project,
+where source files appear in a number of sub-directories.
+The ``-I%0.'' ensures that there are locally include-able
+files in the sub-directories.
+If the ``%0'' had been entirely omitted from the recipe,
+it will only compile files in the current directory.
+.P
+A common \fIyacc\fP recipe, used when there is more than one yacc
+grammar in a project, looks like this:
+.eB
+%0%.gen.c %0%.gen.h: %0%.y
+        single-thread yy.tab.c yy.tab.h
+{
+        yacc -d %0%.y
+        yy = [collect echo %0% | sed "'s/[^A-Za-z0-9]/_/'"];
+        sed "'s/[yY][yY]/"[yy]"_/g'" yy.tab.c > %0%.gen.c;
+        sed "'s/[yY][yY]/"[yy]"_/g'" yy.tab.h > %0%.gen.h;
+        rm yy.tab.c yy.tab.h;
+}
+.eE
+To be more selective about the ``%0'' portion,
+use more pattern elements before or after it.
+.H 2 "Regular Expressions"
+The regular expression pattern matcher uses POSIX regular expressions.
+It has asymmetric left-hand-side and right-hand-side patterns.  This is
+best demonstrated with an example recipe:
+.eB
+\e\e(.*\e\e)\e\e.c \e\e(.*\e\e)\e\e.h: \e\e1.y
+        set match-mode-regex
+{
+        yacc -d \e\e1.y;
+        mv yy.tab.c \e\e1.c;
+        mv yy.tab.h \e\e1.h;
+}
+.eE
+Notice how the left-hand-side of the recipe (the targets) uses a
+completely different style of patterns as the right-hand-side (the
+ingredients and the recipe body).
+.P
+All those backslashes are necessary, because Cook uniformly applies C
+escapes to strings when it reads them, and it doesn't know you mean a
+regular expression backslash until you use it in a recipe context.
+.P
+See \fIre_format\fP(7) for a definition of POSIX 1003.2 regular expressions;
+you want the ``basic'' REs.
+.P
+Please note that characters which are special to Cook will need to be
+escaped with a backslash, or enclosed in quotes.  These include curly
+braces (``{'' and ``}''), square brackets (``['' and ``]''), colon
+(``:'') and equals (``='').  Backslash always needs to be escaped,
+whether encoded in a string or not, because within a string it serves
+to escape the string terminator.
+.P
+You also need to remember that dot (``.'') is a common character in
+filenames, and frequenty significant in file name patters, but it is a
+regular expression wildcard.  You need to escape it to make it literal.
+.P
+You need to make absolutely certain that when recipes have more than
+one left-hand-size (as in the yacc example) that the patterns \fIall\fP
+assign identical values to their nested sub-expressions.
+.P
+The usual right-hand-side replacements are available: an escaped number
+is replaced with the \fIn\fP-th nested sub-expression; and the ampersand
+(``&'') is replaced by the whole left-hand-side (if you have more than
+one left-hand-side, this is ambiguous).  Backslash may be used to escape them.
+.H 3 "Examples"
+There are two main places where patterns are used:
+with the \fImatch_mask\fP and \fIfromto\fP functions, and in recipes.
+.P
+You can perform file name filtering and rewriting as follows:
+.eB
+set match-mode-regex;
+source_files = [collect cat MANIFEST];
+object_files =
+        [fromto \e\e(.*\e\e)\e\e.c \e\e1.o
+                [match_mask \e\e(.*\e\e)\e\e.c [manifest]]]
+        [fromto \e\e(.*\e\e)\e\e.y \e\e1.gen.o
+                [match_mask \e\e(.*\e\e)\e\e.y [manifest]]]
+        ;
+.eE
+.P
+The recipes to go with the above files may be
+.eB
+\e\e(.*\e\e)\e\e.o: \e\e1.c
+        single-thread ["if" [not [in [relative_dirname \e\e1] .]]
+                "then" [notdir \e\e1.o]]
+{
+        cc -c -I[[relative_dirname \e\e1] \e\e1.c;
+        if [not [in [relative_dirname \e\e1] .]] then
+                mv [notdir \e\e1.o] \e\e1.o;
+}
+.eE
+This recipe can compile files in a large project,
+where source files appear in a number of sub-directories.
+The ``-I\e\e1.'' ensures that there are locally include-able
+files in the sub-directories.
+.P
+A common \fIyacc\fP recipe, used when there is more than one yacc
+grammar in a project, looks like this:
+.eB
+\e\e(.*\e\e)\e\e.gen.c \e\e(.*\e\e)\e\e.gen.h: \e\e1.y
+        single-thread yy.tab.c yy.tab.h
+{
+        yacc -d \e\e1.y
+        yy = [collect echo \e\e1 | sed "'s/[^A-Za-z0-9]/_/'"];
+        sed "'s/[yY][yY]/"[yy]"_/g'" yy.tab.c > \e\e1.gen.c;
+        sed "'s/[yY][yY]/"[yy]"_/g'" yy.tab.h > \e\e1.gen.h;
+        rm yy.tab.c yy.tab.h;
+}
+.eE
+To be more selective about the ``\f[CW]\e\e(.*\e\e)\fP'' portion,
+use more pattern elements before or after it.

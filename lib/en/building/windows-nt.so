@@ -1,0 +1,144 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1998, 1999, 2006, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing how to build Cook for Windows-NT
+.\"
+.br
+.ne 2i
+.SH WINDOWS-NT
+.XX "" "\ \ \ \ Windows NT"
+It is possible to build Cook for Windows-NT.
+I have done this using the Cygnus freeware CygWin32 system,
+and I believe it has also once been done
+using the commercial NutCracker system.
+This document only describes the CygWin32 port.
+.SS The Source
+You need to FTP the CygWin32 system from Cygnus.
+It can be found at
+.RS
+http://sourceware.cygnus.com/cygwin/
+.RE
+and then follow the links.  The version I used was B20.1.
+.SS Mounting Things
+You need to mount a directory onto \f(CW/tmp\fP, or lots of things, and
+especially \fIbash\fP(1), don't work.  If you are in a heavily networked
+environment, like me, you need to know that using a networked drive for
+\f(CW/tmp\fP just doesn't work.  I have no idea why.  Use
+.RS
+mount C:/temp /tmp
+.RE
+instead.  (Or some other local drive.)
+.PP
+Just a tip for all of you who, like me, know UNIX much better than you
+know Windows-NT: the left-hand mount argument needs to be specified
+with a drive letter (\fIe.g. \f(CWC:\fP) rather than with a double slash
+(\fIe.g.\fP not \f(CW//C\fP) unless its Windows-NT name starts with \e\e.
+.PP
+You need to mount the Cygnus bin directory at \f(CW/bin\fP, otherwise
+shell scripts that start with \f(CW#!/bin/sh\fP don't work, among other
+things.  This includes the \f(CW./configure\fP script, and the scripts
+it writes (\fIe.g.\fP \f(CWconfig.status\fP).
+.RS
+mount \fPCygnus-Dir\fP/H-i386-cygwin/bin /bin
+.RE
+You will want to mount your various network drives onto the same places
+they appear on your UNIX hosts.  This means that your cookbooks will
+work without change, even if they contain absolute paths.
+And your users don't need to learn two names for all the source files.
+.PP
+Don't forget your home directory.  The trick is to set HOME in the
+cygnus.bat file, before bash starts.  (How you do this with one batch
+file and multiple users I haven't yet figured out.)
+.PP
+You also need to set the LOGNAME and USER environment variables
+appropriately, or test 14 will fail.
+.PP
+Mounts persist across Cygwin sessions.  They are stored in a registry
+file somewhere.  You will not need to do all this every time!
+.\" .\" More recent Sygwin versions dont need this.
+.\" .SS Before you start
+.\" You will need to install a couple of other pieces of software before
+.\" you build Cook.
+.\" .TP 8n
+.\" util-linux
+.\" You need to get GNU rx, but to make it work you have to find a
+.\" \fItsort\fP command, so that GNU rx's \fI./configure\fP script works.
+.\" Try the latest copy of \f(CWsystem/misc/util-linux-?.?.tar.gz\fP from
+.\" the \f(CWsunsite.unc.edu\fP Linux archive (or a mirror).  Simply build
+.\" and install \fImisc-utils/tsort.c\fP by hand.
+.\" .TP 8n
+.\" GNU rx
+.\" Once you have \fItsort\fP installed, you will be able to get GNU rx
+.\" configured.  Get a copy from your local GNU mirror.
+.SS Configure
+The configure and build step should be the same as for UNIX, as described
+above.  All the problems I encountered were to do with getting the mounts
+just right.
+(But expect it to be dog slow compared to Linux or FreeBSD on the same box.)
+.PP
+The configure step is almost the same as for UNIX.  I know you are
+itching to get typing, but read throught to the install section before
+you configure anything.
+.RS
+.ft CW
+.nf
+\f(CBbash$\fP ./configure
+\fI\&...lots of output...\fP
+\f(CBbash$\fP
+.fi
+.ft R
+.RE
+.SS Build
+The build step is exactly the same as for UNIX, and you shouldn't notice
+any difference...
+.RS
+.nf
+\f(CBbash$\fP make
+\fI\&...lots of output...\fP
+\f(CBbash$\fP
+.fi
+.RE
+.SS Test
+All of the tests should pass, you only need to run them to convince
+yourself the build worked...  (a constant surprize to me, I must say!)
+.RS
+.nf
+\f(CBbash$\fP make sure
+\fI\&...lots of output...\fP
+\f(CBPassed All Tests\fP
+\f(CBbash$\fP
+.fi
+.RE
+.PP
+If test 12 fails, it probably means you don't have \fI/bin\fP right.
+.SS Install
+Installing the software works as usual, though you need to make some
+choices right at the start (I told you to read this all the way through
+first).  If you want to use the ``\fI/usr/local\fP'' prefix (or any other
+install prefix) you mount it right at the start.  For anything other
+than the ``\fI/usr/local\fP'' default prefix, you also needed to give
+a ``\f(CB--prefix=\fP\fIblahblah\fI'' argument to the \fIconfigure\fP
+script, right at the start.
+.RS
+.nf
+\f(CBbash$\fP make install
+\fI\&...lots of output...\fP
+\f(CBbash$\fP
+.fi
+.RE

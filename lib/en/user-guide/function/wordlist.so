@@ -1,0 +1,55 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing wordlist.so
+.\"
+.H 3 Wordlist
+This function may be used to extract a list of words from a larger list.
+The first argument is the starting position, and the second argument is
+the ending poistion, inclusive.  The third and subsequent arguments are
+the list to be extracted from.  Positions are numbered starting from 1.
+If the start is bigger than the end, they will be quietly swapped.  If
+the start is bigger than the list, the result will be empty.
+.H 4 Example
+.TS
+center,tab(;);
+l l.
+Expression;Result
+_
+[wordlist 2 3 foo bar baz];bar baz
+[wordlist 1 1 foo bar baz];foo
+[wordlist 7 3 foo bar baz];baz
+.TE
+.P
+There are a number of functions which are similar
+.TS
+center,tab(;);
+l l.
+Expression;Similar to
+_
+[wordlist 1 1 \fIlist\fP];[head \fIlist\fP]
+[wordlist 2 9999 \fIlist\fP];[tail \fIlist\fP]
+[wordlist \fIN N list\fP];[word \fIN list\fP]
+.TE
+.H 4 "See Also"
+firstword
+head,
+tail,
+word,
+words

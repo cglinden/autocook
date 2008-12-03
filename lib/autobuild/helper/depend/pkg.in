@@ -1,0 +1,68 @@
+#!@PERL@
+
+while (@ARGV) {
+    $_ = shift;
+    if ($_ eq '-preamble') {
+	$preamble = shift;
+    } elsif ($_ eq '-suffix') {
+	$suffix = shift;
+    } elsif ($_ eq '-objdir') {
+	$do = shift;
+    } elsif ($_ eq '-basedir') {
+	$basedir = shift;
+    } elsif ($_ eq '-perl_depend') {
+        $perl_depend = shift;
+    } elsif ($_ eq '-non_existing_targets') {
+        $add_dummies = 1;
+    } elsif ($_ eq '-o') {
+	$output = shift;
+    } elsif (index($_, '-') == 0) {
+	print STDERR "Unknown option: $_\n";
+	exit 1;
+    } else {
+	push(@input, $_);
+    }
+}
+
+$top = '.';
+
+$read_errors = 0;
+
+foreach $file (@input) {
+    if (open(F, $file)) {
+	while (<F>) {
+            if (/^!(\w+)=(\S+)/) {
+                eval("\$$1 = '$2'");
+	    } elsif ((/^i\s+(\S+)/) or (/^f\s+\S+\s+[^\s=]+=([^\s=]+)/)) {
+		$uses{eval('"'.$1.'"')} .= " $file:$.";
+	    }
+	}
+	close(F);
+    } else {
+	print STDERR "Couldn't read $file\n";
+	$read_errors++;
+    }
+}
+
+if (open(F, ">$output")) {
+    # the first batch is for actual link dependencies
+    print F "$preamble\n";
+    while (($use, $comment) = each(%uses)) {
+	if (index($use, '/') != 0) {
+	    if (index($use, './') != 0) {
+	        $use = "$basedir/$use";
+	    } else {
+	        $use =~ s,^\./,,;
+	    }
+	}
+	print F "'$use' /*$comment */\n";
+	$suffix .= "\n'$use':;" if $add_dummies;
+    }
+    print F "$suffix\n";
+    close(F);
+} else {
+    print STDERR "Couldn't write $output\n";
+    exit 2;
+}
+
+exit $read_errors;

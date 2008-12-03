@@ -1,0 +1,47 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+/* The following initializes the directory lists for specific targets */
+/* The presence of an entry here makes the "make <target>" legal      */
+
+[set-variant-value target_list_for_sub_build];
+
+generate_test_files_for_sub_build = 1;
+
+/* This function transforms a directory/variant into the actual build target  */
+function make_target_sub_build /* dir, variant */ =
+{
+  return [fromto %0%/ %0%/[do]/[unix]/[@2]/[sub_build_log] [@1]];
+}
+
+/* This function transforms a directory/variant into the actual test target  */
+function make_test_target_sub_build /* dir, variant */ =
+{
+  return [fromto %0%/ %0%/[do]/[unix]/[@2]/[sub_build_test] [@1]];
+}
+
+/* This function creates a list of copy targets -deprecated- */
+function make_copy_targets_sub_build /* dir */ =
+{
+  if [match_mask %1/%2/%3/%4/%5/%6/%7/%0 [@1]] then
+    fail sub_build [@1] may not be deeper than 6 directory levels;
+  return [fromto [@1]%0% [@1][do]/[unix]/[@2]/%0% [source_files_for_[@1][@2]]];
+}

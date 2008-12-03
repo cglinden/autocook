@@ -1,0 +1,69 @@
+#!@PERL@
+
+my @inc = ();
+my @filter = ();
+
+while (@ARGV) {
+  $_ = shift;
+  if ($_ eq '-prefix') {
+    $preamble = shift;
+  } elsif ($_ eq '-suffix') {
+    $suffix = shift;
+  } elsif ($_ eq '-filter') {
+    push(@filter, shift);
+  } elsif ($_ eq '-o') {
+    $output = shift;
+  } elsif ($_ eq '-I') {
+    push(@inc, shift);
+  } elsif (/-I(.+)/) {
+    push(@inc, $1);
+  } elsif (index($_, '-') == 0) {
+    print STDERR "Unknown option: $_\n";
+    exit 1;
+  } else {
+    push(@input, $_);
+  }
+}
+
+$top = '.';
+
+$read_errors = 0;
+
+my $filter = join('|', @filter);
+
+foreach $file (@input) {
+  if (open(F, $file)) {
+    while (<F>) {
+      if (/^\s*use\s+([^;\s]*::|)($filter)(::[^;\s]*)[\s;]/) {
+	my $use = $1.$2.$3;
+	$use =~ s,::,/,g;
+	$use .= '.pm';
+	for my $i (@inc) {
+	  if (-r "$i/$use") {
+	    $uses{"$i/$use"} .= " $file";
+	    last;
+	  }
+	}
+      }
+    }
+    close(F);
+  } else {
+    print STDERR "Couldn't read $file\n";
+    $read_errors++;
+  }
+}
+
+if (open(F, ">$output")) {
+  # the first batch is for actual link dependencies
+  print F "$preamble\n";
+  while (($use, $comment) = each(%uses)) {
+    print F "'$use'\n";
+  }
+  print F "$suffix\n";
+  close(F);
+} else {
+  print STDERR "Couldn't write $output\n";
+  exit 2;
+}
+
+exit $read_errors;

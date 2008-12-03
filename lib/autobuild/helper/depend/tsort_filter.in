@@ -1,0 +1,69 @@
+#!@PERL@
+
+my $header = <>;
+
+if (index($header, 'input contains a loop') >= 0) {
+  my @loop = ();
+  while (<>) {
+    chomp;
+    next unless /tsort: (.*)/;
+    push(@loop, $1);
+  }
+
+  next unless @loop;
+
+  push(@loop, $loop[0]);
+
+  for(@loop) {
+    s,([^/]+)(/DO/[^/]+/[^/]+)/[^/]+/[^/]+$,$1$2/lib$1.*.ld,;
+  }
+
+  my $text = '';
+  my $first = (glob(shift(@loop)))[0];
+  my $first_prefix = $first;
+  $first_prefix =~ s,/DO/.*,/,;
+  my $second = undef;
+  while ($second = (glob(shift(@loop)))[0]) {
+    my $prefix = $second;
+    $prefix =~ s,/DO/.*,/,;
+    my %known = ();
+    if (open(F, $first)) {
+      my @d_files = ();
+      while (<F>) {
+	next unless m, [ /]\* (.*),;
+	push(@d_files, $1);
+      }
+      close(F);
+      for my $d (@d_files) {
+	if (open(F, $d)) {
+	  my $source_file;
+	  my $found = '';
+	  while (<F>) {
+	    if (/cascade-for (\S+)/) {
+	      $source_file = $1;
+	    } elsif ($known{$_}) {
+	      next;
+	    } elsif (index($_, $prefix) == 0) {
+	      $found .= "  $_";
+	      $known{$_} = 1;
+	    }
+	  }
+	  close(F);
+	  $text .= "$first_prefix referenced by:\n$found" if $found;
+	} else {
+	  print STDERR "### Failed to open $f (needed by $first): $!\n";
+	}
+      }
+    } else {
+      print STDERR "### Cannot open $first: $!\n";
+    }
+    $first = $second;
+    $first_prefix = $prefix;
+  }
+  print STDERR "Cyclic dependency found:\n$text" if $text;
+} else {
+  print STDERR $header;
+  while (<>) {
+    print STDERR;
+  }
+}

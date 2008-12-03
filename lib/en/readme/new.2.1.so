@@ -1,0 +1,64 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.1 features
+.\"
+.PP
+.if n *
+.if t \(bu
+The \fIc_incl\fP utility has had two new languages added.
+It now understands M4, and also has an ``optimistic'' language
+which can scan many assemblers and even some high-level languages.
+See \fIc_incl\fP(1) for more information.
+.PP
+.if n *
+.if t \(bu
+The \fIc_incl\fP utility also has a new \f[CW]--no-absolute-path\fP
+option, to supress scanning and reporting of such files.
+See \fIc_incl\fP(1) for more information.
+.PP
+.if n *
+.if t \(bu
+There is a new warning added for dependencies on derived ingredients
+when this information resides solely in derived cookbooks included using
+the \f[CW]#include-cooked\fP facility.  This assists in detecting
+problems which may preclude a successful ``clean'' build.
+.PP
+.if n *
+.if t \(bu
+This release adds a number of cookbook functions to the distrubuted
+cookbooks.  These may be used by adding a
+.nf
+.in +4m
+#include "functions"
+.in -4m
+.fi
+line to your cookbook.  See the Cook User Guide for more information.
+.PP
+.if n *
+.if t \(bu
+This release fixes a bug where the graph walking phase ignored
+interrupts until something went wrong.
+.PP
+.if n *
+.if t \(bu
+This release fixes a bug where \fImake2cook\fP did not correctly
+translate ``%'' into sematicly equivalent Cook constructs.
+.\" ---------------------- Add New Notes Above This Line ----------------------
+.SS "Release 2.1 (1997-Oct-12)"

@@ -1,0 +1,113 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing fig2.so
+.\"
+.\"        lib/src1.c       lib/src2.c
+.\"                 |       |
+.\"                 V       V
+.\"        lib/src1.o       lib/src2.o
+.\"                 |       |
+.\"                 V       V
+.\"        +----- lib/liblib.a ----+-------------+
+.\"        |                       |             |
+.\"        |                       |             V
+.\" +------|-+------+-------+------|--------+--- include/lib.h
+.\" |      | |      |       |      | src1.y |
+.\" |      | |      |       |      | |      |
+.\" V      | V      V       V      | V      V
+.\" main.c | src1.c src2.c  main.c | src1.c src2.c
+.\" |      | |      |       |      | |      |
+.\" V      | V      V       V      | V      V
+.\" main.o | src1.o src2.o  main.o | src1.o src2.o
+.\" |      |  |      |      |      | |      |
+.\" V      V  V      |      V      V V      |
+.\" bin/prog1<--------      bin/prog2<-------   doc/prog1/manua doc/prog2/manual
+.\" |                       |                       |                    |
+.\" V                       V                       V                    V
+.\" ULB/prog1       ULB/prog2       ULSDM/prog1/manual      ULSMD/prog2/manual
+.PS
+.ft CW
+ellipseht = 0.38
+ellipsewid = 0.6
+sepd=0.15
+down
+
+L1c: ellipse "lib1.c"
+L2c: ellipse "lib2.c" with .w at L1c.e+(sepd,0)
+L3: ellipse "lib.h" with .w at L2c.e+(sepd,0)
+L1o: ellipse "lib1.o" with .n at L1c.s-(0,sepd)
+arrow from L1c.s to L1o.n
+arrow from L3.sw to L1o.ne
+L2o: ellipse "lib2.o" with .n at L2c.s-(0,sepd)
+arrow from L2c.s to L2o.n
+arrow from L3.sw to L2o.ne
+
+A: ellipse "lib/lib.a" wid (ellipsewid*1.3) with .n at L2o.s-(0,sepd)
+arrow from L2o.s to A.n
+arrow from L1o.se to A.nw
+
+.\" do the bottom layer
+
+P2: ellipse "bin/prog2" with .n at A.s+(sepd,-3.6*sepd-2*ellipseht) fill 0 \
+        wid (ellipsewid*2)
+spline -> from A.se then down sepd*2 right sepd*1.6 then down (2*ellipseht) \
+        then to 0.3<P2.n,P2.ne>
+
+C5: ellipse "src1.c" with .n at A.s+(sepd,-1.6*sepd) fill 0
+C4: ellipse "main.c" with .e at C5.w-(sepd,0) fill 0
+C6: ellipse "src2.c" with .w at C5.e+(sepd,0) fill 0
+O4: ellipse "main.o" with .n at C4.s-(0,sepd) fill 0
+O5: ellipse "src1.o" with .n at C5.s-(0,sepd) fill 0
+O6: ellipse "src2.o" with .n at C6.s-(0,sepd) fill 0
+spline -> from L3.s then down sepd+2*ellipseht then to O4.ne
+spline -> from L3.s then down sepd+2*ellipseht then to O5.ne
+spline -> from L3.s then down sepd+2*ellipseht then to O6.n
+arrow from C4.s to O4.n
+arrow from C5.s to O5.n
+arrow from C6.s to O6.n
+arrow from O4.se to P2.nw
+arrow from O5.s to P2.n
+arrow from O6.sw to P2.ne
+Y: ellipse "src2.y" fill 0 with .s at C6.n+(0,sepd)
+arrow from Y.s to C6.n
+
+.\" do the top layer
+
+P1: ellipse "bin/prog1" with .n at A.s+(0,-3*sepd-2*ellipseht) fill 0 \
+        wid (ellipsewid*2)
+spline -> from A.sw then down sepd*2 left sepd*0.6 then down (2*ellipseht) \
+        then to 0.5<P1.nw,P1.n>
+
+C1: ellipse "main.c" with .c at C4.c+(-sepd,sepd*0.6) fill 0
+C2: ellipse "src1.c" with .c at C5.c+(-sepd,sepd*0.6) fill 0
+C3: ellipse "src2.c" with .c at C6.c+(-sepd,sepd*0.6) fill 0
+O1: ellipse "main.o" with .n at C1.s-(0,sepd) fill 0
+O2: ellipse "src1.o" with .n at C2.s-(0,sepd) fill 0
+O3: ellipse "src2.o" with .n at C3.s-(0,sepd) fill 0
+spline -> from L3.s then down sepd+2*ellipseht then to O1.ne
+spline -> from L3.s then down sepd+2*ellipseht then to O2.ne
+spline -> from L3.s then down sepd+2*ellipseht then to O3.n
+arrow from C1.s to O1.n
+arrow from C2.s to O2.n
+arrow from C3.s to O3.n
+arrow from O1.se to P1.nw
+arrow from O2.s to P1.n
+arrow from O3.sw to P1.ne
+.PE

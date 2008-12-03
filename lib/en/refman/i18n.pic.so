@@ -1,0 +1,162 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing i18n.pic.so
+.\"
+.PS
+line from (0,10.3162) \
+        then to (1.01833,10.3162)
+"localization" at (0.509167,10.4002)
+line from (1.01833,10.3162) \
+        then to (1.1665,10.3162)
+line from (1.1665,10.1995) \
+        then to (2.06433,10.1995) \
+        then to (2.06433,10.4328) \
+        then to (1.1665,10.4328) \
+        then to (1.1665,10.1995)
+"\fIlanguage\fP" at (1.61542,10.3162)
+line from (1.08317,10.3439) \
+        then to (1.1665,10.3162) \
+        then to (1.08317,10.2884)
+line from (2.06433,10.3162) \
+        then to (2.2125,10.3162)
+line from (2.2125,10.3162) \
+        then to (3.35,10.3162)
+line from (3.26667,10.3439) \
+        then to (3.35,10.3162) \
+        then to (3.26667,10.2884)
+line from (3.35,10.3162) \
+        then to (4.4875,10.3162)
+arc cw at (2.2125,10.1495) \
+        rad 0.166667 \
+        from (2.2125,10.3162) \
+        to (2.37917,10.1495)
+arc at (4.4875,10.1495) \
+        rad 0.166667 \
+        from (4.4875,10.3162) \
+        to (4.32083,10.1495)
+line from (2.37917,10.1495) \
+        then to (2.37917,10.1495)
+arc at (2.54583,10.1495) \
+        rad 0.166667 \
+        from (2.37917,10.1495) \
+        to (2.54583,9.98284)
+line from (4.32083,10.1495) \
+        then to (4.32083,10.1495)
+arc cw at (4.15417,10.1495) \
+        rad 0.166667 \
+        from (4.32083,10.1495) \
+        to (4.15417,9.98284)
+line from (2.54583,9.98284) \
+        then to (2.7125,9.98284)
+arc at (2.82917,9.98284) \
+        rad 0.116667 \
+        from (2.82917,10.0995) \
+        to (2.82917,9.86617)
+line from (2.82917,9.86617) \
+        then to (2.892,9.86617)
+arc at (2.892,9.98284) \
+        rad 0.116667 \
+        from (2.892,9.86617) \
+        to (2.892,10.0995)
+line from (2.892,10.0995) \
+        then to (2.82917,10.0995)
+"\f[CW]-\fP" at (2.86058,9.98284)
+line from (2.62917,10.0106) \
+        then to (2.7125,9.98284) \
+        then to (2.62917,9.95506)
+line from (3.00867,9.98284) \
+        then to (3.15683,9.98284)
+line from (3.15683,9.86617) \
+        then to (3.9875,9.86617) \
+        then to (3.9875,10.0995) \
+        then to (3.15683,10.0995) \
+        then to (3.15683,9.86617)
+"\fIterritory\fP" at (3.57217,9.98284)
+line from (3.0735,10.0106) \
+        then to (3.15683,9.98284) \
+        then to (3.0735,9.95506)
+line from (3.9875,9.98284) \
+        then to (4.15417,9.98284)
+line from (4.4875,10.3162) \
+        then to (4.63567,10.3162)
+line from (4.63567,10.3162) \
+        then to (5.73975,10.3162)
+line from (5.65642,10.3439) \
+        then to (5.73975,10.3162) \
+        then to (5.65642,10.2884)
+line from (5.73975,10.3162) \
+        then to (6.84383,10.3162)
+arc cw at (4.63567,10.1495) \
+        rad 0.166667 \
+        from (4.63567,10.3162) \
+        to (4.80233,10.1495)
+arc at (6.84383,10.1495) \
+        rad 0.166667 \
+        from (6.84383,10.3162) \
+        to (6.67717,10.1495)
+line from (4.80233,10.1495) \
+        then to (4.80233,10.1495)
+arc at (4.969,10.1495) \
+        rad 0.166667 \
+        from (4.80233,10.1495) \
+        to (4.969,9.98284)
+line from (6.67717,10.1495) \
+        then to (6.67717,10.1495)
+arc cw at (6.5105,10.1495) \
+        rad 0.166667 \
+        from (6.67717,10.1495) \
+        to (6.5105,9.98284)
+line from (4.969,9.98284) \
+        then to (5.13567,9.98284)
+arc at (5.25233,9.98284) \
+        rad 0.116667 \
+        from (5.25233,10.0995) \
+        to (5.25233,9.86617)
+line from (5.25233,9.86617) \
+        then to (5.30133,9.86617)
+arc at (5.30133,9.98284) \
+        rad 0.116667 \
+        from (5.30133,9.86617) \
+        to (5.30133,10.0995)
+line from (5.30133,10.0995) \
+        then to (5.25233,10.0995)
+"\f[CW].\fP" at (5.27683,9.98284)
+line from (5.05233,10.0106) \
+        then to (5.13567,9.98284) \
+        then to (5.05233,9.95506)
+line from (5.418,9.98284) \
+        then to (5.56617,9.98284)
+line from (5.56617,9.86617) \
+        then to (6.34383,9.86617) \
+        then to (6.34383,10.0995) \
+        then to (5.56617,10.0995) \
+        then to (5.56617,9.86617)
+"\fIcodeset\fP" at (5.955,9.98284)
+line from (5.48283,10.0106) \
+        then to (5.56617,9.98284) \
+        then to (5.48283,9.95506)
+line from (6.34383,9.98284) \
+        then to (6.5105,9.98284)
+line from (6.84383,10.3162) \
+        then to (6.992,10.3162)
+line from (6.90867,10.3439) \
+        then to (6.992,10.3162) \
+        then to (6.90867,10.2884)
+.PE

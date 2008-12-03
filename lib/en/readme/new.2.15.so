@@ -1,0 +1,64 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 2000, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.15 features
+.\"
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" change 21
+The \fIstringset\fP function now accepts a `+' operator.
+While union is implicit, the apparrently redundant `+' operator is useful
+for cancelling the other operators.
+.PP
+.if n *
+.if t \(bu
+.\" change 20
+The ``reason and fingerprint bug'' has been fixed.  This caused
+a mysterious error message to appear sometimes when using the -reson
+option incombination with fingerprints.
+.PP
+.if n *
+.if t \(bu
+.\" change 19
+The % and %\fIn\fP patterns are now allowed to match the empty string,
+provided they aren't the first thing in the pattern (otherwise undesirable
+absolute path problems can occur).
+.PP
+.if n *
+.if t \(bu
+.\" change 18
+The \fIc_incl\fP(1) command now accepts `-' as a file name on the command
+line, meaning standard input.
+.PP
+.if n *
+.if t \(bu
+.\" change 17
+Some improvements have been made to the Cygwin support, extending the
+``.exe'' automatic executable suffix coverage to a couple more places.
+.PP
+.if n *
+.if t \(bu
+.\" change 11
+A bug in the ``c'' cookbook has been fixed, which was getting \f[CW].h\fP
+dependency files wrong.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.15 (2000-Apr-11)

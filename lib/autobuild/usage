@@ -1,0 +1,268 @@
+Usage:
+=====
+   cook [options] [targets]
+
+Description:
+===========
+
+"b" is a wrapper script which first determines your current
+working dir, changes to the top most directory which contains
+a Howto.cook file and then invokes "cook", passing through the
+specified options and targets.
+
+
+Common Options:
+==============
+
+  `-ns'
+    Display commands executed.
+  `-errok'
+    Don't stop on error.
+  `-script'
+    Generate shell script, but don't build.
+
+See "man cook", "cook -help" or "b -help" for a complete list.
+
+
+Targets:
+=======
+
+If no target is specified, the default variant is built. The
+current default can be set in the top level Howto.cook file.
+
+  `all'
+    Builds all standard derived files for all variants.
+
+  `assembler'
+    Only builds assembler files from C/C++ sources.
+
+  `clean'
+    Removes all derived files.
+
+  `debug'
+    Builds debug variant only.
+
+  `ppc-debug'
+    Power PC (GHS Multi) debug build variant.
+
+  `fast'
+    Skips dependency checks. Requires that the dependency files
+    exist and are up to date.
+
+  `install'
+    Installs RPMs into source tree under runtime/<variant>
+
+  `install-<rpm>'
+    Installs specified RPM into source tree under runtime/<variant>
+
+  `help'
+    Prints this text.
+
+  `lint'
+    Generates flint (tm) output.
+
+  `optimized'
+    Builds optimized variant only
+
+  `ppc-optimized'
+    Power PC (GHS Multi) debug build variant.
+
+  `skip'
+    Skips rebuilds of any derived files not contained within
+    the current directory or any of its subdirectories. Note
+    that this may cause incorrect builds. Use with care!
+
+  `<file>.o'
+    Build just the specified object file from a C/C++ source file.
+
+  `<file>.s'
+    Build just the specified assembler file from a C/C++ source file.
+
+
+Customizing the build:
+=====================
+
+The build can be customized by placing files named "Howto.cook" in
+the directory the customization is intended to affect:
+
+  - what gets built;
+  - how it gets built;
+  - when it gets built;
+
+"make" targets (what gets built):
+--------------------------------
+
+These directives control what gets built. They are valid for the current directory
+and all subdirectories, except those that contain a Howto.cook file with its own
+"make" directive.
+
+  `make simplex' (simple executable)
+    Transforms every C/C++ file into an executable.
+
+  `make complex' (complex executable)
+    Transforms all C/C++ files into one executable.
+
+  `make archive' (static lib)
+    Generates a static library from all C/C++ files
+
+  `make dumb_so' (dynamic lib)
+    Generates a shared object intended for load time linking
+
+  `make smart_so' (loadable shared object)
+    Generates a shared object intended for runtime linking (opendl)
+
+  `make sub_build' (hand-off to third party builds)
+    Runs the "build.sh" script in the current directory. That script
+    must be provided and will be called with at least three arguments:
+    variant, platform and the absolute path to the current directory.
+
+  `make custom' (hook for local build rules)
+    Generates a local target to trigger rules specified in the Howto.cook
+    file.
+
+variables (how it gets built):
+-----------------------------
+
+All build methods refer to variables to invoke the various compilers and
+code generators with the proper flags. There are two types of variables:
+
+ - once only
+ - cumulative
+
+The once only variables can only have one value at a time. The cumulative
+ones can have values added to them as the source tree hierarchy is traversed
+and variable settings are propagated to the subdirectories.
+
+Some link related variables are propagated to the users of a shared object or
+library, in order to avoid having to respecify them in the Howto.cook file
+of the user of a library.
+
+To set a variable to a new value, use:
+
+<var> := <value> ;
+
+To add a value to a cumulative variable, use:
+
+<var> += <value> ;
+
+To restrict a value to a specific variant, use <var>_<variant> instead
+of just <var>. For example:
+
+  cc_flags_optimized := -O3;
+  cc_flags_debug := -g -O0;
+
+
+C compilation
+
+  `pre_cc' (once only)
+    command to prepend to the C compiler invokation. This command is prepended
+    "as is" to the compiler invokation and can be used to set environment
+    variables, filtering wrappers or other preprocessors.
+
+  `cc' (once only)
+    The actual C compiler invokation
+
+  `cc_D_flags' (cumulative)
+    C compiler -D flags used to define macros. Note that the "-D" must be
+    included in the values assigned.
+
+  `cc_I_flags' (cumulative)
+    C compiler -I flags used to define include search paths. Note that the "-I"
+    must be included in the values assigned.
+
+  `cc_flags' (cumulative)
+    any other C compiler flags.
+
+C++ compilation
+
+  `pre_cpp' (once only)
+    Command to prepend to the C++ compiler invokation. This command is prepended
+    "as is" to the compiler invokation and can be used to set environment
+    variables, filtering wrappers or other preprocessors.
+
+  `cpp' (once only)
+    The actual C++ compiler invokation
+
+  `cpp_D_flags' (cumulative)
+    C++ compiler -D flags used to define macros. Note that the "-D" must be
+    included in the values assigned.
+
+  `cpp_I_flags' (cumulative)
+    C++ compiler -I flags used to define include search paths. Note that the "-I"
+    must be included in the values assigned.
+
+  `cpp_flags' (cumulative)
+    Any other C++ compiler flags.
+
+
+Linking
+
+  `pre_ld' (once only)
+    Command to prepend to the linker invokation.
+
+  `ld' (once only)
+    The actual linker command
+
+  `ld_L_flags' (cumulative and propagated to link clients)
+    Library search path flags - must include the "-L" in their values.
+
+  `ld_l_flags' (cumulative and propagated to link clients)
+    System library flags - must inclyde the "-l" in their values.
+
+  `ld_flags' (cumulative and propagated to link clients)
+    Any other linker flags
+
+  `external_libs' (cumulative and propagated to link clients)
+    Paths to actual library files - use this if a dependency to the files is
+    desired (e.g. third party, non-system libraries)
+
+  `external_objs' (cumulative and propagated to link clients)
+    Paths to prebuilt object files - rarely used except for some bizarre
+    third party packages which do not provide libraries.
+
+
+"use" modules (how it gets built):
+---------------------------------
+
+For a variety of third party objects and common configurations, predefined
+variable settings exist. They are all stored in make/cook/include/use.
+
+Some common ones:
+
+  `use cc'
+    C linkage
+  `use cpp'
+    C++ linkage
+  `use jni'
+    JNI code generation
+
+Others can be defined easily by creating new files in make/cook/include/use
+and defining the variables by prepending the module name to the variable
+names. Also, if the name of the module matches the basename of a tarball
+in the make/3party/<platform> directory, that tarball will be unpacked as
+part of the build and is availabe for use at build time.
+
+in/excluding variants and platforms (when it gets built):
+--------------------------------------------------------
+
+The top level Howto.cook file defines the supported variant names and
+which one of them is to be the default variant.
+
+The platform string is determined by running "make/platform --cook".
+
+To exclude parts of the source tree from being involved with a specific
+platform or variant, use the following directives:
+
+  `include-platform <platform>[,<platform>[,...]]'
+    use the subtree only for builds on specified platforms.
+
+  `exclude-platform <platform>[,<platform>[,...]]'
+    never use the subtree for builds on specified platforms.
+
+  `include-variant <variant>[,<variant>[,...]]'
+    use the subtree only for builds on specified variants.
+
+  `exclude-variant <variant>[,<variant>[,...]]'
+    never use the subtree for builds on specified variants.
+
+

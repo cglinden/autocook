@@ -1,0 +1,49 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, If
+.\"
+.H 2 "if"
+This function requires one or more arguments,
+the arguments before the "then" word are used as a condition.
+If the condition is true the words between the "then" word and the
+"else" word are the result, otherwise the words after the "else" word
+are the value.
+The "else" clause is optional.
+There is no way to escape the "then" and "else" words.
+.H 3 "Example"
+Here is an example of the ``if'' function.
+Please note that ``if'', ``then'' and ``else'' are reserved words,
+so you need to quote them before they will be recognised on
+the function context.
+.eB
+%: %_obj
+        set ["if" [defined all_shallow] "then" shallow]
+{
+        [cc] -o [target] [%_obj];
+}
+.eE
+.H 3 "Caveat"
+It is often clearer to use the
+.I "if statement"
+than this function.
+.P
+The recipe flags are evaluated at the same time as the recipe targets.
+None of the [target], [targets], [need], [younger] variables or pattern
+matches (%, %1, \fIetc\fP) are set at this time.

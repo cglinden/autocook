@@ -1,0 +1,43 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1991-1994, 1997, 1999, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Matches
+.\"
+.H 2 "matches"
+This function requires one or more arguments.
+The first argument is a pattern,
+the second and later arguments are strings to match against the
+pattern.
+The resulting wordlist contains "" (false) if did not
+match and the 1-based list index (true) if it did.
+.P
+The returned list index may be used in combination with the [words] function.
+.H 3 "Example"
+This function may be used to test for
+strings which have a particular form:
+.eB
+if [matches %1C%2 [version]] then
+        cc_flags = [cc_flags] -DDEBUG
+.eE
+If the version contains a Capital-C character, then turn on debugging.
+.H 3 "Match Mode"
+This function is affected by the selected match mode.
+See the \fIFile Name Patterns\fP chapter for details.
+.H 3 "See Also"
+filter, filter-out, words

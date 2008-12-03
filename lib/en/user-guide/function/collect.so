@@ -1,0 +1,39 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Collect
+.\"
+.H 2 "collect"
+The arguments are interpreted as a command to be passed to the operating system.
+The result is one word for
+each white-space separated word of the output of the command.
+.P
+The command will not be echoed unless the -No_Silent option
+is specified on the command line.
+.H 3 "Example"
+Read the date and time and assign it to a variable:
+.eB
+now = [collect date];
+.eE
+Do not use the collect function to expand a filename wildcard,
+used the [glob] function instead.
+.H 3 "See Also"
+collect_lines, execute, glob, read, read_lines, write
+.H 3 "Also Known As"
+shell

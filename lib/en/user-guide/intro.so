@@ -1,0 +1,130 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1997, 1999, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Introduction
+.\"
+.H 1 "Introduction"
+This document describes
+.BR cook ,
+a maintenance tool designed to construct files.
+.B Cook
+may be used to maintain consistency between executable files and the
+associated source files that are used to generate them.
+The consistency is designated by the relative
+last-modified times of files
+and is thus automatically adjusted each time a file is edited,
+compiled or otherwise modified.
+.B Cook
+validates the consistency of a system of
+files and executes all commands necessary to maintain that
+consistency.
+.P
+.B Cook
+is a tool for constructing files.
+It is given a set of files to create,
+and instructions detailing how to construct them.
+In any non-trivial program
+there will be prerequisites to performing
+the actions necessary to creating any file,
+such as extraction from a source-control system.
+.B Cook
+provides a mechanism to define these.
+.P
+When a program is being developed or maintained,
+the programmer will typically change one file of several
+which comprise the program.
+.B Cook
+examines the last-modified times of the files to see when
+the prerequisites of a file have changed,
+implying that the file
+needs to be recreated as it is logically out of date.
+.P
+.B Cook
+also provides a facility for implicit recipes,
+allowing users to specify how to form a file with a given suffix from
+a file with a different suffix.
+For example,
+to create
+.IB filename .o
+from
+.IB filename .c
+.H 2 "Why You Want To Use Cook"
+.BL
+.LI
+Cook is a replacement for the traditional \fImake\fP(1) tool.
+.LI
+There is a \fImake2cook\fP utility included in the distribution
+to help convert makefiles into cookbooks.
+.LI
+Cook is more powerful than the traditional \fImake\fP tool.
+.LI
+Cook has true variables, not simple macros.
+.LI
+Cook has a simple but powerful string-based description language with
+many built-in functions.  This allows sophisticated filename
+specification and manipulation without loss of readability or
+performance.
+.LI
+Cook has user defined functions.
+.LI
+Cook can build in parallel.
+.LI
+Cook can distribute builds across your LAN.
+.LI
+Cook is able to build your project with multiple parallel threads, with
+support for rules which must be single threaded.  It is possible to
+distribute parallel builds over your LAN, allowing you to turn your
+network into a virtual parallel build engine.
+.LI
+Cook is able to use fingerprints to supplement file modification
+times.  This allows build optimization without contorted rules.
+.LI
+Cook can be configured with an explicit list of primary source files.
+This allow the dependency graph to be constructed faster by not going
+down dead ends, and also allows better error messages when the graph
+can't be constructed.  This requires an accurate source file manifest.
+.LI
+In addition to walking the dependency graph,
+Cook can turn the input rules into a shell script, or a web page.
+.LI
+Cook has special \fIcascade\fP dependencies, allowing powerful include
+dependency specification, amongst other things.
+.LI
+And Cook doesn't interpret tab differently to 8 space characters!
+.LE
+.P
+If you are putting together a source-code distribution and planning to
+write a makefile, consider writing a cookbook instead.  Although
+Cook takes a day or two to learn, it is much more powerful and a bit
+more intuitive than the traditional \fImake\fP(1) tool.
+.H 2 "How to Use this Manual"
+This manual is divided into two parts.
+.P
+The first part is tutorial introduction to
+.BR cook .
+This part runs from chapter 4 to chapter 5.
+.P
+The second part is for reference and details precisely how
+.B cook
+works.
+This part runs from chapter 6 to chapter 14.
+.P
+Users familiar with other programs similar to
+.B cook
+are advised to skim the tutorial part before diving into the reference part.

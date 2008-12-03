@@ -1,0 +1,163 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 2001, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Glossary
+.\"
+.H 1 "Glossary"
+This document employs a number of terms specific to
+.BR cook .
+.VL 1i
+.\"===============================================================
+.LI \fIbody\fR
+A set of statements, usually commands, to be performed
+to
+.I cook
+the
+.IR target s
+of a
+.I recipe
+after the
+.IR ingredient s
+exist.
+.\"===============================================================
+.LI \fIcommand\fR
+A command is a list of words to be passed to the
+.I "operating system"
+to be executed.
+.\"===============================================================
+.LI \fIcook\fR
+When used as a verb,
+refers to the actions
+.B cook
+would
+perform to create a
+.IR target ,
+according to some
+.IR recipe .
+.\"===============================================================
+.LI \fIcookbook\fR
+A file containing input for
+.BR cook ,
+usually
+.IR recipe s.
+.\"===============================================================
+.LI "\fIexplicit recipe\fR"
+An explicit recipe is one where the
+.IR target s
+contain no patterns.
+That is, there are no percent ('\fB%\fP') characters in any of the
+.IR target s.
+.\"===============================================================
+.LI \fIfingerprint\fR
+A cryptographically strong hash of the contents of a file,
+use to determine if the file contents have changed.
+.\"===============================================================
+.LI \fIflag\fR
+A flag modifies the behavior of a cook session,
+.I recipe
+or command.
+.\"===============================================================
+.LI "\fIforced ingredient\fR"
+A files which must exist before a
+.I target
+file
+of an
+.I "implicit recipe"
+may be cooked.
+The inability to construct a forced ingredient
+is an error.
+.\"===============================================================
+.LI \fIfunction\fP
+A function is an action applied to a word list.
+.\"===============================================================
+.LI \fIgate\fR
+A gate is a condition which allows the conditional application of
+a
+.IR recipe .
+The gate condition is in addition to the requirement that the
+ingredients are cookable.
+.\"===============================================================
+.LI "\fIimplicit recipe\fR"
+An implicit recipe is a recipe with patterns in the
+.IR target s.
+That is, there is a percent ('\fB%\fP') character in at least one of the
+.IR target s.
+.\"===============================================================
+.LI \fIingredient\fR
+A files which must exist before a
+.I target
+file may be cooked.
+In an
+.I "implicit recipe"
+the inability to construct of an ingredient
+means that the
+.I recipe
+will not be applied.
+In an explicit recipe
+the inability to construct an ingredient is an error.
+.\"===============================================================
+.LI "\fIlast-modified time\fR"
+.br
+\s-4UNIX\s0 imbues files with several attributes.
+One of these is a time-stamp of when the file was last modified.
+Usually this is when the file was last written to.
+.\"===============================================================
+.LI \fIrecipe\fR
+A
+.I recipe
+consists of several parts.
+.AL
+.LI
+A set of
+.IR target s
+to be cooked,
+.LI
+A set of ingredients of those
+.IR target s,
+and
+.LI
+An optional set of forced ingredients.
+.LI
+An optional set of flags.
+.LI
+An optional gate.
+.LI
+An optional body .
+.LE
+.\"===============================================================
+.LI \fItarget\fR
+The object of a
+.IR recipe ,
+a thing which is cooked.
+.\"===============================================================
+.LI \fItouch\fR
+UNIX imbues files with several attributes.
+One of these is a time-stamp of when the file was last modified.
+Usually this is when the file was last written to,
+however it is possible to simply adjust this attribute,
+rather than actually writing to the file;
+this is colloquially known as
+.IR touch ing
+a file.
+.\"===============================================================
+.LI \fIvariable\fR
+A variable is a named place holder for a value.
+The value may be changed.
+.\"===============================================================
+.LE

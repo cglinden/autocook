@@ -1,0 +1,60 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1998, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Expr
+.\"
+.H 2 "expr"
+This function may be used to calculate simple integer arithmetic expressions.
+The numbers and the operators are expected to each be a separate argument.
+The result is a string containing the value of the evaluated expression.
+.H 3 "Operators"
+The following operators are understood.
+They have the same precedence as the equivalent C operators.
+.TS
+center,tab(;);
+c c
+lf(CW) c.
+Operator;Associativity
+_
+( );\(->
+! ~ -;\(<-
+* / %;\(->
++ -;\(->
+<< >>;\(->
+< <= > >=;\(->
+== !=;\(->
+&;\(->
+^;\(->
+|;\(->
+&&;\(->
+||;\(->
+?:;\(<-
+.TE
+Please note that there is no short-circuit evaluation of
+the \f(CW?:\fP or \f(CW&&\fP or \f(CW||\fP operators.
+.P
+You may need to quote some of the operators, to insulate them from their
+usual Cook interpretation (colon and equals characters in particular).
+.P
+Numbers may be given in decimal,
+octal (with a \f(CW0\fP prefix), or
+hexadecimal (with a \f(CW0x\fP prefix).
+The result is always decimal.
+.H 3 "See Also"
+count

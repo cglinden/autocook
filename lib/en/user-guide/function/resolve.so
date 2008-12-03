@@ -1,0 +1,46 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1994, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Resolve
+.\"
+.H 2 "resolve"
+This builtin function is used to resolve file names when using the
+.I search_list
+variable to locate files.
+This builtin function produces resolved file names as output.
+This is useful when taking partial copies of a source
+to perform controlled updates.
+The targets of recipes are always cooked into the current directory.
+.H 3 "Example"
+This function is used in cookbooks
+which  use the
+.I search_list
+functionality:
+.eB
+search_list = . baseline;
+
+%.o: %.c
+{
+        [cc] [cc_flags] [addprefix -I [search_list]] [resolve %.c];
+}
+.eE
+.P
+The cookbooks distributed with Cook contain full support for the
+\f[CW]search_list\fP functionality.  They are a good source of examples
+of how to write recipes which take this into account.

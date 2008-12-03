@@ -1,0 +1,9 @@
+make rpm;
+
+pkg/hello_world/[do]/[unix]/%9/hello_world.rpmbuild-output:
+  pkg/MANIFEST.preamble
+  [defined-or-warn build_target_for_src/hello_world_1/%9]
+  [defined-or-warn build_target_for_src/hello_world_2/%9]
+  [defined-or-warn build_target_for_src/hello_world_3/bin/%9]
+  [defined-or-warn build_target_for_src/hello_world_4/bin/%9]
+;

@@ -1,0 +1,31 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+#if [exists /usr/bin/xml2-config]
+xml2_libconfig = [collect /usr/bin/xml2-config --libs];
+xml2_incconfig = [collect /usr/bin/xml2-config --cflags];
+
+xml2_ld_L_flags  = [match_mask -L% [xml2_libconfig]];
+xml2_ld_l_flags  = [match_mask -l% [xml2_libconfig]];
+xml2_cc_I_flags  = [xml2_incconfig];
+xml2_cpp_I_flags = [xml2_incconfig];
+xml2_use_dependency = ADD [__FILE__]':'[__LINE__] [__FILE__];
+#endif

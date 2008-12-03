@@ -1,0 +1,77 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1996, 1997, 2002, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: User Guide, Built-In Functions, Options
+.\"
+.H 2 "options"
+This functions takes no arguments.
+The results is a complete list of
+.I cook
+options,
+exactly describing the current options settings.
+This intended for use in constructing recursive
+.I cook
+invocations.
+.P
+The option setting generated are a combination of the command line
+options used to invoke
+.I cook,
+the contents of the COOK environment variable,
+the results of the ``set'' command and the various ``set'' clauses.
+.H 3 "Example"
+The top level cookbook for a recursive project structure can be as follows:
+.eB
+%:
+{
+        dirlist = [dirname [glob '*/Howto.cook' ]];
+        loop
+        {
+                dir = [head [dirlist]];
+                if [not [dir]] then
+                        loopstop;
+                dirlist = [tail [dirlist]];
+
+                cd [dir]\e; cook [options] %;
+        }
+}
+
+/*
+ * This recipe sets the default.
+ * It doesn't actually do anything.
+ */
+all:;
+.eE
+Please note the % hiding on the end of the nested
+.I cook
+command, this is how the target is communicated to the nested
+.B cook
+invocation.
+.H 3 Caveat
+Recursive Cook is not recommended, because it segments the dependency graph
+and forces Cook to walk the graph in (potentially) the wrong order.
+This introduces a number of significant problems.
+A single top-level cookbook is recommended.
+.H 3 "See Also"
+The supplied ``recursive'' cookbook does exactly this.
+In order to use it, you need a
+.I Howto.cook
+file containing the single line
+.eB
+#include "recursive"
+.eE

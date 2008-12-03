@@ -1,0 +1,6 @@
+#!@SH@
+
+# This script is intended to be customized for local usage
+
+echo 'default_platform'
+

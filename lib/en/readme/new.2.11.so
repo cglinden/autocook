@@ -1,0 +1,61 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1999, 2000, 2004, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing new 2.11 features
+.\"
+.PP
+.if n *
+.if t \(bu
+.\" Change 30
+The \fIc_incl\fP program now has a \fB-quote-filenames\fP option, which
+means that you can have filenames with spaces and special characters
+in them.
+.PP
+.if n *
+.if t \(bu
+.\" Change 28
+A bug in the \fIc_incl\fP program's path flattening has been fixed.
+.PP
+.if n *
+.if t \(bu
+.\" change 26
+A small Y2K bug has been fixed in the date parsing used by the
+\fIcooktime\fP(1) command.
+.PP
+.if n *
+.if t \(bu
+.\" change 25
+A bug which caused the -parallel option to lose track of processes when
+you used [execute] in a recipe body has been fixed.
+.PP
+.if n *
+.if t \(bu
+.\" change 17
+The restrictions on the placement of the placement of %0 in a pattern
+have been dropped; too many people didn't like it.  This does \fInot\fP
+break any cookbooks.
+.PP
+.if n *
+.if t \(bu
+.\" change 15
+Cook now copes with the absence of the HOME environment variable.
+This was a problem for CGI scripts.
+.\" ------------------------------------------------------------------------
+.\" Place all new text above this line.
+.SS Version 2.11 (1999-Nov-04)

@@ -1,0 +1,224 @@
+
+
+
+Project "cook.2.27"						  Page 1
+List of Changes					Mon Mar 19 08:58:01 2007
+
+Change	State		Description
+------- -------		-------------
+  10	completed	prepare for release
+  11	completed	fix web icon
+  12	being_		web repo
+	integrated
+	pmiller
+
+
+
+Project "cook.2.27", Change 10					  Page 1
+Change Details					Mon Mar 19 08:58:01 2007
+
+NAME
+	Project "cook.2.27", Delta 1, Change 10,
+	f1153add-b567-413f-8770-fc77a5aa9d35
+
+SUMMARY
+	prepare for release
+
+DESCRIPTION
+	This change prepares Cook for the next public release.
+
+	This change must pass a full regression test.  This change is
+	exempt from testing against the development directory. This
+	change is exempt from testing against the baseline.
+
+
+ARCHITECTURE
+	This change must build and test in the "linux-i486"
+	architecture.
+
+CAUSE
+	This change was caused by internal_improvement.
+
+FILES
+	Type	Action	 Edit	      File Name
+	------- -------- -------      -----------
+	build	modify	  341 -> 342  BUILDING
+	build	modify	  232 -> 233  MANIFEST
+	build	modify	  228 -> 229  Makefile.in
+	build	modify	  145 -> 146  README
+	build	modify	   32	      common/config.h.in
+	build	modify	  444 -> 445  common/patchlevel.h
+	build	modify	   43	      configure
+	source	modify	    6 -> 7    etc/archive.cook
+	build	modify	  306 -> 307  etc/version.so
+	source	modify	   12 -> 13   lib/en/readme/new.1.11.so
+	source	modify	    7 -> 8    lib/en/readme/new.2.0.so
+	source	modify	    5 -> 6    lib/en/readme/new.2.1.so
+	source	modify	    7 -> 8    lib/en/readme/new.2.10.so
+	source	modify	    9 -> 10   lib/en/readme/new.2.11.so
+	source	modify	    4 -> 5    lib/en/readme/new.2.12.so
+	source	modify	    6 -> 7    lib/en/readme/new.2.15.so
+	source	modify	    7 -> 8    lib/en/readme/new.2.16.so
+	source	modify	    6 -> 7    lib/en/readme/new.2.17.so
+	source	modify	    5 -> 6    lib/en/readme/new.2.18.so
+	source	modify	    5 -> 6    lib/en/readme/new.2.19.so
+	source	modify	    9 -> 10   lib/en/readme/new.2.2.so
+	source	modify	    4 -> 5    lib/en/readme/new.2.20.so
+	source	modify	    4 -> 5    lib/en/readme/new.2.21.so
+	source	modify	    4 -> 5    lib/en/readme/new.2.22.so
+	source	modify	    4 -> 5    lib/en/readme/new.2.23.so
+	source	modify	    3 -> 4    lib/en/readme/new.2.24.so
+	source	modify	    3 -> 4    lib/en/readme/new.2.25.so
+	source	create	    1	      lib/en/readme/new.2.26.so
+	source	create	    1	      lib/en/readme/new.2.27.so
+	source	modify	    6 -> 7    lib/en/readme/new.2.3.so
+	source	modify	    5 -> 6    lib/en/readme/new.2.4.so
+	source	modify	    7 -> 8    lib/en/readme/new.2.5.so
+
+
+
+Project "cook.2.27", Change 10					  Page 2
+Change Details					Mon Mar 19 08:58:01 2007
+
+	Type	Action	 Edit	      File Name
+	------- -------- -------      -----------
+	source	modify	    9 -> 10   lib/en/readme/new.2.6.so
+	source	modify	    6 -> 7    lib/en/readme/new.2.7.so
+	source	modify	    9 -> 10   lib/en/readme/new.2.8.so
+	source	modify	    8 -> 9    lib/en/readme/new.2.9.so
+
+HISTORY
+	What		When		Who	 Comment
+	------		------		-----	 ---------
+	new_change	Tue Mar 13	pmiller
+			09:00:35 2007
+	develop_begin	Tue Mar 13	pmiller	 Elapsed time: 0.159
+			09:00:35 2007		 days.
+	develop_end_2ai Tue Mar 13	pmiller	 Elapsed time: 0.055
+			10:12:15 2007		 days.
+	integrate_begin Tue Mar 13	pmiller
+			10:36:52 2007
+	integrate_	Tue Mar 13	pmiller
+	begin_undo	10:37:38 2007
+	develop_end_	Tue Mar 13	pmiller
+	undo		10:37:45 2007
+	develop_end_2ai Tue Mar 13	pmiller
+			10:42:26 2007
+	integrate_begin Tue Mar 13	pmiller
+			10:48:26 2007
+	integrate_pass	Tue Mar 13	pmiller
+			10:52:41 2007
+
+
+
+Project "cook.2.27", Change 11					  Page 1
+Change Details					Mon Mar 19 08:58:02 2007
+
+NAME
+	Project "cook.2.27", Delta 2, Change 11,
+	133e147b-1479-49e2-b48c-53a45a0f3275
+
+SUMMARY
+	fix web icon
+
+DESCRIPTION
+	The icon has been convereted to be a png file, and a favicon has
+	been added as well.
+
+	This change must pass a full regression test.  This change is
+	exempt from testing against the development directory. This
+	change is exempt from testing against the baseline.
+
+
+ARCHITECTURE
+	This change must build and test in the "linux-i486"
+	architecture.
+
+CAUSE
+	This change was caused by internal_improvement.
+
+FILES
+	Type	Action	 Edit	      File Name
+	------- -------- -------      -----------
+	build	modify	  342 -> 343  BUILDING
+	build	modify	  233 -> 234  MANIFEST
+	build	modify	  229	      Makefile.in
+	build	modify	  146	      README
+	build	modify	   32	      common/config.h.in
+	build	modify	  445 -> 446  common/patchlevel.h
+	build	modify	   43	      configure
+	source	modify	    7 -> 8    etc/archive.cook
+	source	remove	    2	      etc/cook.gif.uue
+	source	create	    1	      etc/cook.png.uue
+	source	modify	    8 -> 9    etc/download.html
+	source	modify	    1 -> 2    etc/index.html
+	source	modify	    4 -> 5    etc/mail-list.html
+	source	modify	   12 -> 13   etc/spec.sh
+	build	modify	  307 -> 308  etc/version.so
+	source	modify	    3 -> 4    etc/y2k.html
+
+HISTORY
+	What		When		Who	 Comment
+	------		------		-----	 ---------
+	new_change	Tue Mar 13	pmiller
+			11:02:08 2007
+	develop_begin	Tue Mar 13	pmiller	 Elapsed time: 0.057
+			11:02:09 2007		 days.
+	develop_end_2ai Tue Mar 13	pmiller
+			11:27:41 2007
+	integrate_begin Tue Mar 13	pmiller
+			11:28:53 2007
+	integrate_pass	Tue Mar 13	pmiller
+			11:32:09 2007
+
+
+
+Project "cook.2.27", Change 12					  Page 1
+Change Details					Mon Mar 19 08:58:02 2007
+
+NAME
+	Project "cook.2.27", Delta 3, Change 12.
+
+SUMMARY
+	web repo
+
+DESCRIPTION
+	The web site now has a link to the on-line Cook repository, via
+	aeget.
+
+	This change must pass a full regression test.  This change is
+	exempt from testing against the development directory. This
+	change is exempt from testing against the baseline.
+
+
+ARCHITECTURE
+	This change must build and test in the "linux-i486"
+	architecture.
+
+	arch.	 host	  aeb	      aet	  aet -bl     aet -reg
+	-------- -------- ---------   ---------	  ---------   ---------
+	linux-		  required    exempt	  exempt      required
+	i486
+
+CAUSE
+	This change was caused by internal_improvement.
+
+STATE
+	This change is in the 'being_integrated' state.
+
+FILES
+	Type	Action	 Edit	      File Name
+	------- -------- -------      -----------
+	source	modify	    2	      etc/index.html
+
+HISTORY
+	What		When		Who	 Comment
+	------		------		-----	 ---------
+	new_change	Mon Mar 19	pmiller
+			08:43:19 2007
+	develop_begin	Mon Mar 19	pmiller	 Elapsed time: 0.031
+			08:43:19 2007		 days.
+	develop_end_2ai Mon Mar 19	pmiller
+			08:57:18 2007
+	integrate_begin Mon Mar 19	pmiller
+			08:57:51 2007

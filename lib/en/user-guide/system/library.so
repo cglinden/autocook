@@ -1,0 +1,58 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1990-1993, 1996, 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing the ``library'' cookbook
+.\"
+.H 2 "library"
+This cookbook defines how to construct a library.
+.P
+If an include file (or files) are defined for this library,
+you will have to append them to [install] in your
+.I Howto.cook
+file.
+.H 3 "variables"
+.VL 1i
+.LI all
+targets of the all recipe
+.LI install
+targets of the install recipe
+.LI me
+The name of the library to be constructed.
+Defaults to the last component of the pathname of the current directory.
+.LI ar
+The archive command.
+.LI install
+targets of the install command.
+Only defined if the [lib] variable is defined.
+.LE
+.H 3 "recipes"
+.VL 1i
+.LI all
+construct the targets defined in [all].
+.LI clean
+remove the files named in [dot_clean].
+.LI clobber
+remove the files name in [dot_clean] and [all].
+.LI install
+Construct the files named in [install].
+Only defined if the [lib] variable is defined.
+.LI uninstall
+Remove the files named in [install].
+Only defined if the [lib] variable is defined.
+.LE

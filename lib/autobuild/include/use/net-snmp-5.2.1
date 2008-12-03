@@ -1,0 +1,43 @@
+/*  cook files look like -*- C++ -*-
+ *
+ *  Autodiscovering Build System
+ *  Copyright (C) 1997 - 2002 CG Software Design LLC
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  Please send bug reports to bugs@cg-soft.com
+ */
+net-snmp-5.2.1_version = 5.2.1;
+net-snmp-5.2.1_dir = [thirdparty]/net-snmp-[net-snmp-5.2.1_version];
+net-snmp-5.2.1_use_unpack  = [net-snmp-5.2.1_dir]/[dummy];
+net-snmp-5.2.1_cpp_I_flags = ADD [__FILE__]':'[__LINE__] -I[net-snmp-5.2.1_dir]/include;
+net-snmp-5.2.1_cc_I_flags  = ADD [__FILE__]':'[__LINE__] -I[net-snmp-5.2.1_dir]/include;
+net-snmp-5.2.1_cc_I_flags += ADD [__FILE__]':'[__LINE__] -I[net-snmp-5.2.1_dir]/include/ucd-snmp;
+net-snmp-5.2.1_ld_l_flags  = ADD [__FILE__]':'[__LINE__] -ldl -lcrypto -lm; 
+net-snmp-5.2.1_external_obj = ADD [__FILE__]':'[__LINE__]
+  "'-Wl,-('"
+  [net-snmp-5.2.1_dir]/lib/libnetsnmp.a
+  [net-snmp-5.2.1_dir]/lib/libnetsnmpmibs.a
+  [net-snmp-5.2.1_dir]/lib/libnetsnmpagent.a
+  [net-snmp-5.2.1_dir]/lib/libnetsnmphelpers.a
+  [net-snmp-5.2.1_dir]/lib/libnetsnmptrapd.a
+  "'-Wl,-)'"
+;
+
+[combine [net-snmp-5.2.1_external_obj]]: [net-snmp-5.2.1_use_unpack];
+
+net-snmp-5.2.1_cc_D_flags_optimized  = ADD [__FILE__]':'[__LINE__] -DHAVE_STRDUP;
+net-snmp-5.2.1_cpp_D_flags_optimized = ADD [__FILE__]':'[__LINE__] -DHAVE_STRDUP;
+net-snmp-5.2.1_use_dependency = ADD [__FILE__]':'[__LINE__] [__FILE__];

@@ -1,0 +1,122 @@
+#!@PERL@
+
+use XML::Parser;
+use Data::Dumper;
+
+my $variant = shift;
+my $compile_target = shift;
+my $install_target = shift;
+my $file = shift;
+
+my $parser = XML::Parser->new(Handlers => {Start => \&start_tag,
+                                           End => \&end_tag,
+                                           Char => \&text});
+
+my $text;
+my $in_parent = 0;
+my $nesting = 0;
+my $in_dependency_management = 0;
+my $in_dependencies = 0;
+my $in_dependency = 0;
+my @dependencies = ();
+my $parent_artifact_id;
+my $parent_group_id;
+my $project_artifact_id;
+my $project_group_id;
+my $artifact_id;
+my $group_id;
+my $scope;
+
+sub start_tag {
+  my $expat = shift;
+  my $tag = shift;
+
+  $nesting++;
+  if ($tag eq 'parent') {
+    $in_parent = 1;
+    $group_id = $artifact_id = undef;
+  } elsif ($tag eq 'dependencyManagement') {
+    $in_dependency_management = 1;
+  } elsif ($tag eq 'dependencies') {
+    $in_dependencies = 1;
+  } elsif ($tag eq 'dependency') {
+    $in_dependency = 1;
+    $group_id = $artifact_id = undef;
+    $scope = 'main';
+  }
+}
+
+sub end_tag {
+  my $expat = shift;
+  my $tag = shift;
+
+  $nesting--;
+  if ($tag eq 'parent') {
+    $in_parent = 0;
+  } elsif ($tag eq 'dependencyManagement') {
+    $in_dependency_management = 0;
+  } elsif ($tag eq 'dependencies') {
+    $in_dependencies = 0;
+  } elsif ($tag eq 'dependency') {
+    $in_dependency = 0;
+    push(@dependencies, {groupId => $group_id, artifactId => $artifact_id})
+      if $scope eq 'main' && !$in_dependency_management;
+  } elsif ($tag eq 'groupId') {
+    if ($in_dependencies && $in_dependency) {
+      $group_id = $text;
+    } elsif ($in_parent) {
+      $parent_group_id = $text;
+    } elsif ($nesting == 1) {
+      $project_group_id = $text;
+    }
+  } elsif ($tag eq 'artifactId') {
+    if ($in_dependencies && $in_dependency) {
+      $artifact_id = $text;
+    } elsif ($in_parent) {
+      $parent_artifact_id = $text;
+    } elsif ($nesting == 1) {
+      $project_artifact_id = $text;
+    }
+  } elsif ($tag eq 'scope') {
+    $scope = $text;
+  }
+}
+
+sub text {
+  my $expat = shift;
+  $text = shift;
+  $text =~ s/^\s*//;
+  $text =~ s/\s*$//;
+}
+
+$parser->parsefile($file);
+
+unless (defined($project_group_id)) {
+  unless (defined($parent_group_id)) {
+    die("Failed to determine project's group id.\n");
+  } else {
+    $project_group_id = $parent_group_id;
+  }
+}
+
+if (defined($parent_artifact_id)) {
+  unless (defined($parent_group_id)) {
+    $parent_group_id = $project_group_id;
+  }
+  push(@dependencies, {groupId => $parent_group_id, artifactId => $parent_artifact_id});
+}
+
+print "maven_compile_target_for_$project_group_id.$project_artifact_id/$variant = '$compile_target';\n";
+print "maven_install_target_for_$project_group_id.$project_artifact_id/$variant = '$install_target';\n";
+print "'$install_target': '$compile_target';\n";
+
+if (@dependencies) {
+  print "$compile_target:\n";
+  for my $d (@dependencies) {
+    $group_id = $d->{groupId} || $project_group_id;
+    $artifact_id = $d->{artifactId};
+    print "  \[defined-or-warn maven_install_target_for_$group_id.$artifact_id/$variant\]\n"
+      unless $group_id ne $project_group_id || $artifact_id eq $project_artifact_id;
+  }
+  print ";\n";
+}

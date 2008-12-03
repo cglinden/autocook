@@ -1,0 +1,216 @@
+.br
+.ne 3i
+.so function/addprefix.so
+.br
+.ne 3i
+.so function/addsuffix.so
+.br
+.ne 3i
+.so function/and.so
+.br
+.ne 3i
+.so function/basename.so
+.br
+.ne 3i
+.so function/cando.so
+.br
+.ne 3i
+.so function/catenate.so
+.br
+.ne 3i
+.so function/collect_ln.so
+.br
+.ne 3i
+.so function/collect.so
+.br
+.ne 3i
+.so function/cook.so
+.br
+.ne 3i
+.so function/count.so
+.br
+.ne 3i
+.so function/defined.so
+.br
+.ne 3i
+.so function/dirname.so
+.br
+.ne 3i
+.so function/dir.so
+.br
+.ne 3i
+.so function/dos_path.so
+.br
+.ne 3i
+.so function/downcase.so
+.br
+.ne 3i
+.so function/entryname.so
+.br
+.ne 3i
+.so function/execute.so
+.br
+.ne 3i
+.so function/exists.so
+.br
+.ne 3i
+.so function/expr.so
+.br
+.ne 3i
+.so function/filter_out.so
+.br
+.ne 3i
+.so function/filter.so
+.br
+.ne 3i
+.so function/find_cmd.so
+.br
+.ne 3i
+.so function/findstring.so
+.br
+.ne 3i
+.so function/firstword.so
+.br
+.ne 3i
+.so function/fromto.so
+.br
+.ne 3i
+.so function/getenv.so
+.br
+.ne 3i
+.so function/glob.so
+.br
+.ne 3i
+.so function/head.so
+.br
+.ne 3i
+.so function/home.so
+.br
+.ne 3i
+.so function/if.so
+.br
+.ne 3i
+.so function/in.so
+.br
+.ne 3i
+.so function/inter_files.so
+.br
+.ne 3i
+.so function/join.so
+.br
+.ne 3i
+.so function/leaf_files.so
+.br
+.ne 3i
+.so function/matches.so
+.br
+.ne 3i
+.so function/match_mask.so
+.br
+.ne 3i
+.so function/mtime.so
+.br
+.ne 3i
+.so function/notdir.so
+.br
+.ne 3i
+.so function/not.so
+.br
+.ne 3i
+.so function/opsys.so
+.br
+.ne 3i
+.so function/options.so
+.br
+.ne 3i
+.so function/or.so
+.br
+.ne 3i
+.so function/pathname.so
+.br
+.ne 3i
+.so function/patsubst.so
+.br
+.ne 3i
+.so function/prepost.so
+.br
+.ne 3i
+.so function/print.so
+.br
+.ne 3i
+.so function/quote.so
+.br
+.ne 3i
+.so function/read_lines.so
+.br
+.ne 3i
+.so function/readlink.so
+.br
+.ne 3i
+.so function/read.so
+.br
+.ne 3i
+.so function/relat_dirna.so
+.br
+.ne 3i
+.so function/resolve.so
+.br
+.ne 3i
+.so function/shell.so
+.br
+.ne 3i
+.so function/sort_newest.so
+.br
+.ne 3i
+.so function/sort.so
+.br
+.ne 3i
+.so function/split.so
+.br
+.ne 3i
+.so function/stringset.so
+.br
+.ne 3i
+.so function/stripdot.so
+.br
+.ne 3i
+.so function/strip.so
+.br
+.ne 3i
+.so function/substr.so
+.br
+.ne 3i
+.so function/subst.so
+.br
+.ne 3i
+.so function/suffix.so
+.br
+.ne 3i
+.so function/tail.so
+.br
+.ne 3i
+.so function/un_dos_path.so
+.br
+.ne 3i
+.so function/unsplit.so
+.br
+.ne 3i
+.so function/upcase.so
+.br
+.ne 3i
+.so function/uptodate.so
+.br
+.ne 3i
+.so function/wildcard.so
+.br
+.ne 3i
+.so function/wordlist.so
+.br
+.ne 3i
+.so function/word.so
+.br
+.ne 3i
+.so function/words.so
+.br
+.ne 3i
+.so function/write.so

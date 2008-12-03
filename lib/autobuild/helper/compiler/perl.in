@@ -1,0 +1,167 @@
+#!@PERL@
+
+use IO::File;
+
+my $script = undef;
+my %inc = ();
+my %use = ();
+my %def = (PERL => '/usr/bin/atperl');
+my $do_inlining = 1;
+
+while (my $arg = shift) {
+  if ($arg eq '-I') {
+    $arg = shift;
+    if ( -d $arg ) {
+      $inc{$arg} = 1;
+    } elsif ( -f $arg ) {
+      $use{$arg} = 2;
+      $explored{$arg} = 1;
+    } else {
+      die("### Not found: $arg\n");
+    }
+  } elsif ($arg =~ /^-I(.*)/) {
+    $arg = $1;
+    if ( -d $arg ) {
+      $inc{$arg} = 1;
+    } elsif ( -f $arg ) {
+      $use{$arg} = 2;
+      $explored{$arg} = 1;
+    } else {
+      die("### Not found: $arg\n");
+    }
+  } elsif ($arg =~ /^-D([^=]*)=(.*)/) {
+    $def{$1} = $2;
+  } elsif ($arg eq '-no-inlining') {
+    $do_inlining = 0;
+  } elsif (defined($script)) {
+    $use{$arg} = 1 unless $arg eq $script;
+  } else {
+    $script = $arg;
+  }
+}
+
+my @inc = keys(%inc);
+
+die("No source specified\n") unless defined($script);
+die("File not found: $script\n") unless -r $script;
+
+# start the concatenation - assume atperl
+print <<EOT unless $script =~ /\.pm$/;
+#!/bin/sh
+# This is actually automagically generated -*- perl -*- code - do not edit!
+LANG=C
+export LANG
+if test -r .
+then
+  test -x $def{PERL}\\
+   && exec $def{PERL} -x -S \$0 \$\{1+"\$\@"\}\\
+   || exec perl -x -S \$0 \$\{1+"\$\@"\}\\
+   || echo "### Couldn't locate atperl or perl" && exit 1
+else
+  echo "### Can't read current directory as: "`id`
+  exit 1
+fi
+
+#! perl 
+EOT
+
+# Explore files to figure out in which order to concatenate them.
+# Some code relies on initializers being run in the proper order.
+my @use = ();
+my %explored = ();
+explore_file($script);
+
+# Check for files listed, but not explored
+if ($do_inlining) {
+  for my $f (@use) {
+    $use{$f} = 2;
+  }
+
+  while (my($f, $tag) = each(%use)) {
+    next if $tag == 2;
+    print STDERR "Dependency detected $f, but no \"use\" statement found.\n";
+    push(@use, $f);
+  }
+
+  # insert inlined modules if requested
+  for my $f (@use) {
+    print "#==== including $f\n";
+    print "#line 1 \"$f\"\n";
+    cat_file($f);
+    print "#==== end of inclusion: $f\n";
+  }
+}
+
+# Append the script at the end, ensuring we are in "main":
+
+print "package main;\n";
+print "#line 1 \"$script\"\n";
+cat_file($script);
+
+print "# -eof-  generated code, do not edit\n";
+
+sub explore_file {
+  my $file = shift;
+  my $fh = new IO::File;
+
+  $fh->open($file) || die("Failed to open $file: $!\n");
+
+  while(<$fh>) {
+
+    if (/^\s*use\s+([^\s;]+)/) {
+      # recursively explore "use" statements
+      if (defined(my $found = package_file($1))) {
+	next if $explored{$found};
+	$explored{$found} = 1;
+	# recurse here to include dependents first
+	explore_file($found);
+	# now include actual package - note we do not "use" $file...
+	push(@use, $found);
+      }
+    } elsif (/^\s*__END__\s*$/) {
+      # skip stuff after __END__
+      last;
+    }
+  }
+  $fh->close();
+}
+
+sub cat_file {
+  my $file = shift;
+  my $fh = new IO::File;
+
+  $fh->open($file) || die("Failed to open $file: $!\n");
+
+  while(<$fh>) {
+
+    while (my($key,$val) = each(%def)) {
+      s/\%$key\%/$val/g;
+    }
+
+    if (/^\s*use\s+([^\s;]+)/) {
+      # Omit "use" statement for files included in script
+      s/^/# / if $do_inlining && defined(package_file($1));
+    } elsif (/^\s*__END__\s*$/) {
+      # skip stuff after __END__
+      last;
+    } elsif (/die .* unless caller/) {
+      s/^/# /;
+    }
+    print;
+  }
+  $fh->close();
+}
+
+sub package_file {
+  my $use = shift;
+
+  $use =~ s,::,/,g;
+  $use .= '.pm';
+
+  for my $i (@inc) {
+    if (-r "$i/$use") {
+      return "$i/$use";
+    }
+  }
+  return undef;
+}

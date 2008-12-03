@@ -1,0 +1,183 @@
+.\"
+.\"     cook - file construction tool
+.\"     Copyright (C) 1997, 2007 Peter Miller;
+.\"     All rights reserved.
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" MANIFEST: document describing i18n.so
+.\"
+.TH Internationalization Cook Cook "Reference Manual"
+.SH NAME
+Internationalization
+.XX "" "Internationalization"
+.SH DESCRIPTION
+The Cook package has gone international; it can now speak many
+languages.  This is accomplished by using the GNU Gettext library and
+utilities.  In order to do this, is is necessary to install GNU Gettext
+prior to configuring, making and installing the Cook package, as
+described in the
+.I BUILDING
+file.
+.SS Internationalization
+This is the process of identifying all of the error messages in the
+source code, and providing error message catalogues in a variety of
+languages.  The error message identification was performed by the Cook
+package's author, and the various GNU translation teams provided the
+translations.  Users of the Cook package do not need to do anything to
+internationalize it, this has already been done.
+.SS Localization
+The programs in the Cook package are "localizable" when properly
+installed; the programs they contain can be made to speak your own
+native language.
+.PP
+By default, the Cook package will be installed to allow translation of
+messages.  It will automatically detect whether the system provides
+a usable `gettext' function.
+.br
+.ne 2i
+.SH INSTRUCTIONS FOR USERS
+As a user, if your language has been installed for this package, you
+only have to set the `LANG' environment variable to the appropriate
+ISO 639 two-letter code prior to using the programs in the
+package.  For example, let's suppose that you speak German.  At the
+shell prompt, merely execute
+.RS
+setenv LANG de
+.RE
+(in `csh'), or
+.RS
+LANG=de; export LANG
+.RE
+(in `sh').
+This can be done from your
+.I \&.cshrc
+or
+.I \&.profile
+file, setting this automatically each time you login.
+.PP
+An operating system might already offer message localization for many of
+its programs, while other programs have been installed locally with the
+full capabilities of GNU Gettext.  Using the GNU Gettext extended syntax
+for the `LANG' environment variable may break the localization of
+already available through the operating system.  In this case, users
+should set both the `LANGUAGE' and `LANG' environment variables, as
+programs using GNU Gettext give preference to the `LANGUAGE' environment
+variable.
+.PP
+For example, some Swedish users would rather read translations in German
+when Swedish is not available.  This is easily accomplished by setting
+`LANGUAGE' to `sv:de' while leaving `LANG' set to `sv'.
+.br
+.ne 2i
+.SH DIRECTORY STRUCTURE
+All files which may require translation are located below the
+.I lib
+directory of the source distribution.
+It is organized as one directory below
+.I lib
+for each localization.
+Localizations
+include all documentation as well as the error messages.
+.SS Localization Directory Names
+Each localization is contained in a sub-directory of the
+.I lib
+directory, with a unique name.
+Each localization sub-directory has a name of the form:
+.so i18n.pic.so
+.TP 10n
+.I language
+is one of the 2-letter names
+from the ISO 639 standard.
+See
+.I http://www.ics.uci.edu/\%pub/\%ietf/\%http/\%related/\%iso639.txt
+for a list.
+.TP 10n
+.I territory
+is one of the 2-letter country codes from the
+ISO 3166 standard.
+See
+.I ftp://rs.internic.net/\%netinfo/\%iso3166-countrycodes
+for a list.
+.TP 10n
+.I codeset
+is one of the codeset names defined in RFC 1345.
+This simplifies the task of moving localizations between charsets,
+because GNU Recode understands them.
+See
+.I http://info.internet.isi.edu/\%1s/\%in-notes/\%rfc/\%files/\%rfc1345.txt
+for a list.
+.PP
+Here are some examples of localization names:
+.TS
+box,center,tab(;);
+c c
+l l.
+Name;Description
+_
+en.ascii;English, ASCII encoding
+en_us.ascii;English with US spelling
+de.latin1;German, Latin-1 encoding
+.TE
+.SS Localization Directory Contents
+Each localization sub-directory in turn contains sub-directories.
+These are:
+.TS
+box,center,tab(;);
+c c
+l l.
+Directory;Contents
+_
+LC_MESSAGES;The error message (PO) files
+building;The BUILDING file
+man1;The section 1 manual entries
+readme;The README file
+refman;The Reference Manual
+user-guide;The User Guide
+.TE
+.PP
+The structure is identical below each of the localization directories.
+The sub-directories of all localizations will have the same names.
+.br
+.ne 2i
+.SH INSTRUCTIONS FOR TRANSLATORS
+When translating the error messages, all of the substitutions
+described in
+.IR cook_sub (5)
+are also available.  Substitution variable
+names and function names may be abbreviated, in the same way
+that command line options are abbreviated, but abbreviation
+should probably be avoided.
+Substitution names will
+.I never
+be internationalized,
+otherwise the substitutions will stop working, Catch-22.
+.PP
+While Cook was written by an English speaker,
+the English
+localization is necessary, to translate the ``terse
+programmer'' style error messages into something more user
+friendly.
+.PP
+Messages which include command line options need to leave the
+command line options untranslated, because they are not yet
+internationalized, though they may be one day.
+.PP
+Each LC_MESSAGES directory within each localization
+contains a number of PO files.
+There is one for each program in the Cook package,
+plus one called \f(CWcommon.po\fP containing messages common to all of them.
+The MO file for each program is generated by naming
+the program specific PO file and also the common PO file.

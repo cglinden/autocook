@@ -1,0 +1,26 @@
+The autobuild cookbooks are an addition to the cook distribution
+and implement a build system intended for large scale development
+projects. Features include:
+
+  o  Automated dependency detection
+  o  Reliable incremental builds
+  o  RPM packing support
+  o  Third party package support
+  o  Java/maven handoff
+
+... and much more. For further information, see http://www.cg-soft.com/tools/build
+
+
+For a quick demo, run the following commands after unpacking this tarfile:
+
+% ./configure
+% make
+% cd examples
+% ../bin/b install
+
+
+Changelog
+
+1.1  Fixed bug in lib/autobuild/include/use/xml2
+     Left location of the tar command unspecified for now
+     Fixed bug in untar rule.
